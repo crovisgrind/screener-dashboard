@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screener Ibovespa - MRS/RSV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .pulse-green {
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">📊 Screener Ibovespa</h1>
+                    <p class="text-purple-200">Estratégia MRS/RSV - Análise em Tempo Real</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-purple-200">Última atualização</div>
+                    <div class="text-xl font-semibold" id="lastUpdate">Carregando...</div>
+                    <button onclick="atualizarDados()" class="mt-2 bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50 transition">
+                        🔄 Atualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="container mx-auto px-4 -mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Sinais Hoje</p>
+                        <p class="text-3xl font-bold text-gray-800" id="totalHoje">0</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded-full">
+                        <span class="text-3xl">🎯</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Compra Hoje</p>
+                        <p class="text-3xl font-bold text-green-600" id="comprasHoje">0</p>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-full pulse-green">
+                        <span class="text-3xl">🟢</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Próximos de Cruzar</p>
+                        <p class="text-3xl font-bold text-orange-600" id="proximosCruzar">0</p>
+                    </div>
+                    <div class="bg-orange-100 p-4 rounded-full">
+                        <span class="text-3xl">🔶</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Ações Analisadas</p>
+                        <p class="text-3xl font-bold text-purple-600" id="totalAcoes">0</p>
+                    </div>
+                    <div class="bg-purple-100 p-4 rounded-full">
+                        <span class="text-3xl">📈</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Sinais de Hoje -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.4s">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center">
+                        <span class="text-3xl mr-2">🎯</span>
+                        Sinais de Hoje
+                    </h2>
+                    <div id="sinaisHoje" class="space-y-4">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performers -->
+            <div>
+                <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.5s">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <span class="text-2xl mr-2">🌟</span>
+                        Top MRS
+                    </h2>
+                    <div id="topMRS" class="space-y-3">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos de Cruzar -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in" style="animation-delay: 0.6s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="text-3xl mr-2">🔶</span>
+                Próximos de Cruzar (< 2%)
+            </h2>
+            <div id="proximosCruzarLista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Cruzamentos Recentes -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in" style="animation-delay: 0.7s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="text-3xl mr-2">📅</span>
+                Cruzamentos Últimos 5 Dias
+            </h2>
+            <div id="cruzamentosRecentes" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">Screener Ibovespa - Estratégia MRS/RSV</p>
+            <p class="text-gray-500 text-sm mt-2">Dados fornecidos por Yahoo Finance</p>
+        </div>
+    </div>
+
+    <script>
+        // Dados de exemplo (você vai substituir por dados reais da API)
+        const dadosExemplo = {
+            lastUpdate: new Date().toLocaleString('pt-BR'),
+            totalAcoes: 103,
+            sinaisHoje: [
+                { ticker: 'PRIO3', tipo: 'COMPRA', mrs: 0.87, rsv: 28.88, preco: 45.73, emoji: '🟢' },
+                { ticker: 'TIMS3', tipo: 'COMPRA', mrs: 0.49, rsv: 88.72, preco: 24.21, emoji: '🟢' },
+                { ticker: 'FLRY3', tipo: 'VENDA', mrs: -0.15, rsv: -41.08, preco: 15.53, emoji: '🔴' }
+            ],
+            proximosCruzar: [
+                { ticker: 'ITUB4', mrs: -0.33, rsv: -6.06, preco: 39.84, distancia: 0.33 },
+                { ticker: 'WEGE3', mrs: -1.08, rsv: -39.61, preco: 46.51, distancia: 1.08 },
+                { ticker: 'BBDC4', mrs: -0.84, rsv: -15.22, preco: 19.11, distancia: 0.84 }
+            ],
+            cruzamentosRecentes: [
+                { ticker: 'CVCB3', tipo: 'COMPRA', mrs: -0.84, rsv: 229.10, preco: 2.48, diasAtras: 2 },
+                { ticker: 'SANB11', tipo: 'COMPRA', mrs: 1.41, rsv: 32.32, preco: 33.92, diasAtras: 2 },
+                { ticker: 'RDOR3', tipo: 'VENDA', mrs: -1.94, rsv: -52.41, preco: 39.91, diasAtras: 5 }
+            ],
+            topMRS: [
+                { ticker: 'VALE3', mrs: 24.08, preco: 79.83 },
+                { ticker: 'BBDC4', mrs: 3.10, preco: 19.11 },
+                { ticker: 'SANB11', mrs: 1.41, preco: 33.92 }
+            ]
+        };
+
+        function renderizarDados(dados) {
+            // Atualizar timestamp
+            document.getElementById('lastUpdate').textContent = dados.lastUpdate;
+            
+            // Atualizar cards
+            document.getElementById('totalHoje').textContent = dados.sinaisHoje.length;
+            document.getElementById('comprasHoje').textContent = dados.sinaisHoje.filter(s => s.tipo === 'COMPRA').length;
+            document.getElementById('proximosCruzar').textContent = dados.proximosCruzar.length;
+            document.getElementById('totalAcoes').textContent = dados.totalAcoes;
+
+            // Renderizar sinais de hoje
+            const sinaisHojeHTML = dados.sinaisHoje.map(sinal => `
+                <div class="border-l-4 ${sinal.tipo === 'COMPRA' ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'} p-4 rounded-lg card-hover">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-4xl">${sinal.emoji}</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">${sinal.ticker}</h3>
+                                <p class="text-gray-600">R$ ${sinal.preco.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex space-x-4">
+                                <div>
+                                    <p class="text-xs text-gray-500">MRS</p>
+                                    <p class="text-lg font-bold ${sinal.mrs >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                        ${sinal.mrs >= 0 ? '+' : ''}${sinal.mrs.toFixed(2)}%
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">RSV</p>
+                                    <p class="text-lg font-bold ${sinal.rsv >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                        ${sinal.rsv >= 0 ? '+' : ''}${sinal.rsv.toFixed(2)}%
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('sinaisHoje').innerHTML = sinaisHojeHTML || '<p class="text-gray-500 text-center py-8">Nenhum sinal hoje</p>';
+
+            // Renderizar próximos de cruzar
+            const proximosHTML = dados.proximosCruzar.map(acao => `
+                <div class="border border-orange-200 bg-orange-50 p-4 rounded-lg card-hover">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-gray-800">${acao.ticker}</h3>
+                        <span class="bg-orange-200 text-orange-800 px-2 py-1 rounded text-xs font-semibold">
+                            ${acao.distancia.toFixed(2)}% até cruzar
+                        </span>
+                    </div>
+                    <p class="text-gray-600 text-sm">R$ ${acao.preco.toFixed(2)}</p>
+                    <div class="flex justify-between mt-2 text-sm">
+                        <span class="text-gray-600">MRS: <span class="font-semibold">${acao.mrs.toFixed(2)}%</span></span>
+                        <span class="text-gray-600">RSV: <span class="font-semibold">${acao.rsv.toFixed(2)}%</span></span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('proximosCruzarLista').innerHTML = proximosHTML || '<p class="text-gray-500 col-span-3 text-center py-8">Nenhuma ação próxima de cruzar</p>';
+
+            // Renderizar cruzamentos recentes
+            const recentesHTML = dados.cruzamentosRecentes.map(acao => `
+                <div class="border ${acao.tipo === 'COMPRA' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'} p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold text-gray-800">${acao.ticker}</h3>
+                        <span class="${acao.tipo === 'COMPRA' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} px-2 py-1 rounded text-xs font-semibold">
+                            ${acao.tipo} há ${acao.diasAtras}d
+                        </span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">R$ ${acao.preco.toFixed(2)}</p>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">MRS: <span class="font-semibold ${acao.mrs >= 0 ? 'text-green-600' : 'text-red-600'}">${acao.mrs >= 0 ? '+' : ''}${acao.mrs.toFixed(2)}%</span></span>
+                        <span class="text-gray-600">RSV: <span class="font-semibold ${acao.rsv >= 0 ? 'text-green-600' : 'text-red-600'}">${acao.rsv >= 0 ? '+' : ''}${acao.rsv.toFixed(2)}%</span></span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('cruzamentosRecentes').innerHTML = recentesHTML || '<p class="text-gray-500 col-span-2 text-center py-8">Nenhum cruzamento recente</p>';
+
+            // Renderizar top MRS
+            const topMRSHTML = dados.topMRS.map(acao => `
+                <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                    <div>
+                        <p class="font-bold text-gray-800">${acao.ticker}</p>
+                        <p class="text-xs text-gray-600">R$ ${acao.preco.toFixed(2)}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-purple-600">${acao.mrs >= 0 ? '+' : ''}${acao.mrs.toFixed(2)}%</p>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('topMRS').innerHTML = topMRSHTML;
+        }
+
+        async function atualizarDados() {
+    try {
+        // Mostrar loading
+        document.getElementById('lastUpdate').textContent = 'Carregando...';
+        
+        // Chamar API
+        const response = await fetch('/api/screener');
+        const dados = await response.json();
+        
+        // Renderizar
+        renderizarDados(dados);
+    } catch (error) {
+        console.error('Erro ao atualizar:', error);
+        // Usar dados de exemplo em caso de erro
+        renderizarDados(dadosExemplo);
+    }
+}
+
+        // Carrega dados iniciais
+        atualizarDados();
+
+        // Atualiza a cada 5 minutos
+        setInterval(atualizarDados, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
