@@ -6,6 +6,19 @@ import json
 import yfinance as yf
 import pandas as pd
 from datetime import datetime
+import time
+
+# Cache simples (válido por 5 minutos)
+_cache = {'data': None, 'timestamp': 0}
+CACHE_DURATION = 3000  # 50 minutos
+
+def handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        # Verificar cache
+        now = time.time()
+        if _cache['data'] and (now - _cache['timestamp']) < CACHE_DURATION:
+            self.wfile.write(json.dumps(_cache['data']).encode())
+            return
 
 # Lista de ações (pode ser todas as 103 ou um subconjunto)
 ACOES_PRINCIPAIS = [
@@ -214,3 +227,6 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
+
+_cache['data'] = resposta
+_cache['timestamp'] = now
