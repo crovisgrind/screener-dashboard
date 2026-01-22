@@ -1,13 +1,14 @@
 # api/screener.py
-# API Serverless para rodar no Vercel
+# API com cache diário - atualiza apenas 1x por dia após fechamento da B3
 
 from http.server import BaseHTTPRequestHandler
 import json
 import yfinance as yf
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, time
+import pytz
 
-# Lista de ações (pode ser todas as 103 ou um subconjunto)
+# Lista de ações
 ACOES_PRINCIPAIS = [
     "ALOS3.SA","ABEV3.SA","ANIM3.SA","ASAI3.SA","AURE3.SA","AXIA3.SA","AXIA6.SA","AXIA7.SA",					
 "AZZA3.SA","B3SA3.SA","BBSE3.SA","BBDC3.SA","BBDC4.SA","BRAP4.SA","BBAS3.SA","BRKM5.SA",					
@@ -26,10 +27,49 @@ ACOES_PRINCIPAIS = [
 
 LENGTH = 200
 
+# ==================== CACHE DIÁRIO ====================
+# Cache que persiste apenas durante o dia
+_cache_diario = {
+    'data': None,
+    'data_processamento': None,
+    'em_processamento': False
+}
+
+def obter_data_pregao_atual():
+    """Retorna a data do pregão atual (BR timezone)"""
+    tz_br = pytz.timezone('America/Sao_Paulo')
+    agora_br = datetime.now(tz_br)
+    
+    # Se for antes das 18h30, considera pregão de hoje
+    # Se for após 18h30, já considera próximo pregão
+    hora_limite = time(18, 30)
+    
+    if agora_br.time() < hora_limite:
+        # Ainda é o pregão de ontem (dados não atualizaram)
+        data_pregao = agora_br.date()
+    else:
+        # Já passou 18h30, dados devem estar atualizados
+        data_pregao = agora_br.date()
+    
+    return data_pregao
+
+def cache_valido():
+    """Verifica se o cache ainda é válido para o pregão de hoje"""
+    data_pregao_atual = obter_data_pregao_atual()
+    
+    if _cache_diario['data'] is None:
+        return False
+    
+    if _cache_diario['data_processamento'] != data_pregao_atual:
+        return False
+    
+    return True
+
+# ==================== FUNÇÕES DE PROCESSAMENTO ====================
+
 def baixar_dados(ticker):
     """Baixa dados sem cache"""
     try:
-        # Força download fresco sem cache do yfinance
         df = yf.download(
             ticker, 
             period='1y', 
@@ -44,16 +84,13 @@ def baixar_dados(ticker):
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
         
-        # Debug: Log da última data disponível
-        if len(df) > 0:
-            print(f"[DEBUG] {ticker}: Última data = {df.index[-1]}, Preço = {df['Close'].iloc[-1]:.2f}")
-        
         return df if len(df) > LENGTH else None
     except Exception as e:
-        print(f"[ERROR] Falha ao baixar {ticker}: {e}")
+        print(f"[ERROR] {ticker}: {e}")
         return None
 
 def calcular_sinais(ticker, bova_data):
+    """Calcula sinais para uma ação"""
     try:
         df = baixar_dados(ticker)
         if df is None or len(df) < LENGTH:
@@ -102,7 +139,7 @@ def calcular_sinais(ticker, bova_data):
                 'emoji': '🔴'
             })
         
-        # Próximo de cruzar para CIMA
+        # Próximo de cruzar
         if -2 <= mrs_atual < 0 and rsv_atual > 0:
             if len(mrs) >= 3 and mrs.iloc[-3] < mrs.iloc[-2] < mrs_atual:
                 resultado['sinais'].append({
@@ -111,7 +148,7 @@ def calcular_sinais(ticker, bova_data):
                     'distancia': round(abs(mrs_atual), 2)
                 })
         
-        # Cruzamentos recentes (últimos 5 dias)
+        # Cruzamentos recentes
         for i in range(2, min(6, len(mrs))):
             if mrs.iloc[-i-1] <= 0 and mrs.iloc[-i] > 0 and rsv.iloc[-i] > 0:
                 resultado['sinais'].append({
@@ -142,97 +179,160 @@ def calcular_sinais(ticker, bova_data):
         return resultado
         
     except Exception as e:
-        print(f"Erro em {ticker}: {e}")
+        print(f"[ERROR] {ticker}: {e}")
         return None
+
+def processar_screener():
+    """Processa o screener completo"""
+    print(f"[INFO] Iniciando processamento do screener...")
+    
+    # Baixar BOVA11
+    bova_data = baixar_dados('BOVA11.SA')
+    
+    if bova_data is None:
+        print("[ERROR] Falha ao baixar BOVA11")
+        return None
+    
+    print(f"[INFO] BOVA11 baixado: {len(bova_data)} dias")
+    
+    # Processar ações
+    todas_acoes = []
+    sinais_hoje = []
+    proximos_cruzar = []
+    cruzamentos_recentes = []
+    
+    for i, ticker in enumerate(ACOES_PRINCIPAIS, 1):
+        print(f"[INFO] Processando {i}/{len(ACOES_PRINCIPAIS)}: {ticker}")
+        
+        resultado = calcular_sinais(ticker, bova_data)
+        
+        if resultado:
+            todas_acoes.append(resultado)
+            
+            for sinal in resultado['sinais']:
+                item = {
+                    'ticker': resultado['ticker'],
+                    'mrs': resultado['mrs'],
+                    'rsv': resultado['rsv'],
+                    'preco': resultado['preco']
+                }
+                
+                if sinal['tipo'] in ['COMPRA_HOJE', 'VENDA_HOJE']:
+                    item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
+                    item['emoji'] = sinal['emoji']
+                    sinais_hoje.append(item)
+                
+                elif sinal['tipo'] == 'PROXIMO_COMPRA':
+                    item['distancia'] = sinal['distancia']
+                    proximos_cruzar.append(item)
+                
+                elif sinal['tipo'] in ['COMPRA_RECENTE', 'VENDA_RECENTE']:
+                    item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
+                    item['diasAtras'] = sinal['dias_atras']
+                    cruzamentos_recentes.append(item)
+    
+    # Top MRS
+    todas_acoes_ordenadas = sorted(todas_acoes, key=lambda x: x['mrs'], reverse=True)
+    top_mrs = [
+        {
+            'ticker': acao['ticker'],
+            'mrs': acao['mrs'],
+            'preco': acao['preco']
+        }
+        for acao in todas_acoes_ordenadas[:10]
+    ]
+    
+    # Obter última data de dados
+    ultima_data = bova_data.index[-1].strftime('%d/%m/%Y')
+    
+    # Montar resposta
+    tz_br = pytz.timezone('America/Sao_Paulo')
+    agora_br = datetime.now(tz_br)
+    
+    resposta = {
+        'lastUpdate': agora_br.strftime('%d/%m/%Y %H:%M:%S'),
+        'dataDados': ultima_data,
+        'timestamp': int(agora_br.timestamp()),
+        'totalAcoes': len(ACOES_PRINCIPAIS),
+        'sinaisHoje': sinais_hoje,
+        'proximosCruzar': proximos_cruzar,
+        'cruzamentosRecentes': cruzamentos_recentes,
+        'topMRS': top_mrs,
+        'cacheInfo': {
+            'cached': False,
+            'dataProcessamento': obter_data_pregao_atual().isoformat()
+        }
+    }
+    
+    print(f"[INFO] Processamento concluído: {len(sinais_hoje)} sinais hoje")
+    
+    return resposta
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # Headers CORS + Desabilitar Cache
+        # Headers
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
+        self.send_header('Cache-Control', 'public, max-age=3600')  # Cache de 1 hora no browser
         self.end_headers()
         
         try:
-            # Baixar BOVA11
-            bova_data = baixar_dados('BOVA11.SA')
-            
-            if bova_data is None:
-                self.wfile.write(json.dumps({
-                    'error': 'Erro ao baixar dados do BOVA11'
-                }).encode())
+            # Verificar se cache é válido
+            if cache_valido():
+                print("[INFO] Usando cache do dia")
+                resposta = _cache_diario['data'].copy()
+                resposta['cacheInfo']['cached'] = True
+                
+                self.wfile.write(json.dumps(resposta).encode())
                 return
             
-            # Processar ações
-            todas_acoes = []
-            sinais_hoje = []
-            proximos_cruzar = []
-            cruzamentos_recentes = []
+            # Se outro request já está processando, aguarda
+            if _cache_diario['em_processamento']:
+                print("[INFO] Processamento em andamento, aguardando...")
+                # Retorna dados em cache (mesmo que antigos) ou erro
+                if _cache_diario['data']:
+                    resposta = _cache_diario['data'].copy()
+                    resposta['cacheInfo']['cached'] = True
+                    resposta['cacheInfo']['processando'] = True
+                    self.wfile.write(json.dumps(resposta).encode())
+                else:
+                    self.wfile.write(json.dumps({
+                        'error': 'Processamento em andamento, tente novamente em 30 segundos'
+                    }).encode())
+                return
             
-            for ticker in ACOES_PRINCIPAIS:
-                resultado = calcular_sinais(ticker, bova_data)
+            # Marcar como em processamento
+            _cache_diario['em_processamento'] = True
+            
+            print("[INFO] Cache inválido, processando nova análise...")
+            
+            # Processar screener
+            resposta = processar_screener()
+            
+            if resposta:
+                # Atualizar cache
+                _cache_diario['data'] = resposta
+                _cache_diario['data_processamento'] = obter_data_pregao_atual()
                 
-                if resultado:
-                    todas_acoes.append(resultado)
-                    
-                    # Classificar sinais
-                    for sinal in resultado['sinais']:
-                        item = {
-                            'ticker': resultado['ticker'],
-                            'mrs': resultado['mrs'],
-                            'rsv': resultado['rsv'],
-                            'preco': resultado['preco']
-                        }
-                        
-                        if sinal['tipo'] in ['COMPRA_HOJE', 'VENDA_HOJE']:
-                            item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
-                            item['emoji'] = sinal['emoji']
-                            sinais_hoje.append(item)
-                        
-                        elif sinal['tipo'] == 'PROXIMO_COMPRA':
-                            item['distancia'] = sinal['distancia']
-                            proximos_cruzar.append(item)
-                        
-                        elif sinal['tipo'] in ['COMPRA_RECENTE', 'VENDA_RECENTE']:
-                            item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
-                            item['diasAtras'] = sinal['dias_atras']
-                            cruzamentos_recentes.append(item)
-            
-            # Top MRS
-            todas_acoes_ordenadas = sorted(todas_acoes, key=lambda x: x['mrs'], reverse=True)
-            top_mrs = [
-                {
-                    'ticker': acao['ticker'],
-                    'mrs': acao['mrs'],
-                    'preco': acao['preco']
-                }
-                for acao in todas_acoes_ordenadas[:10]
-            ]
-            
-            # Montar resposta
-            now_utc = datetime.utcnow()
-            now_brasilia = datetime.now()  # Timezone do servidor Vercel é UTC
-            
-            resposta = {
-                'lastUpdate': now_brasilia.strftime('%d/%m/%Y %H:%M:%S'),
-                'serverTime': now_utc.strftime('%Y-%m-%d %H:%M:%S UTC'),
-                'timestamp': int(now_utc.timestamp()),
-                'totalAcoes': len(ACOES_PRINCIPAIS),
-                'sinaisHoje': sinais_hoje,
-                'proximosCruzar': proximos_cruzar,
-                'cruzamentosRecentes': cruzamentos_recentes,
-                'topMRS': top_mrs
-            }
-            
-            self.wfile.write(json.dumps(resposta).encode())
+                self.wfile.write(json.dumps(resposta).encode())
+            else:
+                self.wfile.write(json.dumps({
+                    'error': 'Erro ao processar screener'
+                }).encode())
             
         except Exception as e:
+            print(f"[ERROR] {e}")
+            import traceback
+            traceback.print_exc()
+            
             self.wfile.write(json.dumps({
                 'error': str(e)
             }).encode())
+        
+        finally:
+            # Desmarcar processamento
+            _cache_diario['em_processamento'] = False
 
     def do_OPTIONS(self):
         self.send_response(200)
