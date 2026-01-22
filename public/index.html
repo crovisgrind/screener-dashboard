@@ -40,8 +40,8 @@
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-4xl font-bold mb-2">🚀 Foguetão Cartesius</h1>
-                    <p class="text-purple-200">Estratégia RSI/Volume - Análise em Tempo Real</p>
+                    <h1 class="text-4xl font-bold mb-2">📊 Screener Ibovespa</h1>
+                    <p class="text-purple-200">Estratégia MRS/RSV - Análise em Tempo Real</p>
                 </div>
                 <div class="text-right">
                     <div class="text-sm text-purple-200">Última atualização</div>
@@ -127,7 +127,7 @@
                 <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.5s">
                     <h2 class="text-xl font-bold mb-4 flex items-center">
                         <span class="text-2xl mr-2">🌟</span>
-                        Top Volumão
+                        Top MRS
                     </h2>
                     <div id="topMRS" class="space-y-3">
                         <!-- Será preenchido via JavaScript -->
@@ -196,7 +196,17 @@
 
         function renderizarDados(dados) {
             // Atualizar timestamp
-            document.getElementById('lastUpdate').textContent = dados.lastUpdate;
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = dados.lastUpdate || now.toLocaleString('pt-BR');
+            
+            // Adicionar indicador de dados reais vs exemplo
+            const updateElement = document.getElementById('lastUpdate');
+            if (dados === dadosExemplo) {
+                updateElement.innerHTML = `
+                    <span class="text-yellow-300">⚠️ Usando dados de exemplo</span>
+                    <br><small class="text-xs">API não disponível</small>
+                `;
+            }
             
             // Atualizar cards
             document.getElementById('totalHoje').textContent = dados.sinaisHoje.length;
@@ -288,22 +298,28 @@
         }
 
         async function atualizarDados() {
-    try {
-        // Mostrar loading
-        document.getElementById('lastUpdate').textContent = 'Carregando...';
-        
-        // Chamar API
-        const response = await fetch('/api/screener');
-        const dados = await response.json();
-        
-        // Renderizar
-        renderizarDados(dados);
-    } catch (error) {
-        console.error('Erro ao atualizar:', error);
-        // Usar dados de exemplo em caso de erro
-        renderizarDados(dadosExemplo);
-    }
-}
+            try {
+                // Adiciona timestamp para forçar bypass do cache
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/api/screener?t=${timestamp}`, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro na API');
+                }
+                
+                const dados = await response.json();
+                renderizarDados(dados);
+            } catch (error) {
+                console.error('Erro ao atualizar:', error);
+                // Em caso de erro, mostra dados de exemplo
+                renderizarDados(dadosExemplo);
+            }
+        }
 
         // Carrega dados iniciais
         atualizarDados();
