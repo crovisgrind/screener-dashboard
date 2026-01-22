@@ -1,12 +1,21 @@
-# api/screener.py
+# Lista de ações
+ACOES_PRINCIPAIS = [
+    'PETR4.SA', 'VALE3.SA', 'ITUB4.SA', 'BBDC4.SA', 'WEGE3.SA',
+    'ABEV3.SA', 'MGLU3.SA', 'RENT3.SA', 'B3SA3.SA', 'PRIO3.SA',
+    'LREN3.SA', 'RADL3.SA', 'EGIE3.SA', 'CMIG4.SA', 'SANB11.SA',
+    'RAIL3.SA', 'VIVT3.SA', 'TIMS3.SA', 'CSAN3.SA', 'SUZB3.SA',
+    'FLRY3.SA', 'CVCB3.SA', 'RDOR3.SA', 'SIMH3.SA',
+    'AURE3.SA', 'BRAV3.SA', 'CEAB3.SA'
+    # Adicione suas outras ações aqui
+]# api/screener.py
 # API com cache diário - atualiza apenas 1x por dia após fechamento da B3
 
 from http.server import BaseHTTPRequestHandler
 import json
 import yfinance as yf
 import pandas as pd
-from datetime import datetime, time
-import pytz
+from datetime import datetime, time, timedelta
+import os
 
 # Lista de ações
 ACOES_PRINCIPAIS = [
@@ -36,19 +45,19 @@ _cache_diario = {
 }
 
 def obter_data_pregao_atual():
-    """Retorna a data do pregão atual (BR timezone)"""
-    tz_br = pytz.timezone('America/Sao_Paulo')
-    agora_br = datetime.now(tz_br)
+    """Retorna a data do pregão atual (considerando timezone BR = UTC-3)"""
+    # Vercel usa UTC, BR é UTC-3
+    agora_utc = datetime.utcnow()
+    agora_br = agora_utc - timedelta(hours=3)
     
-    # Se for antes das 18h30, considera pregão de hoje
-    # Se for após 18h30, já considera próximo pregão
+    # Se for antes das 18h30 BRT, ainda não temos dados de hoje
     hora_limite = time(18, 30)
     
     if agora_br.time() < hora_limite:
-        # Ainda é o pregão de ontem (dados não atualizaram)
-        data_pregao = agora_br.date()
+        # Ainda não passou das 18h30 BR, dados são de ontem
+        data_pregao = (agora_br - timedelta(days=1)).date()
     else:
-        # Já passou 18h30, dados devem estar atualizados
+        # Já passou 18h30 BR, dados devem estar atualizados
         data_pregao = agora_br.date()
     
     return data_pregao
@@ -67,27 +76,61 @@ def cache_valido():
 
 # ==================== FUNÇÕES DE PROCESSAMENTO ====================
 
-def baixar_dados(ticker):
-    """Baixa dados sem cache"""
-    try:
-        df = yf.download(
-            ticker, 
-            period='1y', 
-            interval='1d', 
-            progress=False,
-            auto_adjust=True,
-            prepost=False,
-            actions=False,
-            keepna=False
-        )
-        
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.get_level_values(0)
-        
-        return df if len(df) > LENGTH else None
-    except Exception as e:
-        print(f"[ERROR] {ticker}: {e}")
-        return None
+def baixar_dados(ticker, max_retries=2):
+    """Baixa dados com retry"""
+    for tentativa in range(max_retries):
+        try:
+            print(f"[INFO] Baixando {ticker} (tentativa {tentativa + 1}/{max_retries})...")
+            
+            df = yf.download(
+                ticker, 
+                period='1y', 
+                interval='1d', 
+                progress=False,
+                auto_adjust=True,
+                prepost=False,
+                actions=False,
+                keepna=False,
+                threads=False
+            )
+            
+            # Verificar se retornou dados válidos
+            if df is None or len(df) == 0:
+                print(f"[WARN] {ticker}: DataFrame vazio na tentativa {tentativa + 1}")
+                if tentativa < max_retries - 1:
+                    continue
+                return None
+            
+            # Proteção extra para MultiIndex
+            if hasattr(df, 'columns'):
+                if isinstance(df.columns, pd.MultiIndex):
+                    df.columns = df.columns.get_level_values(0)
+            
+            # Verificar se tem colunas necessárias
+            required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+            missing_cols = [col for col in required_cols if col not in df.columns]
+            
+            if missing_cols:
+                print(f"[ERROR] {ticker}: Faltam colunas {missing_cols}")
+                return None
+            
+            # Verificar quantidade mínima de dados
+            if len(df) < LENGTH:
+                print(f"[WARN] {ticker}: Apenas {len(df)} dias (mínimo {LENGTH})")
+                return None
+            
+            print(f"[SUCCESS] {ticker}: {len(df)} dias baixados")
+            return df
+            
+        except Exception as e:
+            print(f"[ERROR] Tentativa {tentativa + 1} falhou para {ticker}: {str(e)}")
+            if tentativa < max_retries - 1:
+                import time
+                time.sleep(1)  # Aguarda 1 segundo antes de retry
+                continue
+            return None
+    
+    return None
 
 def calcular_sinais(ticker, bova_data):
     """Calcula sinais para uma ação"""
@@ -186,14 +229,15 @@ def processar_screener():
     """Processa o screener completo"""
     print(f"[INFO] Iniciando processamento do screener...")
     
-    # Baixar BOVA11
+    # Baixar BOVA11 (essencial para cálculo de RSV - tem volume)
     bova_data = baixar_dados('BOVA11.SA')
     
     if bova_data is None:
-        print("[ERROR] Falha ao baixar BOVA11")
+        print("[ERROR] BOVA11.SA indisponível - aguarde alguns minutos e tente novamente")
+        print("[INFO] O Yahoo Finance às vezes tem problemas temporários com ETFs")
         return None
     
-    print(f"[INFO] BOVA11 baixado: {len(bova_data)} dias")
+    print(f"[INFO] BOVA11 baixado com sucesso: {len(bova_data)} dias")
     
     # Processar ações
     todas_acoes = []
@@ -246,13 +290,13 @@ def processar_screener():
     ultima_data = bova_data.index[-1].strftime('%d/%m/%Y')
     
     # Montar resposta
-    tz_br = pytz.timezone('America/Sao_Paulo')
-    agora_br = datetime.now(tz_br)
+    agora_utc = datetime.utcnow()
+    agora_br = agora_utc - timedelta(hours=3)
     
     resposta = {
         'lastUpdate': agora_br.strftime('%d/%m/%Y %H:%M:%S'),
         'dataDados': ultima_data,
-        'timestamp': int(agora_br.timestamp()),
+        'timestamp': int(agora_utc.timestamp()),
         'totalAcoes': len(ACOES_PRINCIPAIS),
         'sinaisHoje': sinais_hoje,
         'proximosCruzar': proximos_cruzar,
@@ -317,17 +361,24 @@ class handler(BaseHTTPRequestHandler):
                 
                 self.wfile.write(json.dumps(resposta).encode())
             else:
+                # Retornar mensagem amigável se BOVA11 estiver indisponível
                 self.wfile.write(json.dumps({
-                    'error': 'Erro ao processar screener'
+                    'error': 'Dados temporariamente indisponíveis',
+                    'message': 'O Yahoo Finance está com problemas no BOVA11. Tente novamente em alguns minutos.',
+                    'retry': True,
+                    'timestamp': datetime.utcnow().isoformat()
                 }).encode())
             
         except Exception as e:
-            print(f"[ERROR] {e}")
+            print(f"[ERROR] Erro crítico: {e}")
             import traceback
-            traceback.print_exc()
+            error_details = traceback.format_exc()
+            print(error_details)
             
             self.wfile.write(json.dumps({
-                'error': str(e)
+                'error': 'Erro ao processar screener',
+                'details': str(e),
+                'trace': error_details if 'VERCEL_ENV' not in os.environ else None
             }).encode())
         
         finally:

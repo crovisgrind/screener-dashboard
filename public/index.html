@@ -305,10 +305,10 @@
             document.getElementById('topMRS').innerHTML = topMRSHTML;
         }
 
-        async function atualizarDados() {
+        async function atualizarDados(tentativa = 1, maxTentativas = 3) {
             try {
                 const response = await fetch('/api/screener', {
-                    cache: 'default'  // Permite cache do browser
+                    cache: 'default'
                 });
                 
                 if (!response.ok) {
@@ -316,10 +316,41 @@
                 }
                 
                 const dados = await response.json();
+                
+                // Verificar se é erro de BOVA11 indisponível
+                if (dados.error && dados.retry) {
+                    console.warn(`Tentativa ${tentativa}/${maxTentativas}: ${dados.message}`);
+                    
+                    // Mostrar mensagem ao usuário
+                    const updateElement = document.getElementById('lastUpdate');
+                    updateElement.innerHTML = `
+                        <span class="text-yellow-300">⏳ ${dados.message}</span>
+                        <br><small class="text-xs">Tentando novamente... (${tentativa}/${maxTentativas})</small>
+                    `;
+                    
+                    // Retry após 10 segundos se não for última tentativa
+                    if (tentativa < maxTentativas) {
+                        setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 10000);
+                    } else {
+                        updateElement.innerHTML = `
+                            <span class="text-red-300">❌ Dados indisponíveis</span>
+                            <br><small class="text-xs">Tente novamente mais tarde</small>
+                        `;
+                    }
+                    return;
+                }
+                
                 renderizarDados(dados);
             } catch (error) {
                 console.error('Erro ao atualizar:', error);
-                renderizarDados(dadosExemplo);
+                
+                // Retry em caso de erro de rede
+                if (tentativa < maxTentativas) {
+                    console.log(`Erro de rede, tentando novamente em 5s... (${tentativa}/${maxTentativas})`);
+                    setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 5000);
+                } else {
+                    renderizarDados(dadosExemplo);
+                }
             }
         }
 
