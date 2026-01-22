@@ -195,16 +195,36 @@
         };
 
         function renderizarDados(dados) {
-            // Atualizar timestamp
-            const now = new Date();
-            document.getElementById('lastUpdate').textContent = dados.lastUpdate || now.toLocaleString('pt-BR');
-            
-            // Adicionar indicador de dados reais vs exemplo
+            // Atualizar timestamp com indicador de frescor
             const updateElement = document.getElementById('lastUpdate');
+            
             if (dados === dadosExemplo) {
                 updateElement.innerHTML = `
-                    <span class="text-yellow-300">⚠️ Usando dados de exemplo</span>
-                    <br><small class="text-xs">API não disponível</small>
+                    <span class="text-yellow-300">⚠️ Dados de exemplo</span>
+                    <br><small class="text-xs">API indisponível</small>
+                `;
+            } else {
+                const agora = new Date();
+                const timestampAPI = dados.timestamp ? new Date(dados.timestamp * 1000) : null;
+                const minutosAtras = timestampAPI ? Math.floor((agora - timestampAPI) / 60000) : 0;
+                
+                let freshnessIndicator = '';
+                let freshnessColor = 'text-white';
+                
+                if (minutosAtras < 5) {
+                    freshnessIndicator = '🟢 Dados frescos';
+                    freshnessColor = 'text-green-300';
+                } else if (minutosAtras < 30) {
+                    freshnessIndicator = '🟡 Dados recentes';
+                    freshnessColor = 'text-yellow-300';
+                } else {
+                    freshnessIndicator = '🔴 Dados antigos';
+                    freshnessColor = 'text-red-300';
+                }
+                
+                updateElement.innerHTML = `
+                    ${dados.lastUpdate}
+                    <br><small class="text-xs ${freshnessColor}">${freshnessIndicator} ${minutosAtras > 0 ? `(${minutosAtras}min atrás)` : ''}</small>
                 `;
             }
             

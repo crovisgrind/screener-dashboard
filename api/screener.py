@@ -27,12 +27,30 @@ ACOES_PRINCIPAIS = [
 LENGTH = 200
 
 def baixar_dados(ticker):
+    """Baixa dados sem cache"""
     try:
-        df = yf.download(ticker, period='1y', interval='1d', progress=False)
+        # Força download fresco sem cache do yfinance
+        df = yf.download(
+            ticker, 
+            period='1y', 
+            interval='1d', 
+            progress=False,
+            auto_adjust=True,
+            prepost=False,
+            actions=False,
+            keepna=False
+        )
+        
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
+        
+        # Debug: Log da última data disponível
+        if len(df) > 0:
+            print(f"[DEBUG] {ticker}: Última data = {df.index[-1]}, Preço = {df['Close'].iloc[-1]:.2f}")
+        
         return df if len(df) > LENGTH else None
-    except:
+    except Exception as e:
+        print(f"[ERROR] Falha ao baixar {ticker}: {e}")
         return None
 
 def calcular_sinais(ticker, bova_data):
@@ -195,8 +213,13 @@ class handler(BaseHTTPRequestHandler):
             ]
             
             # Montar resposta
+            now_utc = datetime.utcnow()
+            now_brasilia = datetime.now()  # Timezone do servidor Vercel é UTC
+            
             resposta = {
-                'lastUpdate': datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
+                'lastUpdate': now_brasilia.strftime('%d/%m/%Y %H:%M:%S'),
+                'serverTime': now_utc.strftime('%Y-%m-%d %H:%M:%S UTC'),
+                'timestamp': int(now_utc.timestamp()),
                 'totalAcoes': len(ACOES_PRINCIPAIS),
                 'sinaisHoje': sinais_hoje,
                 'proximosCruzar': proximos_cruzar,
