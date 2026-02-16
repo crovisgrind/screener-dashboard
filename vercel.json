@@ -5,20 +5,20 @@
     {
       "src": "api/screener.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/screener",
-      "dest": "/api/screener.py",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Access-Control-Allow-Origin": "*"
-      }
+      "dest": "/api/screener.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "src": "/",
+      "dest": "/index.html"
     }
   ]
 }
