@@ -329,50 +329,49 @@
 
         async function atualizarDados(tentativa = 1, maxTentativas = 3) {
             try {
-                const response = await fetch('/api/screener', {
-                    cache: 'default'
-                });
+                // URL relativa garante funcionar em qualquer domínio
+                const url = '/api/screener';
+                console.log(`[DEBUG] Buscando: ${url} (tentativa ${tentativa})`);
+                
+                const response = await fetch(url, { cache: 'default' });
+                
+                console.log(`[DEBUG] Status: ${response.status}`);
+                
+                if (response.status === 404) {
+                    throw new Error('API não encontrada (404) - verifique a estrutura do projeto no Vercel');
+                }
                 
                 if (!response.ok) {
-                    throw new Error('Erro na API');
+                    throw new Error(`Erro na API: ${response.status}`);
                 }
                 
                 const dados = await response.json();
+                console.log('[DEBUG] Dados recebidos:', dados);
                 
-                // Verificar se é erro de BOVA11 indisponível
                 if (dados.error && dados.retry) {
-                    console.warn(`Tentativa ${tentativa}/${maxTentativas}: ${dados.message}`);
-                    
-                    // Mostrar mensagem ao usuário
-                    const updateElement = document.getElementById('lastUpdate');
-                    updateElement.innerHTML = `
+                    document.getElementById('lastUpdate').innerHTML = `
                         <span class="text-yellow-300">⏳ ${dados.message}</span>
                         <br><small class="text-xs">Tentando novamente... (${tentativa}/${maxTentativas})</small>
                     `;
-                    
-                    // Retry após 10 segundos se não for última tentativa
                     if (tentativa < maxTentativas) {
                         setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 10000);
                     } else {
-                        updateElement.innerHTML = `
-                            <span class="text-red-300">❌ Dados indisponíveis</span>
-                            <br><small class="text-xs">Tente novamente mais tarde</small>
+                        document.getElementById('lastUpdate').innerHTML = `
+                            <span class="text-red-300">❌ Tente mais tarde</span>
                         `;
                     }
                     return;
                 }
                 
                 renderizarDados(dados);
-            } catch (error) {
-                console.error('Erro ao atualizar:', error);
                 
-                // Retry em caso de erro de rede
-                if (tentativa < maxTentativas) {
-                    console.log(`Erro de rede, tentando novamente em 5s... (${tentativa}/${maxTentativas})`);
-                    setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 5000);
-                } else {
-                    renderizarDados(dadosExemplo);
-                }
+            } catch (error) {
+                console.error('[ERROR] Erro ao atualizar:', error.message);
+                document.getElementById('lastUpdate').innerHTML = `
+                    <span class="text-red-300">❌ ${error.message}</span>
+                `;
+                // Mostra dados de exemplo para não ficar tela vazia
+                renderizarDados(dadosExemplo);
             }
         }
 
