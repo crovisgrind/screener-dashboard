@@ -7,7 +7,7 @@
       "use": "@vercel/python"
     },
     {
-      "src": "index.html",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
@@ -17,8 +17,8 @@
       "dest": "/api/screener.py"
     },
     {
-      "src": "/",
-      "dest": "/index.html"
+      "src": "/(.*)",
+      "dest": "/public/$1"
     }
   ]
 }
