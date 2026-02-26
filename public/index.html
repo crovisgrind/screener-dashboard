@@ -552,9 +552,10 @@
   <div class="topbar-right">
     <div class="update-info">
       <div class="update-label">última atualização</div>
-      <div class="update-time"><span class="dot"></span>26/02/2026 17:42:10</div>
+      <div class="update-time" id="updateTime"><span class="dot"></span>carregando...</div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--mono)" id="cacheInfo"></div>
     </div>
-    <button class="btn-refresh">↻ atualizar</button>
+    <button class="btn-refresh" onclick="forceUpdate(event)">↻ atualizar</button>
   </div>
 </div>
 
@@ -565,19 +566,19 @@
   <div class="stat-strip" style="margin-bottom:40px">
     <div class="stat fade-in">
       <span class="stat-label">Sinais Hoje</span>
-      <span class="stat-value">3</span>
+      <span class="stat-value" id="statTotal">—</span>
     </div>
     <div class="stat fade-in">
       <span class="stat-label">Compras</span>
-      <span class="stat-value buy">2</span>
+      <span class="stat-value buy" id="statCompras">—</span>
     </div>
     <div class="stat fade-in">
       <span class="stat-label">Próx. de Cruzar</span>
-      <span class="stat-value warn">3</span>
+      <span class="stat-value warn" id="statProximos">—</span>
     </div>
     <div class="stat fade-in">
       <span class="stat-label">Ações Analisadas</span>
-      <span class="stat-value muted">98</span>
+      <span class="stat-value muted" id="statAcoes">—</span>
     </div>
   </div>
 
@@ -596,39 +597,7 @@
       <span class="col-label col-rsv" style="text-align:right">RSV</span>
       <span class="col-label col-rsv-badge" style="text-align:right">RSV streak</span>
     </div>
-
-    <div class="sig-row">
-      <div><span class="type-pill buy">COMPRA</span></div>
-      <div class="ticker-cell">
-        <span class="ticker-name">PRIO3</span>
-      </div>
-      <div class="metric neutral cell-price" style="text-align:right">R$ 45,73</div>
-      <div class="metric pos" style="text-align:right">+0.87%</div>
-      <div class="metric pos cell-rsv" style="text-align:right">+28.88%</div>
-      <div class="cell-rsv-badge" style="text-align:right"><span class="rsv-badge start">🌱 3d</span></div>
-    </div>
-
-    <div class="sig-row">
-      <div><span class="type-pill buy">COMPRA</span></div>
-      <div class="ticker-cell">
-        <span class="ticker-name">TIMS3</span>
-      </div>
-      <div class="metric neutral cell-price" style="text-align:right">R$ 24,21</div>
-      <div class="metric pos" style="text-align:right">+0.49%</div>
-      <div class="metric pos cell-rsv" style="text-align:right">+88.72%</div>
-      <div class="cell-rsv-badge" style="text-align:right"><span class="rsv-badge strong">💪 12d</span></div>
-    </div>
-
-    <div class="sig-row">
-      <div><span class="type-pill sell">VENDA</span></div>
-      <div class="ticker-cell">
-        <span class="ticker-name">FLRY3</span>
-      </div>
-      <div class="metric neutral cell-price" style="text-align:right">R$ 15,53</div>
-      <div class="metric neg" style="text-align:right">−0.15%</div>
-      <div class="metric neg cell-rsv" style="text-align:right">−41.08%</div>
-      <div class="cell-rsv-badge" style="text-align:right"><span class="rsv-badge cold">❄️ −8d</span></div>
-    </div>
+    <div id="sinaisRows"></div>
   </div>
 
   <!-- PRÓXIMOS DE CRUZAR -->
@@ -637,52 +606,7 @@
     <span class="section-hint">MRS entre −2% e 0%, RSV positivo</span>
   </div>
 
-  <div class="near-grid">
-    <div class="near-card fade-in">
-      <div class="near-header">
-        <span class="near-ticker">ITUB4</span>
-        <span class="near-dist">falta 0.33%</span>
-      </div>
-      <div class="near-price">R$ 39,84</div>
-      <div class="near-metrics">
-        <div class="metric-pair">
-          <span class="lbl">MRS</span><span class="neg metric">−0.33%</span>
-          <span class="lbl">RSV</span><span class="neg metric">−6.06%</span>
-        </div>
-        <span class="rsv-badge cold">🔻 −5d</span>
-      </div>
-    </div>
-
-    <div class="near-card fade-in">
-      <div class="near-header">
-        <span class="near-ticker">WEGE3</span>
-        <span class="near-dist">falta 1.08%</span>
-      </div>
-      <div class="near-price">R$ 46,51</div>
-      <div class="near-metrics">
-        <div class="metric-pair">
-          <span class="lbl">MRS</span><span class="neg metric">−1.08%</span>
-          <span class="lbl">RSV</span><span class="neg metric">−39.61%</span>
-        </div>
-        <span class="rsv-badge cold">❄️ −12d</span>
-      </div>
-    </div>
-
-    <div class="near-card fade-in">
-      <div class="near-header">
-        <span class="near-ticker">BBDC4</span>
-        <span class="near-dist">falta 0.84%</span>
-      </div>
-      <div class="near-price">R$ 19,11</div>
-      <div class="near-metrics">
-        <div class="metric-pair">
-          <span class="lbl">MRS</span><span class="neg metric">−0.84%</span>
-          <span class="lbl">RSV</span><span class="neg metric">−15.22%</span>
-        </div>
-        <span class="rsv-badge cold">🔻 −3d</span>
-      </div>
-    </div>
-  </div>
+  <div class="near-grid" id="nearGrid"></div>
 
   <!-- CRUZAMENTOS RECENTES -->
   <div class="section-header fade-in">
@@ -690,168 +614,239 @@
     <span class="section-hint">sinal gerado nos últimos pregões</span>
   </div>
 
-  <div class="recent-grid fade-in">
-    <div class="recent-card buy">
-      <div class="recent-header">
-        <span class="recent-ticker">CVCB3</span>
-        <span class="recent-when">COMPRA · há 2d</span>
-      </div>
-      <div class="recent-price">R$ 2,48</div>
-      <div class="recent-metrics">
-        <div class="metric-pair">
-          <span class="lbl">MRS</span><span class="neg metric">−0.84%</span>
-          <span class="lbl">RSV</span><span class="pos metric">+229.10%</span>
-        </div>
-        <span class="rsv-badge fire">🔥 21d</span>
-      </div>
-    </div>
-
-    <div class="recent-card buy">
-      <div class="recent-header">
-        <span class="recent-ticker">SANB11</span>
-        <span class="recent-when">COMPRA · há 2d</span>
-      </div>
-      <div class="recent-price">R$ 33,92</div>
-      <div class="recent-metrics">
-        <div class="metric-pair">
-          <span class="lbl">MRS</span><span class="pos metric">+1.41%</span>
-          <span class="lbl">RSV</span><span class="pos metric">+32.32%</span>
-        </div>
-        <span class="rsv-badge mod">📈 7d</span>
-      </div>
-    </div>
-
-    <div class="recent-card sell">
-      <div class="recent-header">
-        <span class="recent-ticker">RDOR3</span>
-        <span class="recent-when">VENDA · há 5d</span>
-      </div>
-      <div class="recent-price">R$ 39,91</div>
-      <div class="recent-metrics">
-        <div class="metric-pair">
-          <span class="lbl">MRS</span><span class="neg metric">−1.94%</span>
-          <span class="lbl">RSV</span><span class="neg metric">−52.41%</span>
-        </div>
-        <span class="rsv-badge cold">📉 −6d</span>
-      </div>
-    </div>
-  </div>
+  <div class="recent-grid fade-in" id="recentGrid"></div>
 
   <!-- TOP MRS + VOLUME -->
   <div class="two-col fade-in">
-    <!-- Top MRS -->
     <div class="panel">
-      <div class="panel-head">
-        <div class="section-title">Top MRS</div>
-      </div>
-      <div class="panel-body">
-        <div class="rank-row">
-          <span class="rank-num">1</span>
-          <div style="flex:1">
-            <div class="rank-ticker">VALE3</div>
-            <div class="rank-price">R$ 79,83</div>
-          </div>
-          <span class="rsv-badge strong" style="margin-right:10px">💪 8d</span>
-          <span class="rank-mrs pos">+24.08%</span>
-        </div>
-        <div class="rank-row">
-          <span class="rank-num">2</span>
-          <div style="flex:1">
-            <div class="rank-ticker">BBDC4</div>
-            <div class="rank-price">R$ 19,11</div>
-          </div>
-          <span class="rsv-badge cold" style="margin-right:10px">🔻 −5d</span>
-          <span class="rank-mrs pos">+3.10%</span>
-        </div>
-        <div class="rank-row">
-          <span class="rank-num">3</span>
-          <div style="flex:1">
-            <div class="rank-ticker">SANB11</div>
-            <div class="rank-price">R$ 33,92</div>
-          </div>
-          <span class="rsv-badge mod" style="margin-right:10px">📈 7d</span>
-          <span class="rank-mrs pos">+1.41%</span>
-        </div>
-      </div>
+      <div class="panel-head"><div class="section-title">Top MRS</div></div>
+      <div class="panel-body" id="topMRSRows"></div>
     </div>
-
-    <!-- Top RSV Consistente -->
     <div class="panel">
-      <div class="panel-head">
-        <div class="section-title">🔥 Maior Volume Sustentado</div>
-      </div>
-      <div class="panel-body">
-        <div class="rank-row">
-          <span class="rank-num">1</span>
-          <div style="flex:1">
-            <div class="rank-ticker">CVCB3</div>
-            <div class="rank-price">R$ 2,48</div>
-          </div>
-          <span class="rsv-badge fire" style="margin-right:10px">🔥 21d</span>
-          <span class="rank-mrs neg">−0.84%</span>
-        </div>
-        <div class="rank-row">
-          <span class="rank-num">2</span>
-          <div style="flex:1">
-            <div class="rank-ticker">TIMS3</div>
-            <div class="rank-price">R$ 24,21</div>
-          </div>
-          <span class="rsv-badge strong" style="margin-right:10px">💪 12d</span>
-          <span class="rank-mrs pos">+0.49%</span>
-        </div>
-        <div class="rank-row">
-          <span class="rank-num">3</span>
-          <div style="flex:1">
-            <div class="rank-ticker">VALE3</div>
-            <div class="rank-price">R$ 79,83</div>
-          </div>
-          <span class="rsv-badge strong" style="margin-right:10px">💪 8d</span>
-          <span class="rank-mrs pos">+24.08%</span>
-        </div>
-      </div>
+      <div class="panel-head"><div class="section-title">🔥 Maior Volume Sustentado</div></div>
+      <div class="panel-body" id="topRSVConRows"></div>
     </div>
   </div>
 
   <!-- MENOR VOLUME -->
   <div class="two-col fade-in">
     <div class="panel">
-      <div class="panel-head">
-        <div class="section-title">🧊 Menor Volume Sustentado</div>
-      </div>
-      <div class="panel-body">
-        <div class="rank-row">
-          <span class="rank-num">1</span>
-          <div style="flex:1">
-            <div class="rank-ticker">WEGE3</div>
-            <div class="rank-price">R$ 46,51</div>
-          </div>
-          <span class="rsv-badge cold" style="margin-right:10px">❄️ −12d</span>
-          <span class="rank-mrs neg">−1.08%</span>
-        </div>
-        <div class="rank-row">
-          <span class="rank-num">2</span>
-          <div style="flex:1">
-            <div class="rank-ticker">RDOR3</div>
-            <div class="rank-price">R$ 39,91</div>
-          </div>
-          <span class="rsv-badge cold" style="margin-right:10px">📉 −6d</span>
-          <span class="rank-mrs neg">−1.94%</span>
-        </div>
-        <div class="rank-row">
-          <span class="rank-num">3</span>
-          <div style="flex:1">
-            <div class="rank-ticker">ITUB4</div>
-            <div class="rank-price">R$ 39,84</div>
-          </div>
-          <span class="rsv-badge cold" style="margin-right:10px">🔻 −5d</span>
-          <span class="rank-mrs neg">−0.33%</span>
-        </div>
-      </div>
+      <div class="panel-head"><div class="section-title">🧊 Menor Volume Sustentado</div></div>
+      <div class="panel-body" id="topRSVFracoRows"></div>
     </div>
-    <div></div><!-- placeholder -->
+    <div></div>
   </div>
 
 </div><!-- /main -->
 
+<script>
+// ==================== HELPERS ====================
+function fmt(n, sign=false) {
+    const s = Math.abs(n).toFixed(2) + '%';
+    return sign ? (n >= 0 ? '+' : '−') + s : (n < 0 ? '−' : '') + s;
+}
+
+function rsvBadge(diasPos, diasNeg) {
+    diasPos = diasPos || 0;
+    diasNeg = diasNeg || 0;
+    if (diasPos >= 20) return `<span class="rsv-badge fire">🔥 ${diasPos}d</span>`;
+    if (diasPos >= 10) return `<span class="rsv-badge strong">💪 ${diasPos}d</span>`;
+    if (diasPos >= 5)  return `<span class="rsv-badge mod">📈 ${diasPos}d</span>`;
+    if (diasPos >= 1)  return `<span class="rsv-badge start">🌱 ${diasPos}d</span>`;
+    if (diasNeg >= 20) return `<span class="rsv-badge cold">🧊 −${diasNeg}d</span>`;
+    if (diasNeg >= 10) return `<span class="rsv-badge cold">❄️ −${diasNeg}d</span>`;
+    if (diasNeg >= 5)  return `<span class="rsv-badge cold">📉 −${diasNeg}d</span>`;
+    if (diasNeg >= 1)  return `<span class="rsv-badge cold">🔻 −${diasNeg}d</span>`;
+    return `<span class="rsv-badge neutral">⚪ 0d</span>`;
+}
+
+// ==================== DADOS DE EXEMPLO ====================
+const dadosExemplo = {
+    lastUpdate: new Date().toLocaleString('pt-BR'),
+    totalAcoes: 98,
+    sinaisHoje: [
+        { ticker:'PRIO3',  tipo:'COMPRA', mrs: 0.87, rsv: 28.88,  preco:45.73, dias_rsv_positivo:3,  dias_rsv_negativo:0 },
+        { ticker:'TIMS3',  tipo:'COMPRA', mrs: 0.49, rsv: 88.72,  preco:24.21, dias_rsv_positivo:12, dias_rsv_negativo:0 },
+        { ticker:'FLRY3',  tipo:'VENDA',  mrs:-0.15, rsv:-41.08,  preco:15.53, dias_rsv_positivo:0,  dias_rsv_negativo:8 }
+    ],
+    proximosCruzar: [
+        { ticker:'ITUB4', mrs:-0.33, rsv: -6.06, preco:39.84, distancia:0.33, dias_rsv_positivo:0, dias_rsv_negativo:5  },
+        { ticker:'WEGE3', mrs:-1.08, rsv:-39.61, preco:46.51, distancia:1.08, dias_rsv_positivo:0, dias_rsv_negativo:12 },
+        { ticker:'BBDC4', mrs:-0.84, rsv:-15.22, preco:19.11, distancia:0.84, dias_rsv_positivo:0, dias_rsv_negativo:3  }
+    ],
+    cruzamentosRecentes: [
+        { ticker:'CVCB3',  tipo:'COMPRA', mrs:-0.84, rsv: 229.10, preco: 2.48, diasAtras:2, dias_rsv_positivo:21, dias_rsv_negativo:0 },
+        { ticker:'SANB11', tipo:'COMPRA', mrs: 1.41, rsv:  32.32, preco:33.92, diasAtras:2, dias_rsv_positivo:7,  dias_rsv_negativo:0 },
+        { ticker:'RDOR3',  tipo:'VENDA',  mrs:-1.94, rsv: -52.41, preco:39.91, diasAtras:5, dias_rsv_positivo:0,  dias_rsv_negativo:6 }
+    ],
+    topMRS: [
+        { ticker:'VALE3',  mrs:24.08, rsv: 12.50, preco:79.83, dias_rsv_positivo:8, dias_rsv_negativo:0 },
+        { ticker:'BBDC4',  mrs: 3.10, rsv: -6.06, preco:19.11, dias_rsv_positivo:0, dias_rsv_negativo:5 },
+        { ticker:'SANB11', mrs: 1.41, rsv: 32.32, preco:33.92, dias_rsv_positivo:7, dias_rsv_negativo:0 }
+    ],
+    topRSVConsistente: [
+        { ticker:'CVCB3', mrs:-0.84, rsv:229.10, preco: 2.48, dias_rsv_positivo:21 },
+        { ticker:'TIMS3', mrs: 0.49, rsv: 88.72, preco:24.21, dias_rsv_positivo:12 },
+        { ticker:'VALE3', mrs:24.08, rsv: 12.50, preco:79.83, dias_rsv_positivo: 8 }
+    ],
+    topRSVFraco: [
+        { ticker:'WEGE3', mrs:-1.08, rsv:-39.61, preco:46.51, dias_rsv_negativo:12 },
+        { ticker:'RDOR3', mrs:-1.94, rsv:-52.41, preco:39.91, dias_rsv_negativo: 6 },
+        { ticker:'ITUB4', mrs:-0.33, rsv: -6.06, preco:39.84, dias_rsv_negativo: 5 }
+    ]
+};
+
+// ==================== RENDER ====================
+function renderizarDados(dados) {
+    // Header
+    const updateEl = document.getElementById('updateTime');
+    const isExemplo = dados === dadosExemplo;
+    if (updateEl) {
+        updateEl.innerHTML = isExemplo
+            ? `<span style="color:var(--warn)">⚠️ dados de exemplo</span>`
+            : `<span class="dot"></span>${dados.lastUpdate}`;
+    }
+    if (dados.cacheInfo && !isExemplo) {
+        const cacheEl = document.getElementById('cacheInfo');
+        if (cacheEl) {
+            const cached = dados.cacheInfo.cached ? '💾 cache' : '🔄 processado agora';
+            const dataDados = dados.dataDados ? ` · dados de ${dados.dataDados}` : '';
+            cacheEl.textContent = cached + dataDados;
+        }
+    }
+
+    // Stats
+    const compras = dados.sinaisHoje.filter(s => s.tipo === 'COMPRA').length;
+    document.getElementById('statTotal').textContent    = dados.sinaisHoje.length;
+    document.getElementById('statCompras').textContent  = compras;
+    document.getElementById('statProximos').textContent = dados.proximosCruzar.length;
+    document.getElementById('statAcoes').textContent    = dados.totalAcoes;
+
+    // Sinais de hoje
+    document.getElementById('sinaisRows').innerHTML = dados.sinaisHoje.length
+        ? dados.sinaisHoje.map(s => `
+            <div class="sig-row">
+                <div><span class="type-pill ${s.tipo === 'COMPRA' ? 'buy' : 'sell'}">${s.tipo}</span></div>
+                <div class="ticker-cell"><span class="ticker-name">${s.ticker}</span></div>
+                <div class="metric neutral cell-price" style="text-align:right">R$ ${s.preco.toFixed(2)}</div>
+                <div class="metric ${s.mrs >= 0 ? 'pos' : 'neg'}" style="text-align:right">${fmt(s.mrs, true)}</div>
+                <div class="metric ${s.rsv >= 0 ? 'pos' : 'neg'} cell-rsv" style="text-align:right">${fmt(s.rsv, true)}</div>
+                <div class="cell-rsv-badge" style="text-align:right">${rsvBadge(s.dias_rsv_positivo, s.dias_rsv_negativo)}</div>
+            </div>`).join('')
+        : `<div class="sig-row"><span style="color:var(--muted);font-family:var(--mono);font-size:13px">Nenhum sinal hoje</span></div>`;
+
+    // Próximos de cruzar
+    document.getElementById('nearGrid').innerHTML = dados.proximosCruzar.length
+        ? dados.proximosCruzar.map(a => `
+            <div class="near-card">
+                <div class="near-header">
+                    <span class="near-ticker">${a.ticker}</span>
+                    <span class="near-dist">falta ${a.distancia.toFixed(2)}%</span>
+                </div>
+                <div class="near-price">R$ ${a.preco.toFixed(2)}</div>
+                <div class="near-metrics">
+                    <div class="metric-pair">
+                        <span class="lbl">MRS</span><span class="metric ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
+                        <span class="lbl">RSV</span><span class="metric ${a.rsv >= 0 ? 'pos' : 'neg'}">${fmt(a.rsv, true)}</span>
+                    </div>
+                    ${rsvBadge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
+                </div>
+            </div>`).join('')
+        : `<p class="empty" style="grid-column:1/-1">Nenhuma ação próxima de cruzar</p>`;
+
+    // Cruzamentos recentes
+    document.getElementById('recentGrid').innerHTML = dados.cruzamentosRecentes.length
+        ? dados.cruzamentosRecentes.map(a => `
+            <div class="recent-card ${a.tipo === 'COMPRA' ? 'buy' : 'sell'}">
+                <div class="recent-header">
+                    <span class="recent-ticker">${a.ticker}</span>
+                    <span class="recent-when">${a.tipo} · há ${a.diasAtras}d</span>
+                </div>
+                <div class="recent-price">R$ ${a.preco.toFixed(2)}</div>
+                <div class="recent-metrics">
+                    <div class="metric-pair">
+                        <span class="lbl">MRS</span><span class="metric ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
+                        <span class="lbl">RSV</span><span class="metric ${a.rsv >= 0 ? 'pos' : 'neg'}">${fmt(a.rsv, true)}</span>
+                    </div>
+                    ${rsvBadge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
+                </div>
+            </div>`).join('')
+        : `<p class="empty" style="grid-column:1/-1">Nenhum cruzamento recente</p>`;
+
+    // Top MRS
+    document.getElementById('topMRSRows').innerHTML = dados.topMRS.map((a, i) => `
+        <div class="rank-row">
+            <span class="rank-num">${i + 1}</span>
+            <div style="flex:1"><div class="rank-ticker">${a.ticker}</div><div class="rank-price">R$ ${a.preco.toFixed(2)}</div></div>
+            <span style="margin-right:10px">${rsvBadge(a.dias_rsv_positivo, a.dias_rsv_negativo)}</span>
+            <span class="rank-mrs ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
+        </div>`).join('');
+
+    // Top RSV Consistente
+    document.getElementById('topRSVConRows').innerHTML = (dados.topRSVConsistente || []).map((a, i) => `
+        <div class="rank-row">
+            <span class="rank-num">${i + 1}</span>
+            <div style="flex:1"><div class="rank-ticker">${a.ticker}</div><div class="rank-price">R$ ${a.preco.toFixed(2)}</div></div>
+            <span style="margin-right:10px">${rsvBadge(a.dias_rsv_positivo, 0)}</span>
+            <span class="rank-mrs ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
+        </div>`).join('');
+
+    // Top RSV Fraco
+    document.getElementById('topRSVFracoRows').innerHTML = (dados.topRSVFraco || []).map((a, i) => `
+        <div class="rank-row">
+            <span class="rank-num">${i + 1}</span>
+            <div style="flex:1"><div class="rank-ticker">${a.ticker}</div><div class="rank-price">R$ ${a.preco.toFixed(2)}</div></div>
+            <span style="margin-right:10px">${rsvBadge(0, a.dias_rsv_negativo)}</span>
+            <span class="rank-mrs ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
+        </div>`).join('');
+}
+
+// ==================== FETCH ====================
+async function atualizarDados(tentativa = 1, maxTentativas = 3) {
+    try {
+        const response = await fetch('/api/screener', { cache: 'default' });
+        if (response.status === 404) throw new Error('API não encontrada (404)');
+        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+        const dados = await response.json();
+
+        if (dados.error && dados.retry) {
+            const el = document.getElementById('updateTime');
+            if (el) el.innerHTML = `<span style="color:var(--warn)">⏳ ${dados.message} (${tentativa}/${maxTentativas})</span>`;
+            if (tentativa < maxTentativas) {
+                setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 10000);
+            } else {
+                if (el) el.innerHTML = `<span style="color:var(--sell)">❌ Tente mais tarde</span>`;
+            }
+            return;
+        }
+        renderizarDados(dados);
+    } catch (error) {
+        console.error('[ERROR]', error.message);
+        const el = document.getElementById('updateTime');
+        if (el) el.innerHTML = `<span style="color:var(--sell)">❌ ${error.message}</span>`;
+        renderizarDados(dadosExemplo);
+    }
+}
+
+async function forceUpdate(event) {
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    btn.textContent = '⏳ atualizando...';
+    try {
+        const response = await fetch(`/api/screener?force=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Erro na API');
+        const dados = await response.json();
+        renderizarDados(dados);
+        btn.textContent = '✅ atualizado!';
+    } catch (error) {
+        console.error('Erro ao atualizar:', error);
+        btn.textContent = '❌ erro';
+    } finally {
+        setTimeout(() => { btn.textContent = '↻ atualizar'; btn.disabled = false; }, 2000);
+    }
+}
+
+atualizarDados();
+</script>
 </body>
 </html>
