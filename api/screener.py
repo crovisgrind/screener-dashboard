@@ -230,6 +230,31 @@ def calcular_sinais(ticker, bova_data):
                 rsv_atual > 0 and rsv.iloc[-2] > 0 and rsv.iloc[-3] > 0):
             resultado['sinais'].append({'tipo': 'ATENCAO', 'emoji': '🟡'})
 
+        # ---- Sinal de RECUPERAÇÃO ----
+        # Ação ainda abaixo do BOVA11 mas mostrando virada:
+        #   - MRS negativo porém subindo (janela 5-10d, tolerância de 1 tropeço)
+        #   - RSV recentemente virou positivo (1-10 dias)
+        #   - Não está em queda livre (mrs > -5%)
+        if mrs_atual < 0 and mrs_atual > -5 and rsv_atual > 0 and 1 <= dias_rsv_positivo <= 10:
+            janela = min(10, len(mrs) - 1)
+            mrs_janela = [float(mrs.iloc[-i]) for i in range(1, janela + 1)]
+            mrs_crescente = list(reversed(mrs_janela))  # do mais antigo ao mais recente
+
+            # Tolerância de 1 dia: aceita até 1 "tropeço" na sequência crescente
+            quebras = sum(
+                1 for i in range(len(mrs_crescente) - 1)
+                if mrs_crescente[i] >= mrs_crescente[i + 1]
+            )
+
+            if quebras <= 1:
+                resultado['sinais'].append({
+                    'tipo': 'RECUPERACAO',
+                    'emoji': '🔼',
+                    'dias_subindo': janela,
+                    'dias_rsv_positivo': dias_rsv_positivo,
+                    'quebras': quebras
+                })
+
         return resultado
 
     except Exception as e:
@@ -252,6 +277,7 @@ def processar_screener():
     sinais_hoje = []
     proximos_cruzar = []
     cruzamentos_recentes = []
+    recuperacoes = []
 
     for i, ticker in enumerate(ACOES_PRINCIPAIS, 1):
         print(f"[INFO] Processando {i}/{len(ACOES_PRINCIPAIS)}: {ticker}")
@@ -286,6 +312,12 @@ def processar_screener():
                     item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
                     item['diasAtras'] = sinal['dias_atras']
                     cruzamentos_recentes.append(item)
+
+                elif sinal['tipo'] == 'RECUPERACAO':
+                    item['dias_subindo'] = sinal['dias_subindo']
+                    item['dias_rsv_positivo'] = sinal['dias_rsv_positivo']
+                    item['quebras'] = sinal['quebras']
+                    recuperacoes.append(item)
 
     # ==================== TOP MRS ====================
     todas_acoes_ordenadas = sorted(todas_acoes, key=lambda x: x['mrs'], reverse=True)
@@ -335,6 +367,15 @@ def processar_screener():
         for a in acoes_rsv_negativo_ord[:10]
     ]
 
+    # ==================== RECUPERAÇÕES ====================
+    # Ordena por dias_rsv_positivo (volume mais consolidado primeiro),
+    # depois por dias_subindo como desempate
+    recuperacoes_ord = sorted(
+        recuperacoes,
+        key=lambda x: (x['dias_rsv_positivo'], x['dias_subindo']),
+        reverse=True
+    )
+
     # Obter última data de dados
     ultima_data = bova_data.index[-1].strftime('%d/%m/%Y')
 
@@ -350,15 +391,16 @@ def processar_screener():
         'proximosCruzar': proximos_cruzar,
         'cruzamentosRecentes': cruzamentos_recentes,
         'topMRS': top_mrs,
-        'topRSVConsistente': top_rsv_consistente,   # ✅ NOVO — maiores RSV positivos consecutivos
-        'topRSVFraco': top_rsv_fraco,               # ✅ NOVO — maiores RSV negativos consecutivos
+        'topRSVConsistente': top_rsv_consistente,   # maiores RSV positivos consecutivos
+        'topRSVFraco': top_rsv_fraco,               # maiores RSV negativos consecutivos
+        'recuperacoes': recuperacoes_ord,            # virada em andamento: MRS subindo + RSV virando
         'cacheInfo': {
             'cached': False,
             'dataProcessamento': obter_data_pregao_atual().isoformat()
         }
     }
 
-    print(f"[INFO] Processamento concluído: {len(sinais_hoje)} sinais hoje")
+    print(f"[INFO] Processamento concluído: {len(sinais_hoje)} sinais hoje, {len(recuperacoes_ord)} recuperações")
     return resposta
 
 
