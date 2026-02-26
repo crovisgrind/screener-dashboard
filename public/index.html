@@ -1,418 +1,857 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screener Ibovespa - MRS/RSV</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .pulse-green { animation: pulse-green 2s infinite; }
-        @keyframes pulse-green {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screener Ibovespa — MRS/RSV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0d0f14;
+    --surface:  #161a23;
+    --border:   #252b38;
+    --text:     #e8ecf4;
+    --muted:    #5a6478;
+    --buy:      #00e5a0;
+    --sell:     #ff4d6d;
+    --warn:     #ffb020;
+    --purple:   #a78bfa;
+    --mono:     'DM Mono', monospace;
+    --display:  'Syne', sans-serif;
+    --body:     'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(13,15,20,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .logo span {
+    color: var(--buy);
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .update-info {
+    text-align: right;
+  }
+
+  .update-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .update-time {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--buy);
+    margin-right: 5px;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+  }
+
+  .btn-refresh {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-refresh:hover {
+    border-color: var(--purple);
+    color: var(--purple);
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+
+  /* ── STAT STRIP ── */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .stat-value.buy  { color: var(--buy); }
+  .stat-value.warn { color: var(--warn); }
+  .stat-value.muted{ color: var(--purple); }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .section-hint {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── SIGNAL ROW (hoje) ── */
+  .signals-table {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+
+  .sig-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 90px 90px 90px 100px;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    gap: 16px;
+  }
+
+  .sig-row:last-child { border-bottom: none; }
+  .sig-row:hover { background: rgba(255,255,255,0.025); }
+
+  .sig-row.header {
+    background: var(--surface);
+    padding: 10px 20px;
+  }
+
+  .col-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  .ticker-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .type-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .type-pill.buy  { background: rgba(0,229,160,0.12); color: var(--buy);  border: 1px solid rgba(0,229,160,0.25); }
+  .type-pill.sell { background: rgba(255,77,109,0.12); color: var(--sell); border: 1px solid rgba(255,77,109,0.25); }
+
+  .ticker-name {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .price {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .metric {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .metric.pos { color: var(--buy); }
+  .metric.neg { color: var(--sell); }
+  .metric.neutral { color: var(--text); }
+
+  /* ── RSV BADGE ── */
+  .rsv-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .rsv-badge.fire    { background: rgba(255,80,30,0.15); color: #ff6b3d; border: 1px solid rgba(255,80,30,0.2); }
+  .rsv-badge.strong  { background: rgba(255,176,32,0.12); color: var(--warn); border: 1px solid rgba(255,176,32,0.2); }
+  .rsv-badge.mod     { background: rgba(0,229,160,0.1);  color: var(--buy);  border: 1px solid rgba(0,229,160,0.2); }
+  .rsv-badge.start   { background: rgba(0,229,160,0.06); color: #5fe8b8; border: 1px solid rgba(0,229,160,0.15); }
+  .rsv-badge.cold    { background: rgba(99,130,255,0.1);  color: #7fa4ff; border: 1px solid rgba(99,130,255,0.2); }
+  .rsv-badge.neutral { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .panel-head {
+    background: var(--surface);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-body {
+    padding: 0;
+  }
+
+  /* ── RANK ROW ── */
+  .rank-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    transition: background 0.1s;
+  }
+
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row:hover { background: rgba(255,255,255,0.025); }
+
+  .rank-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    width: 18px;
+    flex-shrink: 0;
+  }
+
+  .rank-ticker {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .rank-price {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .rank-mrs {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    width: 70px;
+    text-align: right;
+  }
+
+  /* ── NEAR CROSS GRID ── */
+  .near-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .near-card {
+    border: 1px solid rgba(255,176,32,0.2);
+    background: rgba(255,176,32,0.04);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: background 0.15s;
+  }
+
+  .near-card:hover { background: rgba(255,176,32,0.08); }
+
+  .near-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .near-ticker {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .near-dist {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--warn);
+    background: rgba(255,176,32,0.1);
+    border: 1px solid rgba(255,176,32,0.2);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .near-price {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .near-metrics {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .metric-pair {
+    display: flex;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .metric-pair .lbl { color: var(--muted); }
+
+  /* ── RECENT GRID ── */
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .recent-card {
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: background 0.15s;
+  }
+
+  .recent-card.buy  {
+    border: 1px solid rgba(0,229,160,0.2);
+    background: rgba(0,229,160,0.04);
+  }
+
+  .recent-card.buy:hover  { background: rgba(0,229,160,0.08); }
+
+  .recent-card.sell {
+    border: 1px solid rgba(255,77,109,0.2);
+    background: rgba(255,77,109,0.04);
+  }
+
+  .recent-card.sell:hover { background: rgba(255,77,109,0.08); }
+
+  .recent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .recent-ticker {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .recent-when {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .recent-price {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .recent-metrics {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 0 40px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: var(--mono);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .main { padding: 20px 16px 60px; }
+    .topbar { padding: 14px 16px; }
+    .stat-strip { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .near-grid { grid-template-columns: 1fr 1fr; }
+    .recent-grid { grid-template-columns: 1fr; }
+    .sig-row { grid-template-columns: 1fr 80px 80px 90px; }
+    .sig-row .col-price, .sig-row .cell-price { display: none; }
+    .sig-row.header .col-price { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .near-grid { grid-template-columns: 1fr; }
+    .stat-strip { grid-template-columns: 1fr 1fr; }
+    .sig-row { grid-template-columns: 1fr 75px 75px; }
+    .sig-row .col-rsv, .sig-row .cell-rsv, 
+    .sig-row .col-rsv-badge, .sig-row .cell-rsv-badge { display: none; }
+    .update-info { display: none; }
+  }
+
+  .fade-in {
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.10s; }
+  .fade-in:nth-child(3) { animation-delay: 0.15s; }
+  .fade-in:nth-child(4) { animation-delay: 0.20s; }
+  .fade-in:nth-child(5) { animation-delay: 0.25s; }
+  .fade-in:nth-child(6) { animation-delay: 0.30s; }
+</style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <!-- Header -->
-    <div class="gradient-bg text-white py-8 shadow-lg">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-bold mb-2">📊 Screener Ibovespa</h1>
-                    <p class="text-purple-200">Estratégia MRS/RSV - Análise em Tempo Real</p>
-                </div>
-                <div class="text-right">
-                    <div class="text-sm text-purple-200">Última atualização</div>
-                    <div class="text-xl font-semibold" id="lastUpdate">Carregando...</div>
-                    <div class="text-xs text-purple-200 mt-1" id="cacheInfo"></div>
-                    <button onclick="forceUpdate()" class="mt-2 bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50 transition">
-                        🔄 Forçar Atualização
-                    </button>
-                </div>
-            </div>
-        </div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">MRS<span>/</span>RSV</span>
+    <span class="tag">IBOVESPA</span>
+  </div>
+  <div class="topbar-right">
+    <div class="update-info">
+      <div class="update-label">última atualização</div>
+      <div class="update-time"><span class="dot"></span>26/02/2026 17:42:10</div>
+    </div>
+    <button class="btn-refresh">↻ atualizar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip" style="margin-bottom:40px">
+    <div class="stat fade-in">
+      <span class="stat-label">Sinais Hoje</span>
+      <span class="stat-value">3</span>
+    </div>
+    <div class="stat fade-in">
+      <span class="stat-label">Compras</span>
+      <span class="stat-value buy">2</span>
+    </div>
+    <div class="stat fade-in">
+      <span class="stat-label">Próx. de Cruzar</span>
+      <span class="stat-value warn">3</span>
+    </div>
+    <div class="stat fade-in">
+      <span class="stat-label">Ações Analisadas</span>
+      <span class="stat-value muted">98</span>
+    </div>
+  </div>
+
+  <!-- SINAIS DE HOJE -->
+  <div class="section-header fade-in">
+    <span class="section-title">Sinais de Hoje <span class="count">3</span></span>
+    <span class="section-hint">cruzamento MRS + RSV confirmado</span>
+  </div>
+
+  <div class="signals-table fade-in">
+    <div class="sig-row header">
+      <span class="col-label">tipo</span>
+      <span class="col-label">ticker</span>
+      <span class="col-label col-price" style="text-align:right">preço</span>
+      <span class="col-label" style="text-align:right">MRS</span>
+      <span class="col-label col-rsv" style="text-align:right">RSV</span>
+      <span class="col-label col-rsv-badge" style="text-align:right">RSV streak</span>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="container mx-auto px-4 -mt-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm">Sinais Hoje</p>
-                        <p class="text-3xl font-bold text-gray-800" id="totalHoje">0</p>
-                    </div>
-                    <div class="bg-blue-100 p-4 rounded-full"><span class="text-3xl">🎯</span></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in" style="animation-delay: 0.1s">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm">Compra Hoje</p>
-                        <p class="text-3xl font-bold text-green-600" id="comprasHoje">0</p>
-                    </div>
-                    <div class="bg-green-100 p-4 rounded-full pulse-green"><span class="text-3xl">🟢</span></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in" style="animation-delay: 0.2s">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm">Próximos de Cruzar</p>
-                        <p class="text-3xl font-bold text-orange-600" id="proximosCruzar">0</p>
-                    </div>
-                    <div class="bg-orange-100 p-4 rounded-full"><span class="text-3xl">🔶</span></div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover fade-in" style="animation-delay: 0.3s">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm">Ações Analisadas</p>
-                        <p class="text-3xl font-bold text-purple-600" id="totalAcoes">0</p>
-                    </div>
-                    <div class="bg-purple-100 p-4 rounded-full"><span class="text-3xl">📈</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sinais de Hoje + Top MRS -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.4s">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center">
-                        <span class="text-3xl mr-2">🎯</span>Sinais de Hoje
-                    </h2>
-                    <div id="sinaisHoje" class="space-y-4"></div>
-                </div>
-            </div>
-            <div>
-                <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.5s">
-                    <h2 class="text-xl font-bold mb-4 flex items-center">
-                        <span class="text-2xl mr-2">🌟</span>Top MRS
-                    </h2>
-                    <div id="topMRS" class="space-y-3"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Próximos de Cruzar -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in" style="animation-delay: 0.6s">
-            <h2 class="text-2xl font-bold mb-4 flex items-center">
-                <span class="text-3xl mr-2">🔶</span>Próximos de Cruzar (&lt; 2%)
-            </h2>
-            <div id="proximosCruzarLista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-
-        <!-- Cruzamentos Recentes -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in" style="animation-delay: 0.7s">
-            <h2 class="text-2xl font-bold mb-4 flex items-center">
-                <span class="text-3xl mr-2">📅</span>Cruzamentos Últimos 5 Dias
-            </h2>
-            <div id="cruzamentosRecentes" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-
-        <!-- ✅ NOVO: Top RSV Consistente + Top RSV Fraco lado a lado -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-
-            <!-- Top RSV Consistente (positivo) -->
-            <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.8s">
-                <h2 class="text-xl font-bold mb-1 flex items-center">
-                    <span class="text-2xl mr-2">🔥</span>Maior Volume Sustentado
-                </h2>
-                <p class="text-gray-400 text-xs mb-4">Ações com mais dias consecutivos de RSV positivo (volume acima do mercado)</p>
-                <div id="topRSVConsistente" class="space-y-3"></div>
-            </div>
-
-            <!-- Top RSV Fraco (negativo) -->
-            <div class="bg-white rounded-xl shadow-lg p-6 fade-in" style="animation-delay: 0.9s">
-                <h2 class="text-xl font-bold mb-1 flex items-center">
-                    <span class="text-2xl mr-2">🧊</span>Menor Volume Sustentado
-                </h2>
-                <p class="text-gray-400 text-xs mb-4">Ações com mais dias consecutivos de RSV negativo (volume abaixo do mercado)</p>
-                <div id="topRSVFraco" class="space-y-3"></div>
-            </div>
-
-        </div>
+    <div class="sig-row">
+      <div><span class="type-pill buy">COMPRA</span></div>
+      <div class="ticker-cell">
+        <span class="ticker-name">PRIO3</span>
+      </div>
+      <div class="metric neutral cell-price" style="text-align:right">R$ 45,73</div>
+      <div class="metric pos" style="text-align:right">+0.87%</div>
+      <div class="metric pos cell-rsv" style="text-align:right">+28.88%</div>
+      <div class="cell-rsv-badge" style="text-align:right"><span class="rsv-badge start">🌱 3d</span></div>
     </div>
 
-    <!-- Footer -->
-    <div class="bg-gray-800 text-white py-6 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-gray-400">Screener Ibovespa - Estratégia MRS/RSV</p>
-            <p class="text-gray-500 text-sm mt-2">Dados fornecidos por Yahoo Finance</p>
-        </div>
+    <div class="sig-row">
+      <div><span class="type-pill buy">COMPRA</span></div>
+      <div class="ticker-cell">
+        <span class="ticker-name">TIMS3</span>
+      </div>
+      <div class="metric neutral cell-price" style="text-align:right">R$ 24,21</div>
+      <div class="metric pos" style="text-align:right">+0.49%</div>
+      <div class="metric pos cell-rsv" style="text-align:right">+88.72%</div>
+      <div class="cell-rsv-badge" style="text-align:right"><span class="rsv-badge strong">💪 12d</span></div>
     </div>
 
-    <script>
-        // ==================== DADOS DE EXEMPLO ====================
-        const dadosExemplo = {
-            lastUpdate: new Date().toLocaleString('pt-BR'),
-            totalAcoes: 28,
-            sinaisHoje: [
-                { ticker: 'PRIO3',  tipo: 'COMPRA', mrs:  0.87, rsv:  28.88, preco: 45.73, emoji: '🟢', dias_rsv_positivo: 3,  dias_rsv_negativo: 0, rsv_forca: '🌱 Início',    rsv_lado: 'positivo' },
-                { ticker: 'TIMS3',  tipo: 'COMPRA', mrs:  0.49, rsv:  88.72, preco: 24.21, emoji: '🟢', dias_rsv_positivo: 12, dias_rsv_negativo: 0, rsv_forca: '💪 Forte',      rsv_lado: 'positivo' },
-                { ticker: 'FLRY3',  tipo: 'VENDA',  mrs: -0.15, rsv: -41.08, preco: 15.53, emoji: '🔴', dias_rsv_positivo: 0,  dias_rsv_negativo: 8, rsv_forca: '❄️ Fraco',      rsv_lado: 'negativo' }
-            ],
-            proximosCruzar: [
-                { ticker: 'ITUB4', mrs: -0.33, rsv:  -6.06, preco: 39.84, distancia: 0.33, dias_rsv_positivo: 0, dias_rsv_negativo:  5, rsv_forca: '🔻 Início neg.', rsv_lado: 'negativo' },
-                { ticker: 'WEGE3', mrs: -1.08, rsv: -39.61, preco: 46.51, distancia: 1.08, dias_rsv_positivo: 0, dias_rsv_negativo: 12, rsv_forca: '❄️ Fraco',       rsv_lado: 'negativo' },
-                { ticker: 'BBDC4', mrs: -0.84, rsv: -15.22, preco: 19.11, distancia: 0.84, dias_rsv_positivo: 0, dias_rsv_negativo:  3, rsv_forca: '🔻 Início neg.', rsv_lado: 'negativo' }
-            ],
-            cruzamentosRecentes: [
-                { ticker: 'CVCB3',  tipo: 'COMPRA', mrs: -0.84, rsv:  229.10, preco:  2.48, diasAtras: 2, dias_rsv_positivo: 21, dias_rsv_negativo: 0, rsv_forca: '🔥 Muito forte', rsv_lado: 'positivo' },
-                { ticker: 'SANB11', tipo: 'COMPRA', mrs:  1.41, rsv:   32.32, preco: 33.92, diasAtras: 2, dias_rsv_positivo:  7, dias_rsv_negativo: 0, rsv_forca: '📈 Moderado',    rsv_lado: 'positivo' },
-                { ticker: 'RDOR3',  tipo: 'VENDA',  mrs: -1.94, rsv:  -52.41, preco: 39.91, diasAtras: 5, dias_rsv_positivo:  0, dias_rsv_negativo: 6, rsv_forca: '📉 Moderado neg.', rsv_lado: 'negativo' }
-            ],
-            topMRS: [
-                { ticker: 'VALE3',  mrs: 24.08, rsv:  12.50, preco: 79.83, dias_rsv_positivo: 8,  dias_rsv_negativo: 0,  rsv_forca: '💪 Forte',      rsv_lado: 'positivo' },
-                { ticker: 'BBDC4',  mrs:  3.10, rsv:  -6.06, preco: 19.11, dias_rsv_positivo: 0,  dias_rsv_negativo: 5,  rsv_forca: '🔻 Início neg.', rsv_lado: 'negativo' },
-                { ticker: 'SANB11', mrs:  1.41, rsv:  32.32, preco: 33.92, dias_rsv_positivo: 7,  dias_rsv_negativo: 0,  rsv_forca: '📈 Moderado',    rsv_lado: 'positivo' }
-            ],
-            topRSVConsistente: [
-                { ticker: 'CVCB3', mrs: -0.84, rsv: 229.10, preco:  2.48, dias_rsv_positivo: 21, rsv_forca: '🔥 Muito forte' },
-                { ticker: 'TIMS3', mrs:  0.49, rsv:  88.72, preco: 24.21, dias_rsv_positivo: 12, rsv_forca: '💪 Forte'       },
-                { ticker: 'VALE3', mrs: 24.08, rsv:  12.50, preco: 79.83, dias_rsv_positivo:  8, rsv_forca: '💪 Forte'       }
-            ],
-            topRSVFraco: [
-                { ticker: 'WEGE3', mrs: -1.08, rsv: -39.61, preco: 46.51, dias_rsv_negativo: 12, rsv_forca: '❄️ Fraco'        },
-                { ticker: 'RDOR3', mrs: -1.94, rsv: -52.41, preco: 39.91, dias_rsv_negativo:  6, rsv_forca: '📉 Moderado neg.' },
-                { ticker: 'ITUB4', mrs: -0.33, rsv:  -6.06, preco: 39.84, dias_rsv_negativo:  5, rsv_forca: '🔻 Início neg.'  }
-            ]
-        };
+    <div class="sig-row">
+      <div><span class="type-pill sell">VENDA</span></div>
+      <div class="ticker-cell">
+        <span class="ticker-name">FLRY3</span>
+      </div>
+      <div class="metric neutral cell-price" style="text-align:right">R$ 15,53</div>
+      <div class="metric neg" style="text-align:right">−0.15%</div>
+      <div class="metric neg cell-rsv" style="text-align:right">−41.08%</div>
+      <div class="cell-rsv-badge" style="text-align:right"><span class="rsv-badge cold">❄️ −8d</span></div>
+    </div>
+  </div>
 
-        // ==================== BADGE RSV ====================
-        // Reflete a granularidade completa dos dois lados
-        function rsv_badge(diasPos, diasNeg) {
-            diasPos = diasPos || 0;
-            diasNeg = diasNeg || 0;
+  <!-- PRÓXIMOS DE CRUZAR -->
+  <div class="section-header fade-in">
+    <span class="section-title">Próximos de Cruzar <span class="count">3</span></span>
+    <span class="section-hint">MRS entre −2% e 0%, RSV positivo</span>
+  </div>
 
-            if (diasPos >= 20) return `<span class="bg-red-100    text-red-700    px-2 py-1 rounded-full text-xs font-bold">🔥 ${diasPos}d</span>`;
-            if (diasPos >= 10) return `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-bold">💪 ${diasPos}d</span>`;
-            if (diasPos >= 5)  return `<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold">📈 ${diasPos}d</span>`;
-            if (diasPos >= 1)  return `<span class="bg-green-100  text-green-700  px-2 py-1 rounded-full text-xs font-bold">🌱 ${diasPos}d</span>`;
+  <div class="near-grid">
+    <div class="near-card fade-in">
+      <div class="near-header">
+        <span class="near-ticker">ITUB4</span>
+        <span class="near-dist">falta 0.33%</span>
+      </div>
+      <div class="near-price">R$ 39,84</div>
+      <div class="near-metrics">
+        <div class="metric-pair">
+          <span class="lbl">MRS</span><span class="neg metric">−0.33%</span>
+          <span class="lbl">RSV</span><span class="neg metric">−6.06%</span>
+        </div>
+        <span class="rsv-badge cold">🔻 −5d</span>
+      </div>
+    </div>
 
-            if (diasNeg >= 20) return `<span class="bg-blue-200   text-blue-900   px-2 py-1 rounded-full text-xs font-bold">🧊 -${diasNeg}d</span>`;
-            if (diasNeg >= 10) return `<span class="bg-blue-100   text-blue-700   px-2 py-1 rounded-full text-xs font-bold">❄️ -${diasNeg}d</span>`;
-            if (diasNeg >= 5)  return `<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs font-bold">📉 -${diasNeg}d</span>`;
-            if (diasNeg >= 1)  return `<span class="bg-gray-100   text-gray-600   px-2 py-1 rounded-full text-xs font-bold">🔻 -${diasNeg}d</span>`;
+    <div class="near-card fade-in">
+      <div class="near-header">
+        <span class="near-ticker">WEGE3</span>
+        <span class="near-dist">falta 1.08%</span>
+      </div>
+      <div class="near-price">R$ 46,51</div>
+      <div class="near-metrics">
+        <div class="metric-pair">
+          <span class="lbl">MRS</span><span class="neg metric">−1.08%</span>
+          <span class="lbl">RSV</span><span class="neg metric">−39.61%</span>
+        </div>
+        <span class="rsv-badge cold">❄️ −12d</span>
+      </div>
+    </div>
 
-            return `<span class="bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-xs font-bold">⚪ 0d</span>`;
-        }
+    <div class="near-card fade-in">
+      <div class="near-header">
+        <span class="near-ticker">BBDC4</span>
+        <span class="near-dist">falta 0.84%</span>
+      </div>
+      <div class="near-price">R$ 19,11</div>
+      <div class="near-metrics">
+        <div class="metric-pair">
+          <span class="lbl">MRS</span><span class="neg metric">−0.84%</span>
+          <span class="lbl">RSV</span><span class="neg metric">−15.22%</span>
+        </div>
+        <span class="rsv-badge cold">🔻 −3d</span>
+      </div>
+    </div>
+  </div>
 
-        // ==================== RENDERIZAÇÃO ====================
-        function renderizarDados(dados) {
-            // Header
-            const updateEl  = document.getElementById('lastUpdate');
-            const cacheEl   = document.getElementById('cacheInfo');
+  <!-- CRUZAMENTOS RECENTES -->
+  <div class="section-header fade-in">
+    <span class="section-title">Cruzamentos Últimos 5 Dias</span>
+    <span class="section-hint">sinal gerado nos últimos pregões</span>
+  </div>
 
-            if (dados === dadosExemplo) {
-                updateEl.innerHTML = `<span class="text-yellow-300">⚠️ Dados de exemplo</span>`;
-                cacheEl.innerHTML  = '';
-            } else {
-                updateEl.textContent = dados.lastUpdate;
-                if (dados.cacheInfo) {
-                    const cached    = dados.cacheInfo.cached ? '💾 Cache' : '🔄 Processado agora';
-                    const dataDados = dados.dataDados ? `Dados de ${dados.dataDados}` : '';
-                    cacheEl.textContent = `${cached} | ${dataDados}`;
-                }
-            }
+  <div class="recent-grid fade-in">
+    <div class="recent-card buy">
+      <div class="recent-header">
+        <span class="recent-ticker">CVCB3</span>
+        <span class="recent-when">COMPRA · há 2d</span>
+      </div>
+      <div class="recent-price">R$ 2,48</div>
+      <div class="recent-metrics">
+        <div class="metric-pair">
+          <span class="lbl">MRS</span><span class="neg metric">−0.84%</span>
+          <span class="lbl">RSV</span><span class="pos metric">+229.10%</span>
+        </div>
+        <span class="rsv-badge fire">🔥 21d</span>
+      </div>
+    </div>
 
-            // Stat cards
-            document.getElementById('totalHoje').textContent      = dados.sinaisHoje.length;
-            document.getElementById('comprasHoje').textContent    = dados.sinaisHoje.filter(s => s.tipo === 'COMPRA').length;
-            document.getElementById('proximosCruzar').textContent = dados.proximosCruzar.length;
-            document.getElementById('totalAcoes').textContent     = dados.totalAcoes;
+    <div class="recent-card buy">
+      <div class="recent-header">
+        <span class="recent-ticker">SANB11</span>
+        <span class="recent-when">COMPRA · há 2d</span>
+      </div>
+      <div class="recent-price">R$ 33,92</div>
+      <div class="recent-metrics">
+        <div class="metric-pair">
+          <span class="lbl">MRS</span><span class="pos metric">+1.41%</span>
+          <span class="lbl">RSV</span><span class="pos metric">+32.32%</span>
+        </div>
+        <span class="rsv-badge mod">📈 7d</span>
+      </div>
+    </div>
 
-            // ---- Sinais de Hoje ----
-            document.getElementById('sinaisHoje').innerHTML = dados.sinaisHoje.map(s => `
-                <div class="border-l-4 ${s.tipo === 'COMPRA' ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'} p-4 rounded-lg card-hover">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-4xl">${s.emoji}</span>
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-800">${s.ticker}</h3>
-                                <p class="text-gray-600">R$ ${s.preco.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        <div class="text-right space-y-1">
-                            <div class="flex space-x-4">
-                                <div>
-                                    <p class="text-xs text-gray-500">MRS</p>
-                                    <p class="text-lg font-bold ${s.mrs >= 0 ? 'text-green-600' : 'text-red-600'}">
-                                        ${s.mrs >= 0 ? '+' : ''}${s.mrs.toFixed(2)}%
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">RSV</p>
-                                    <p class="text-lg font-bold ${s.rsv >= 0 ? 'text-green-600' : 'text-red-600'}">
-                                        ${s.rsv >= 0 ? '+' : ''}${s.rsv.toFixed(2)}%
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex justify-end">
-                                ${rsv_badge(s.dias_rsv_positivo, s.dias_rsv_negativo)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-500 text-center py-8">Nenhum sinal hoje</p>';
+    <div class="recent-card sell">
+      <div class="recent-header">
+        <span class="recent-ticker">RDOR3</span>
+        <span class="recent-when">VENDA · há 5d</span>
+      </div>
+      <div class="recent-price">R$ 39,91</div>
+      <div class="recent-metrics">
+        <div class="metric-pair">
+          <span class="lbl">MRS</span><span class="neg metric">−1.94%</span>
+          <span class="lbl">RSV</span><span class="neg metric">−52.41%</span>
+        </div>
+        <span class="rsv-badge cold">📉 −6d</span>
+      </div>
+    </div>
+  </div>
 
-            // ---- Top MRS ---- (agora com badge RSV)
-            document.getElementById('topMRS').innerHTML = dados.topMRS.map(a => `
-                <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
-                    <div>
-                        <p class="font-bold text-gray-800">${a.ticker}</p>
-                        <p class="text-xs text-gray-600">R$ ${a.preco.toFixed(2)}</p>
-                    </div>
-                    <div class="text-right space-y-1">
-                        <p class="text-lg font-bold text-purple-600">${a.mrs >= 0 ? '+' : ''}${a.mrs.toFixed(2)}%</p>
-                        ${rsv_badge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
-                    </div>
-                </div>
-            `).join('');
+  <!-- TOP MRS + VOLUME -->
+  <div class="two-col fade-in">
+    <!-- Top MRS -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="section-title">Top MRS</div>
+      </div>
+      <div class="panel-body">
+        <div class="rank-row">
+          <span class="rank-num">1</span>
+          <div style="flex:1">
+            <div class="rank-ticker">VALE3</div>
+            <div class="rank-price">R$ 79,83</div>
+          </div>
+          <span class="rsv-badge strong" style="margin-right:10px">💪 8d</span>
+          <span class="rank-mrs pos">+24.08%</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-num">2</span>
+          <div style="flex:1">
+            <div class="rank-ticker">BBDC4</div>
+            <div class="rank-price">R$ 19,11</div>
+          </div>
+          <span class="rsv-badge cold" style="margin-right:10px">🔻 −5d</span>
+          <span class="rank-mrs pos">+3.10%</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-num">3</span>
+          <div style="flex:1">
+            <div class="rank-ticker">SANB11</div>
+            <div class="rank-price">R$ 33,92</div>
+          </div>
+          <span class="rsv-badge mod" style="margin-right:10px">📈 7d</span>
+          <span class="rank-mrs pos">+1.41%</span>
+        </div>
+      </div>
+    </div>
 
-            // ---- Próximos de Cruzar ----
-            document.getElementById('proximosCruzarLista').innerHTML = dados.proximosCruzar.map(a => `
-                <div class="border border-orange-200 bg-orange-50 p-4 rounded-lg card-hover">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-lg font-bold text-gray-800">${a.ticker}</h3>
-                        <span class="bg-orange-200 text-orange-800 px-2 py-1 rounded text-xs font-semibold">
-                            falta ${a.distancia.toFixed(2)}%
-                        </span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-2">R$ ${a.preco.toFixed(2)}</p>
-                    <div class="flex justify-between items-center text-sm">
-                        <div>
-                            <span class="text-gray-600">MRS: <span class="font-semibold">${a.mrs.toFixed(2)}%</span></span>
-                            <span class="text-gray-400 mx-1">|</span>
-                            <span class="text-gray-600">RSV: <span class="font-semibold">${a.rsv.toFixed(2)}%</span></span>
-                        </div>
-                        ${rsv_badge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-500 col-span-3 text-center py-8">Nenhuma ação próxima de cruzar</p>';
+    <!-- Top RSV Consistente -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="section-title">🔥 Maior Volume Sustentado</div>
+      </div>
+      <div class="panel-body">
+        <div class="rank-row">
+          <span class="rank-num">1</span>
+          <div style="flex:1">
+            <div class="rank-ticker">CVCB3</div>
+            <div class="rank-price">R$ 2,48</div>
+          </div>
+          <span class="rsv-badge fire" style="margin-right:10px">🔥 21d</span>
+          <span class="rank-mrs neg">−0.84%</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-num">2</span>
+          <div style="flex:1">
+            <div class="rank-ticker">TIMS3</div>
+            <div class="rank-price">R$ 24,21</div>
+          </div>
+          <span class="rsv-badge strong" style="margin-right:10px">💪 12d</span>
+          <span class="rank-mrs pos">+0.49%</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-num">3</span>
+          <div style="flex:1">
+            <div class="rank-ticker">VALE3</div>
+            <div class="rank-price">R$ 79,83</div>
+          </div>
+          <span class="rsv-badge strong" style="margin-right:10px">💪 8d</span>
+          <span class="rank-mrs pos">+24.08%</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            // ---- Cruzamentos Recentes ----
-            document.getElementById('cruzamentosRecentes').innerHTML = dados.cruzamentosRecentes.map(a => `
-                <div class="border ${a.tipo === 'COMPRA' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'} p-4 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-lg font-bold text-gray-800">${a.ticker}</h3>
-                        <span class="${a.tipo === 'COMPRA' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} px-2 py-1 rounded text-xs font-semibold">
-                            ${a.tipo} há ${a.diasAtras}d
-                        </span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-2">R$ ${a.preco.toFixed(2)}</p>
-                    <div class="flex justify-between items-center text-sm">
-                        <div>
-                            <span class="text-gray-600">MRS: <span class="font-semibold ${a.mrs >= 0 ? 'text-green-600' : 'text-red-600'}">${a.mrs >= 0 ? '+' : ''}${a.mrs.toFixed(2)}%</span></span>
-                            <span class="text-gray-400 mx-1">|</span>
-                            <span class="text-gray-600">RSV: <span class="font-semibold ${a.rsv >= 0 ? 'text-green-600' : 'text-red-600'}">${a.rsv >= 0 ? '+' : ''}${a.rsv.toFixed(2)}%</span></span>
-                        </div>
-                        ${rsv_badge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-500 col-span-2 text-center py-8">Nenhum cruzamento recente</p>';
+  <!-- MENOR VOLUME -->
+  <div class="two-col fade-in">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="section-title">🧊 Menor Volume Sustentado</div>
+      </div>
+      <div class="panel-body">
+        <div class="rank-row">
+          <span class="rank-num">1</span>
+          <div style="flex:1">
+            <div class="rank-ticker">WEGE3</div>
+            <div class="rank-price">R$ 46,51</div>
+          </div>
+          <span class="rsv-badge cold" style="margin-right:10px">❄️ −12d</span>
+          <span class="rank-mrs neg">−1.08%</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-num">2</span>
+          <div style="flex:1">
+            <div class="rank-ticker">RDOR3</div>
+            <div class="rank-price">R$ 39,91</div>
+          </div>
+          <span class="rsv-badge cold" style="margin-right:10px">📉 −6d</span>
+          <span class="rank-mrs neg">−1.94%</span>
+        </div>
+        <div class="rank-row">
+          <span class="rank-num">3</span>
+          <div style="flex:1">
+            <div class="rank-ticker">ITUB4</div>
+            <div class="rank-price">R$ 39,84</div>
+          </div>
+          <span class="rsv-badge cold" style="margin-right:10px">🔻 −5d</span>
+          <span class="rank-mrs neg">−0.33%</span>
+        </div>
+      </div>
+    </div>
+    <div></div><!-- placeholder -->
+  </div>
 
-            // ---- Top RSV Consistente (positivo) ----
-            document.getElementById('topRSVConsistente').innerHTML = (dados.topRSVConsistente || []).map((a, i) => `
-                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-gray-400 font-bold text-sm w-5">${i + 1}</span>
-                        <div>
-                            <p class="font-bold text-gray-800">${a.ticker}</p>
-                            <p class="text-xs text-gray-500">R$ ${a.preco.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <div class="text-right space-y-1">
-                        <p class="text-sm text-gray-600">MRS: <span class="font-semibold ${a.mrs >= 0 ? 'text-green-600' : 'text-red-600'}">${a.mrs >= 0 ? '+' : ''}${a.mrs.toFixed(2)}%</span></p>
-                        ${rsv_badge(a.dias_rsv_positivo, 0)}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-400 text-center py-6 text-sm">Sem dados</p>';
+</div><!-- /main -->
 
-            // ---- Top RSV Fraco (negativo) ----
-            document.getElementById('topRSVFraco').innerHTML = (dados.topRSVFraco || []).map((a, i) => `
-                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-gray-400 font-bold text-sm w-5">${i + 1}</span>
-                        <div>
-                            <p class="font-bold text-gray-800">${a.ticker}</p>
-                            <p class="text-xs text-gray-500">R$ ${a.preco.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <div class="text-right space-y-1">
-                        <p class="text-sm text-gray-600">MRS: <span class="font-semibold ${a.mrs >= 0 ? 'text-green-600' : 'text-red-600'}">${a.mrs >= 0 ? '+' : ''}${a.mrs.toFixed(2)}%</span></p>
-                        ${rsv_badge(0, a.dias_rsv_negativo)}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-400 text-center py-6 text-sm">Sem dados</p>';
-        }
-
-        // ==================== FETCH ====================
-        async function atualizarDados(tentativa = 1, maxTentativas = 3) {
-            try {
-                const response = await fetch('/api/screener', { cache: 'default' });
-
-                if (response.status === 404) throw new Error('API não encontrada (404)');
-                if (!response.ok)            throw new Error(`Erro na API: ${response.status}`);
-
-                const dados = await response.json();
-
-                if (dados.error && dados.retry) {
-                    document.getElementById('lastUpdate').innerHTML = `
-                        <span class="text-yellow-300">⏳ ${dados.message}</span>
-                        <br><small class="text-xs">Tentando novamente... (${tentativa}/${maxTentativas})</small>
-                    `;
-                    if (tentativa < maxTentativas) {
-                        setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 10000);
-                    } else {
-                        document.getElementById('lastUpdate').innerHTML = `<span class="text-red-300">❌ Tente mais tarde</span>`;
-                    }
-                    return;
-                }
-
-                renderizarDados(dados);
-
-            } catch (error) {
-                console.error('[ERROR]', error.message);
-                document.getElementById('lastUpdate').innerHTML = `<span class="text-red-300">❌ ${error.message}</span>`;
-                renderizarDados(dadosExemplo);
-            }
-        }
-
-        async function forceUpdate() {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Atualizando...';
-            try {
-                const response = await fetch(`/api/screener?force=${Date.now()}`, { cache: 'no-store' });
-                if (!response.ok) throw new Error('Erro na API');
-                const dados = await response.json();
-                renderizarDados(dados);
-                btn.textContent = '✅ Atualizado!';
-            } catch (error) {
-                console.error('Erro ao atualizar:', error);
-                btn.textContent = '❌ Erro';
-            } finally {
-                setTimeout(() => {
-                    btn.textContent = '🔄 Forçar Atualização';
-                    btn.disabled = false;
-                }, 2000);
-            }
-        }
-
-        // Carrega na inicialização
-        atualizarDados();
-    </script>
 </body>
 </html>

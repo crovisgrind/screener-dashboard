@@ -1,0 +1,413 @@
+{
+  "lastUpdate": "16/02/2026 17:23:52",
+  "dataDados": "13/02/2026",
+  "timestamp": 1771284232,
+  "totalAcoes": 103,
+  "sinaisHoje": [
+    {
+      "ticker": "BBDC3",
+      "mrs": -0.43,
+      "rsv": -2.58,
+      "preco": 18.14,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "VENDA",
+      "emoji": "🔴"
+    },
+    {
+      "ticker": "BPAC11",
+      "mrs": 2.14,
+      "rsv": 5.07,
+      "preco": 59.59,
+      "dias_rsv_positivo": 1,
+      "dias_rsv_negativo": 0,
+      "rsv_forca": "🌱 Início",
+      "rsv_lado": "positivo",
+      "tipo": "COMPRA",
+      "emoji": "🟢"
+    },
+    {
+      "ticker": "ENEV3",
+      "mrs": 2.46,
+      "rsv": 100.5,
+      "preco": 21.44,
+      "dias_rsv_positivo": 1,
+      "dias_rsv_negativo": 0,
+      "rsv_forca": "🌱 Início",
+      "rsv_lado": "positivo",
+      "tipo": "COMPRA",
+      "emoji": "🟢"
+    }
+  ],
+  "proximosCruzar": [],
+  "cruzamentosRecentes": [
+    {
+      "ticker": "ABEV3",
+      "mrs": 5.78,
+      "rsv": -47.29,
+      "preco": 16.35,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 1,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "COMPRA",
+      "diasAtras": 4
+    },
+    {
+      "ticker": "ANIM3",
+      "mrs": -1.47,
+      "rsv": -67.52,
+      "preco": 4.69,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 8,
+      "rsv_forca": "📉 Moderado neg.",
+      "rsv_lado": "negativo",
+      "tipo": "VENDA",
+      "diasAtras": 2
+    },
+    {
+      "ticker": "CXSE3",
+      "mrs": -2.0,
+      "rsv": -27.72,
+      "preco": 18.03,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "VENDA",
+      "diasAtras": 3
+    },
+    {
+      "ticker": "COGN3",
+      "mrs": -5.47,
+      "rsv": -35.8,
+      "preco": 3.46,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 3,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "VENDA",
+      "diasAtras": 3
+    },
+    {
+      "ticker": "EZTC3",
+      "mrs": 0.01,
+      "rsv": -51.0,
+      "preco": 15.25,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "VENDA",
+      "diasAtras": 2
+    },
+    {
+      "ticker": "MGLU3",
+      "mrs": -6.33,
+      "rsv": -47.03,
+      "preco": 10.23,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "COMPRA",
+      "diasAtras": 5
+    },
+    {
+      "ticker": "MGLU3",
+      "mrs": -6.33,
+      "rsv": -47.03,
+      "preco": 10.23,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo",
+      "tipo": "VENDA",
+      "diasAtras": 4
+    },
+    {
+      "ticker": "TIMS3",
+      "mrs": 0.04,
+      "rsv": 11.2,
+      "preco": 27.29,
+      "dias_rsv_positivo": 1,
+      "dias_rsv_negativo": 0,
+      "rsv_forca": "🌱 Início",
+      "rsv_lado": "positivo",
+      "tipo": "COMPRA",
+      "diasAtras": 3
+    }
+  ],
+  "topMRS": [
+    {
+      "ticker": "CBAV3",
+      "mrs": 54.1,
+      "rsv": -11.17,
+      "preco": 10.21,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 1,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "CSMG3",
+      "mrs": 35.11,
+      "rsv": -28.16,
+      "preco": 55.81,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "MOVI3",
+      "mrs": 30.47,
+      "rsv": -57.95,
+      "preco": 13.22,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 5,
+      "rsv_forca": "📉 Moderado neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "AXIA6",
+      "mrs": 18.59,
+      "rsv": -73.56,
+      "preco": 62.02,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 12,
+      "rsv_forca": "❄️ Fraco",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "VALE3",
+      "mrs": 17.51,
+      "rsv": -18.52,
+      "preco": 87.03,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 1,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "VBBR3",
+      "mrs": 15.38,
+      "rsv": -72.3,
+      "preco": 31.73,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "BRAP4",
+      "mrs": 14.7,
+      "rsv": -52.72,
+      "preco": 23.89,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "UGPA3",
+      "mrs": 12.48,
+      "rsv": -61.63,
+      "preco": 26.98,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "TEND3",
+      "mrs": 11.63,
+      "rsv": -29.33,
+      "preco": 32.64,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 2,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    },
+    {
+      "ticker": "RADL3",
+      "mrs": 11.39,
+      "rsv": -39.39,
+      "preco": 25.95,
+      "dias_rsv_positivo": 0,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg.",
+      "rsv_lado": "negativo"
+    }
+  ],
+  "topRSVConsistente": [
+    {
+      "ticker": "CPLE3",
+      "mrs": -3.67,
+      "rsv": 37.07,
+      "preco": 13.97,
+      "dias_rsv_positivo": 44,
+      "rsv_forca": "🔥 Muito forte"
+    },
+    {
+      "ticker": "CVCB3",
+      "mrs": -12.32,
+      "rsv": 203.14,
+      "preco": 2.42,
+      "dias_rsv_positivo": 22,
+      "rsv_forca": "🔥 Muito forte"
+    },
+    {
+      "ticker": "TOTS3",
+      "mrs": -29.72,
+      "rsv": 84.88,
+      "preco": 38.03,
+      "dias_rsv_positivo": 12,
+      "rsv_forca": "💪 Forte"
+    },
+    {
+      "ticker": "CSNA3",
+      "mrs": -19.03,
+      "rsv": 59.93,
+      "preco": 8.73,
+      "dias_rsv_positivo": 7,
+      "rsv_forca": "📈 Moderado"
+    },
+    {
+      "ticker": "BBSE3",
+      "mrs": -16.0,
+      "rsv": 76.92,
+      "preco": 33.82,
+      "dias_rsv_positivo": 5,
+      "rsv_forca": "📈 Moderado"
+    },
+    {
+      "ticker": "GOAU4",
+      "mrs": 1.64,
+      "rsv": 59.52,
+      "preco": 9.71,
+      "dias_rsv_positivo": 3,
+      "rsv_forca": "🌱 Início"
+    },
+    {
+      "ticker": "SMFT3",
+      "mrs": -29.61,
+      "rsv": 104.03,
+      "preco": 20.68,
+      "dias_rsv_positivo": 3,
+      "rsv_forca": "🌱 Início"
+    },
+    {
+      "ticker": "SUZB3",
+      "mrs": -8.22,
+      "rsv": 47.17,
+      "preco": 58.34,
+      "dias_rsv_positivo": 3,
+      "rsv_forca": "🌱 Início"
+    },
+    {
+      "ticker": "BBAS3",
+      "mrs": -9.13,
+      "rsv": 23.88,
+      "preco": 25.43,
+      "dias_rsv_positivo": 2,
+      "rsv_forca": "🌱 Início"
+    },
+    {
+      "ticker": "HAPV3",
+      "mrs": -73.17,
+      "rsv": 54.79,
+      "preco": 10.4,
+      "dias_rsv_positivo": 2,
+      "rsv_forca": "🌱 Início"
+    }
+  ],
+  "topRSVFraco": [
+    {
+      "ticker": "INTB3",
+      "mrs": -19.91,
+      "rsv": -58.75,
+      "preco": 12.47,
+      "dias_rsv_negativo": 17,
+      "rsv_forca": "❄️ Fraco"
+    },
+    {
+      "ticker": "AXIA6",
+      "mrs": 18.59,
+      "rsv": -73.56,
+      "preco": 62.02,
+      "dias_rsv_negativo": 12,
+      "rsv_forca": "❄️ Fraco"
+    },
+    {
+      "ticker": "MBRF3",
+      "mrs": -30.49,
+      "rsv": -62.16,
+      "preco": 18.8,
+      "dias_rsv_negativo": 12,
+      "rsv_forca": "❄️ Fraco"
+    },
+    {
+      "ticker": "ANIM3",
+      "mrs": -1.47,
+      "rsv": -67.52,
+      "preco": 4.69,
+      "dias_rsv_negativo": 8,
+      "rsv_forca": "📉 Moderado neg."
+    },
+    {
+      "ticker": "YDUQ3",
+      "mrs": -23.8,
+      "rsv": -46.01,
+      "preco": 12.88,
+      "dias_rsv_negativo": 8,
+      "rsv_forca": "📉 Moderado neg."
+    },
+    {
+      "ticker": "MOVI3",
+      "mrs": 30.47,
+      "rsv": -57.95,
+      "preco": 13.22,
+      "dias_rsv_negativo": 5,
+      "rsv_forca": "📉 Moderado neg."
+    },
+    {
+      "ticker": "PCAR3",
+      "mrs": -22.27,
+      "rsv": -77.1,
+      "preco": 3.52,
+      "dias_rsv_negativo": 5,
+      "rsv_forca": "📉 Moderado neg."
+    },
+    {
+      "ticker": "AZZA3",
+      "mrs": -35.58,
+      "rsv": -21.32,
+      "preco": 24.48,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg."
+    },
+    {
+      "ticker": "BBDC3",
+      "mrs": -0.43,
+      "rsv": -2.58,
+      "preco": 18.14,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg."
+    },
+    {
+      "ticker": "BRAP4",
+      "mrs": 14.7,
+      "rsv": -52.72,
+      "preco": 23.89,
+      "dias_rsv_negativo": 4,
+      "rsv_forca": "🔻 Início neg."
+    }
+  ],
+  "cacheInfo": {
+    "cached": false,
+    "dataProcessamento": "2026-02-15"
+  }
+}
