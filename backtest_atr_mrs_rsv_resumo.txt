@@ -1,0 +1,85 @@
+============================================================
+  BACKTEST — ATR + MRS/RSV  (Comparação A vs B vs C)
+============================================================
+  Período : 2022-02-22 → 2026-01-27
+  Total sinais : 5658
+
+  Var       N    Rel5d   Rel10d   Rel20d   Acerto10d
+  ───────────────────────────────────────────────────────
+  A       751   -0.98%   -1.67%   -2.96%       41.7%
+  B      1161   -0.08%   -0.04%   -0.58%       45.9%
+  C      3746   -0.01%   -0.08%   -0.75%       47.9%
+
+  ──────────────────────────────────────────────────────────
+  VARIAÇÃO A — Volume + Explosão de Volatilidade (RSV≥2d + ATR>1.2x média)
+  ──────────────────────────────────────────────────────────
+  Sinais          : 751
+  Ações únicas    : 76
+  MRS médio       : -18.83%
+  RSV médio       : +142.22%
+  ATR ratio médio : 1.29x  (ATR atual / média ATR)
+
+     5d │ Rel médio: -0.98%  mediana: -0.86%  │  acerto: 43%  │  payoff: 0.90x  │  P25/P75: -4.0% / +2.3%
+
+    10d │ Rel médio: -1.67%  mediana: -1.28%  │  acerto: 42%  │  payoff: 0.87x  │  P25/P75: -6.4% / +3.3%
+
+    20d │ Rel médio: -2.96%  mediana: -2.40%  │  acerto: 41%  │  payoff: 0.81x  │  P25/P75: -10.6% / +4.8%
+
+    Top ações (≥2 sinais, retorno rel. médio 10d):
+         n  ret_rel_10d  acerto
+ticker                         
+ANIM3    8         8.63   62.50
+SLCE3    3         8.23  100.00
+SMFT3    4         7.45  100.00
+CSMG3    4         6.59  100.00
+MGLU3   18         4.83   66.67
+
+  ──────────────────────────────────────────────────────────
+  VARIAÇÃO B — Candle de Reversão (range>1.5x ATR + fechou terço superior)
+  ──────────────────────────────────────────────────────────
+  Sinais          : 1161
+  Ações únicas    : 95
+  MRS médio       : -14.06%
+  RSV médio       : +101.35%
+  ATR ratio médio : 1.04x  (ATR atual / média ATR)
+
+     5d │ Rel médio: -0.08%  mediana: -0.31%  │  acerto: 48%  │  payoff: 1.06x  │  P25/P75: -3.5% / +3.3%
+
+    10d │ Rel médio: -0.04%  mediana: -0.68%  │  acerto: 46%  │  payoff: 1.16x  │  P25/P75: -5.1% / +3.8%
+
+    20d │ Rel médio: -0.58%  mediana: -0.81%  │  acerto: 47%  │  payoff: 1.01x  │  P25/P75: -7.0% / +5.1%
+
+    Top ações (≥2 sinais, retorno rel. médio 10d):
+         n  ret_rel_10d  acerto
+ticker                         
+SMFT3   12         9.99  100.00
+BHIA3   37         8.07   48.65
+CSMG3    3         4.84  100.00
+SBSP3    3         3.92  100.00
+CMIN3   15         3.88   73.33
+
+  ──────────────────────────────────────────────────────────
+  VARIAÇÃO C — Saída do Buraco com Momentum (MRS<-5.0% + RSV≥2d + close>MA20)
+  ──────────────────────────────────────────────────────────
+  Sinais          : 3746
+  Ações únicas    : 92
+  MRS médio       : -18.05%
+  RSV médio       : +75.01%
+  ATR ratio médio : 1.02x  (ATR atual / média ATR)
+
+     5d │ Rel médio: -0.01%  mediana: -0.08%  │  acerto: 49%  │  payoff: 1.03x  │  P25/P75: -3.3% / +3.1%
+
+    10d │ Rel médio: -0.08%  mediana: -0.39%  │  acerto: 48%  │  payoff: 1.06x  │  P25/P75: -4.9% / +4.3%
+
+    20d │ Rel médio: -0.75%  mediana: -1.28%  │  acerto: 44%  │  payoff: 1.07x  │  P25/P75: -7.3% / +4.7%
+
+    Top ações (≥2 sinais, retorno rel. médio 10d):
+         n  ret_rel_10d  acerto
+ticker                         
+CSMG3    2        11.58  100.00
+IGTI11   5         9.47  100.00
+DIRR3    3         8.16  100.00
+CURY3    2         7.76  100.00
+PRIO3   15         4.91   86.67
+
+============================================================

@@ -1,0 +1,126 @@
+==============================================================
+  BACKTEST — Trend-Following: MMA200 + ATR + MRS/RSV
+  Período : 2022-02-01 → 2026-01-27
+==============================================================
+
+  Var      N    Rel5d   Rel10d   Rel20d    Ac10d   Pay10d
+  ──────────────────────────────────────────────────────────
+  G      418   +0.03%   -0.01%   +0.34%    47.8%    1.08x
+  H     2683   +0.17%   +0.38%   +0.26%    53.5%    1.01x
+  I     2738   -0.03%   +0.01%   -0.17%    49.3%    1.03x
+
+  ────────────────────────────────────────────────────────────
+  VARIAÇÃO G — Cruzamento MRS + ATR expandindo  (close>MMA200 + MRS cruzou 0 + RSV>0 + ATR>1.2x média)
+  ────────────────────────────────────────────────────────────
+  Sinais       : 418
+  Ações únicas : 95
+  MRS médio    : +2.08%
+  RSV médio    : +94.91%
+  ATR ratio    : 1.11x
+  Dias MRS+    : nand  (média)
+  Dias RSV+    : nand  (média)
+
+     5d │ Rel médio: +0.03%  mediana: -0.10%  │  acerto: 49%  │  payoff: 1.07x  │  P25/P75: -2.5% / +2.7%
+
+    10d │ Rel médio: -0.01%  mediana: -0.20%  │  acerto: 48%  │  payoff: 1.08x  │  P25/P75: -3.8% / +3.9%
+
+    20d │ Rel médio: +0.34%  mediana: -0.04%  │  acerto: 50%  │  payoff: 1.10x  │  P25/P75: -5.6% / +6.0%
+
+    Top ações (≥3 sinais):
+         n  ret_rel_10d  acerto
+ticker                         
+CPFE3    4         5.11  100.00
+ANIM3   12         4.86   66.67
+GOAU4    6         4.56   66.67
+COGN3    4         4.53   75.00
+SMFT3    5         4.40   80.00
+BHIA3    4         3.96   25.00
+SUZB3    5         3.28   80.00
+ECOR3    3         3.04  100.00
+
+    Bottom ações (≥3 sinais):
+        n  ret_rel_10d  acerto
+ticker                        
+MBRF3   4        -7.01   25.00
+SIMH3   3        -6.49   66.67
+IGTI11  3        -5.99    0.00
+BBSE3   4        -4.72    0.00
+BBDC4   4        -4.35   25.00
+
+  ────────────────────────────────────────────────────────────
+  VARIAÇÃO H — Momentum duplo  (close>MMA200 + MRS≥3d + RSV≥3d + MRS acelerando)
+  ────────────────────────────────────────────────────────────
+  Sinais       : 2683
+  Ações únicas : 95
+  MRS médio    : +16.52%
+  RSV médio    : +83.96%
+  ATR ratio    : 1.05x
+  Dias MRS+    : 41.8d  (média)
+  Dias RSV+    : 5.7d  (média)
+
+     5d │ Rel médio: +0.17%  mediana: +0.16%  │  acerto: 52%  │  payoff: 1.02x  │  P25/P75: -2.3% / +2.7%
+
+    10d │ Rel médio: +0.38%  mediana: +0.43%  │  acerto: 54%  │  payoff: 1.01x  │  P25/P75: -3.4% / +4.1%
+
+    20d │ Rel médio: +0.26%  mediana: +0.43%  │  acerto: 52%  │  payoff: 0.99x  │  P25/P75: -4.8% / +5.8%
+
+    Top ações (≥3 sinais):
+         n  ret_rel_10d  acerto
+ticker                         
+COGN3   25         6.66   84.00
+CMIN3   44         5.18   75.00
+AXIA6   36         4.80   72.22
+CBAV3    9         3.82   66.67
+BRAP4    9         3.76   77.78
+TAEE11  31         3.04   67.74
+CSNA3   12         3.00   75.00
+SMFT3   52         2.89   67.31
+
+    Bottom ações (≥3 sinais):
+         n  ret_rel_10d  acerto
+ticker                         
+MGLU3    8       -10.35    0.00
+CVCB3    9        -8.39   33.33
+SIMH3   11        -7.73    9.09
+HAPV3    7        -6.28   14.29
+VAMO3    8        -5.99   12.50
+
+  ────────────────────────────────────────────────────────────
+  VARIAÇÃO I — Pullback + retomada  (close>MMA200 + MRS>0 + recuo + ATR contraiu→expandiu)
+  ────────────────────────────────────────────────────────────
+  Sinais       : 2738
+  Ações únicas : 96
+  MRS médio    : +12.01%
+  RSV médio    : +14.43%
+  ATR ratio    : 0.95x
+  Dias MRS+    : nand  (média)
+  Dias RSV+    : nand  (média)
+
+     5d │ Rel médio: -0.03%  mediana: +0.06%  │  acerto: 50%  │  payoff: 0.96x  │  P25/P75: -2.2% / +2.2%
+
+    10d │ Rel médio: +0.01%  mediana: -0.07%  │  acerto: 49%  │  payoff: 1.03x  │  P25/P75: -3.2% / +3.2%
+
+    20d │ Rel médio: -0.17%  mediana: -0.37%  │  acerto: 48%  │  payoff: 1.04x  │  P25/P75: -4.8% / +4.6%
+
+    Top ações (≥3 sinais):
+         n  ret_rel_10d  acerto
+ticker                         
+TEND3   39         4.81   61.54
+PETR4   46         3.66   73.91
+CEAB3   38         3.13   47.37
+SIMH3   10         2.95   60.00
+BEEF3   13         2.31   69.23
+WEGE3   21         2.19   71.43
+IRBR3   28         2.17   46.43
+UGPA3   28         2.09   67.86
+
+    Bottom ações (≥3 sinais):
+         n  ret_rel_10d  acerto
+ticker                         
+PCAR3    8       -16.07   25.00
+MGLU3    4        -7.71   25.00
+ANIM3   22        -6.95   13.64
+BRAV3    7        -6.14   14.29
+HAPV3   14        -5.66    7.14
+
+==============================================================

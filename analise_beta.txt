@@ -1,0 +1,117 @@
+========================================================
+  ANÁLISE DE BETA — Whitelist vs Universo
+========================================================
+
+  ──────────────────────────────────────────────────────
+  WHITELIST — Beta individual
+  ──────────────────────────────────────────────────────
+  Ticker       Beta      R²  Classificação
+  ──────────────────────────────────────────────────────
+  TAEE11      0.482   0.225  muito defensivo
+  CPFE3       0.652   0.229  defensivo
+  BRAP4       0.867   0.281  moderado
+  HYPE3       0.878   0.247  moderado
+  CMIN3       1.225   0.286  neutro/mercado
+  UGPA3       1.325   0.129  agressivo
+  CSNA3       1.516   0.334  agressivo
+  COGN3       1.631   0.299  muito agressivo
+
+  Beta médio whitelist  : 1.072
+  Beta mediana whitelist: 1.052
+  Beta médio universo   : 1.091
+  Beta mediana universo : 1.064
+
+  ──────────────────────────────────────────────────────
+  Distribuição por faixa de beta
+  ──────────────────────────────────────────────────────
+  Faixa                      Whitelist    Universo
+  Defensivo   (< 0.7)         2 (  25%)   11 (  17%)
+  Moderado    (0.7–1.0)       2 (  25%)   16 (  25%)
+  Neutro      (1.0–1.3)       1 (  12%)   22 (  34%)
+  Agressivo   (≥ 1.3)         3 (  38%)   16 (  25%)
+
+  ──────────────────────────────────────────────────────
+  Ranking completo (ordenado por beta)
+  ──────────────────────────────────────────────────────
+  Ticker       Beta      R²    WL  Classificação
+  ──────────────────────────────────────────────────────
+  SUZB3       0.301   0.035        muito defensivo
+  KLBN11      0.459   0.114        muito defensivo
+  TAEE11      0.482   0.225     ✓  muito defensivo
+  BBSE3       0.496   0.173        muito defensivo
+  SLCE3       0.537   0.097        defensivo
+  VIVT3       0.538   0.180        defensivo
+  EGIE3       0.545   0.240        defensivo
+  PSSA3       0.611   0.176        defensivo
+  TIMS3       0.621   0.188        defensivo
+  NEOE3       0.633   0.208        defensivo
+  ABEV3       0.637   0.225        defensivo
+  AURE3       0.642   0.183        defensivo
+  CPFE3       0.652   0.229     ✓  defensivo
+  WEGE3       0.712   0.169        moderado
+  CPLE3       0.764   0.246        moderado
+  BEEF3       0.778   0.105        moderado
+  RADL3       0.795   0.188        moderado
+  EQTL3       0.841   0.333        moderado
+  VALE3       0.851   0.252        moderado
+  BRAP4       0.867   0.281     ✓  moderado
+  CMIG4       0.871   0.313        moderado
+  HYPE3       0.878   0.247     ✓  moderado
+  FLRY3       0.884   0.261        moderado
+  ENGI11      0.887   0.349        moderado
+  SBSP3       0.900   0.293        moderado
+  BBAS3       0.947   0.388        moderado
+  GGBR4       0.955   0.274        moderado
+  GOAU4       0.969   0.313        moderado
+  ITSA4       0.970   0.592        moderado
+  SANB11      0.989   0.423        moderado
+  ITUB4       0.995   0.486        moderado
+  ENEV3       1.020   0.327        neutro/mercado
+  PRIO3       1.022   0.196        neutro/mercado
+  PETR4       1.024   0.318        neutro/mercado
+  RAIL3       1.042   0.336        neutro/mercado
+  PETR3       1.054   0.310        neutro/mercado
+  BBDC3       1.064   0.471        neutro/mercado
+  GGPS3       1.079   0.306        neutro/mercado
+  ASAI3       1.104   0.226        neutro/mercado
+  BBDC4       1.110   0.426        neutro/mercado
+  TOTS3       1.125   0.308        neutro/mercado
+  IRBR3       1.129   0.130        neutro/mercado
+  MULT3       1.136   0.440        neutro/mercado
+  RECV3       1.140   0.213        neutro/mercado
+  RDOR3       1.182   0.319        neutro/mercado
+  BRKM5       1.184   0.169        neutro/mercado
+  ALOS3       1.187   0.473        neutro/mercado
+  BRAV3       1.196   0.189        neutro/mercado
+  VBBR3       1.203   0.413        neutro/mercado
+  IGTI11      1.218   0.441        neutro/mercado
+  CURY3       1.221   0.304        neutro/mercado
+  CMIN3       1.225   0.286     ✓  neutro/mercado
+  USIM5       1.269   0.272        neutro/mercado
+  RAIZ4       1.294   0.245        neutro/mercado
+  UGPA3       1.325   0.129     ✓  agressivo
+  AZZA3       1.363   0.334        agressivo
+  RENT3       1.371   0.414        agressivo
+  NATU3       1.378   0.045        agressivo
+  BPAC11      1.396   0.483        agressivo
+  CSAN3       1.423   0.454        agressivo
+  B3SA3       1.423   0.474        agressivo
+  CSNA3       1.516   0.334     ✓  agressivo
+  CYRE3       1.542   0.424        agressivo
+  LREN3       1.546   0.396        agressivo
+  HAPV3       1.567   0.208        agressivo
+  ECOR3       1.603   0.405        muito agressivo
+  MRVE3       1.623   0.329        muito agressivo
+  COGN3       1.631   0.299     ✓  muito agressivo
+  YDUQ3       1.644   0.271        muito agressivo
+  BHIA3       1.777   0.159        muito agressivo
+  MOVI3       1.876   0.343        muito agressivo
+  CVCB3       2.082   0.280        muito agressivo
+  MGLU3       2.164   0.297        muito agressivo
+
+========================================================
+  Legenda R²: correlação com IBOV (1.0 = movimento idêntico)
+  Beta < 1: menos volátil que o mercado
+  Beta = 1: move igual ao mercado
+  Beta > 1: mais volátil que o mercado
+========================================================
