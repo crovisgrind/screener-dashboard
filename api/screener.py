@@ -1,409 +1,191 @@
 # api/screener.py
-# API com cache diário - atualiza apenas 1x por dia após fechamento da B3
+# Screener VCP (Qullamaggie) para Ibovespa
+# Três estados por ação: SINAL (VCP completo), CONTRACAO (aguardando breakout), WATCHLIST (tendência ok)
 
 from http.server import BaseHTTPRequestHandler
 import json
 import yfinance as yf
 import pandas as pd
+import numpy as np
 from datetime import datetime, time, timedelta
 import os
 
-# Lista de ações
 ACOES_PRINCIPAIS = [
     "ALOS3.SA","ABEV3.SA","ANIM3.SA","ASAI3.SA","AURE3.SA","AXIA3.SA","AXIA6.SA","AXIA7.SA","AZZA3.SA","B3SA3.SA","BBSE3.SA","BBDC3.SA","BBDC4.SA","BRAP4.SA","BBAS3.SA","BRKM5.SA","BRAV3.SA","BPAC11.SA","CXSE3.SA","BHIA3.SA","CBAV3.SA","CEAB3.SA","CMIG4.SA","COGN3.SA","CSMG3.SA","CPLE3.SA","CSAN3.SA","CPFE3.SA","CMIN3.SA","CURY3.SA","CVCB3.SA","CYRE3.SA","CYRE4.SA","DIRR3.SA","ECOR3.SA","EMBJ3.SA","ENGI11.SA","ENEV3.SA","EGIE3.SA","EQTL3.SA","EZTC3.SA","FLRY3.SA","GGBR4.SA","GOAU4.SA","GGPS3.SA","GMAT3.SA","HAPV3.SA","HYPE3.SA","IGTI11.SA","INTB3.SA","IRBR3.SA","ISAE4.SA","ITSA4.SA","ITUB4.SA","KLBN11.SA","RENT3.SA","RENT4.SA","LREN3.SA","LWSA3.SA","MGLU3.SA","POMO4.SA","MBRF3.SA","BEEF3.SA","MOTV3.SA","MOVI3.SA","MRVE3.SA","MULT3.SA","NATU3.SA","NEOE3.SA","PCAR3.SA","PETR3.SA","PETR4.SA","RECV3.SA","PRIO3.SA","AUAU3.SA","PSSA3.SA","RADL3.SA","RAIZ4.SA","RAPT4.SA","RDOR3.SA","RAIL3.SA","SBSP3.SA","SAPR11.SA","SANB11.SA","SMTO3.SA","CSNA3.SA","SIMH3.SA","SLCE3.SA","SMFT3.SA","SUZB3.SA","TAEE11.SA","VIVT3.SA","TEND3.SA","TIMS3.SA","TOTS3.SA","UGPA3.SA","USIM5.SA","VALE3.SA","VAMO3.SA","VBBR3.SA","VIVA3.SA","WEGE3.SA","YDUQ3.SA"
 ]
 
-LENGTH = 200
+# ── Parâmetros VCP ──────────────────────────────────────
+PRECO_MIN        = 5.00
+MA_FAST          = 50
+MA_SLOW          = 200
+VOL_MEDIO_MIN    = 500_000
+CONTRACAO_JANELA = 5
+CONTRACAO_REF    = 20
+CONTRACAO_FATOR  = 0.50   # range5d / range20d < este valor
+BREAKOUT_JANELA  = 10
+VOLUME_FATOR     = 2.0    # vol hoje > X * vol_ma20
 
-# ==================== CACHE DIÁRIO ====================
-_cache_diario = {
-    'data': None,
-    'data_processamento': None,
-    'em_processamento': False
-}
+# ── Cache ────────────────────────────────────────────────
+_cache_diario = {'data': None, 'data_processamento': None, 'em_processamento': False}
 
 def obter_data_pregao_atual():
-    """Retorna a data do pregão atual (considerando timezone BR = UTC-3)"""
-    agora_utc = datetime.utcnow()
-    agora_br = agora_utc - timedelta(hours=3)
-    hora_limite = time(18, 30)
-    if agora_br.time() < hora_limite:
-        data_pregao = (agora_br - timedelta(days=1)).date()
-    else:
-        data_pregao = agora_br.date()
-    return data_pregao
+    agora_br = datetime.utcnow() - timedelta(hours=3)
+    if agora_br.time() < time(18, 30):
+        return (agora_br - timedelta(days=1)).date()
+    return agora_br.date()
 
 def cache_valido():
-    """Verifica se o cache ainda é válido para o pregão de hoje"""
-    data_pregao_atual = obter_data_pregao_atual()
     if _cache_diario['data'] is None:
         return False
-    if _cache_diario['data_processamento'] != data_pregao_atual:
-        return False
-    return True
+    return _cache_diario['data_processamento'] == obter_data_pregao_atual()
 
-# ==================== FUNÇÕES DE PROCESSAMENTO ====================
-
+# ── Download ─────────────────────────────────────────────
 def baixar_dados(ticker, max_retries=2):
-    """Baixa dados com retry"""
     for tentativa in range(max_retries):
         try:
-            print(f"[INFO] Baixando {ticker} (tentativa {tentativa + 1}/{max_retries})...")
-            df = yf.download(
-                ticker,
-                period='1y',
-                interval='1d',
-                progress=False,
-                auto_adjust=True,
-                prepost=False,
-                actions=False,
-                keepna=False,
-                threads=False
-            )
+            df = yf.download(ticker, period='2y', interval='1d',
+                             progress=False, auto_adjust=True,
+                             prepost=False, actions=False, threads=False)
             if df is None or len(df) == 0:
-                print(f"[WARN] {ticker}: DataFrame vazio na tentativa {tentativa + 1}")
-                if tentativa < max_retries - 1:
-                    continue
-                return None
-
-            if hasattr(df, 'columns'):
-                if isinstance(df.columns, pd.MultiIndex):
-                    df.columns = df.columns.get_level_values(0)
-
-            required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
-            missing_cols = [col for col in required_cols if col not in df.columns]
-            if missing_cols:
-                print(f"[ERROR] {ticker}: Faltam colunas {missing_cols}")
-                return None
-
-            if len(df) < LENGTH:
-                print(f"[WARN] {ticker}: Apenas {len(df)} dias (mínimo {LENGTH})")
-                return None
-
-            print(f"[SUCCESS] {ticker}: {len(df)} dias baixados")
-            return df
-
-        except Exception as e:
-            print(f"[ERROR] Tentativa {tentativa + 1} falhou para {ticker}: {str(e)}")
-            if tentativa < max_retries - 1:
-                import time
-                time.sleep(1)
                 continue
-            return None
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            required = ['Open','High','Low','Close','Volume']
+            if any(c not in df.columns for c in required):
+                return None
+            if len(df) < MA_SLOW + CONTRACAO_REF + 5:
+                return None
+            return df
+        except Exception as e:
+            print(f"[ERROR] {ticker} tentativa {tentativa+1}: {e}")
+            if tentativa < max_retries - 1:
+                import time as t; t.sleep(1)
     return None
 
-
-def classificar_rsv_forca(dias_positivo, dias_negativo):
-    """
-    Classifica a força/fraqueza do RSV com granularidade nos dois lados.
-    Retorna (emoji + label, lado) onde lado é 'positivo' ou 'negativo'.
-    """
-    if dias_positivo >= 1:
-        # Lado positivo — volume sustentado acima do mercado
-        if dias_positivo >= 20:
-            return '🔥 Muito forte', 'positivo'
-        elif dias_positivo >= 10:
-            return '💪 Forte', 'positivo'
-        elif dias_positivo >= 5:
-            return '📈 Moderado', 'positivo'
-        else:
-            return '🌱 Início', 'positivo'
-    elif dias_negativo >= 1:
-        # Lado negativo — volume sustentado abaixo do mercado
-        if dias_negativo >= 20:
-            return '🧊 Muito fraco', 'negativo'
-        elif dias_negativo >= 10:
-            return '❄️ Fraco', 'negativo'
-        elif dias_negativo >= 5:
-            return '📉 Moderado neg.', 'negativo'
-        else:
-            return '🔻 Início neg.', 'negativo'
-    else:
-        return '⚪ Neutro', 'neutro'
-
-
-def calcular_sinais(ticker, bova_data):
-    """Calcula sinais para uma ação"""
+# ── Calcular VCP ─────────────────────────────────────────
+def calcular_vcp(ticker, df):
     try:
-        df = baixar_dados(ticker)
-        if df is None or len(df) < LENGTH:
+        c   = df['Close']
+        h   = df['High']
+        l   = df['Low']
+        v   = df['Volume']
+
+        ma50   = c.rolling(MA_FAST).mean()
+        ma200  = c.rolling(MA_SLOW).mean()
+        vol_ma = v.rolling(20).mean()
+        r5d    = h.rolling(CONTRACAO_JANELA).max() - l.rolling(CONTRACAO_JANELA).min()
+        r20d   = h.rolling(CONTRACAO_REF).max()    - l.rolling(CONTRACAO_REF).min()
+        max10d = h.rolling(BREAKOUT_JANELA).max().shift(1)
+        min5d  = l.rolling(CONTRACAO_JANELA).min().shift(1)
+
+        # Valores atuais
+        preco    = float(c.iloc[-1])
+        ma50_h   = float(ma50.iloc[-1])
+        ma200_h  = float(ma200.iloc[-1])
+        vol_h    = float(v.iloc[-1])
+        volma_h  = float(vol_ma.iloc[-1])
+        r5_h     = float(r5d.iloc[-1])
+        r20_h    = float(r20d.iloc[-1])
+        max10_h  = float(max10d.iloc[-1])
+        min5_h   = float(min5d.iloc[-1])
+
+        if any(np.isnan(x) for x in [ma50_h, ma200_h, volma_h, r5_h, r20_h, max10_h, min5_h]):
             return None
 
-        df_aligned, bova_aligned = df.align(bova_data, join='inner')
-        if len(df_aligned) < LENGTH:
-            return None
-
-        # MRS
-        rp = df_aligned['Close'] / bova_aligned['Close']
-        mrs = (rp / rp.rolling(LENGTH).mean() - 1) * 100
-
-        # RSV
-        rp_vol = df_aligned['Volume'] / bova_aligned['Volume']
-        rsv = (rp_vol / rp_vol.rolling(LENGTH).mean() - 1) * 100
-
-        if len(mrs) < 3:
-            return None
-
-        ticker_limpo = ticker.replace('.SA', '')
-        preco = float(df_aligned['Close'].iloc[-1])
-        mrs_atual = float(mrs.iloc[-1])
-        rsv_atual = float(rsv.iloc[-1])
-        mrs_ontem = float(mrs.iloc[-2])
-
-        # ============ CONSISTÊNCIA DO RSV ============
-        dias_rsv_positivo = 0
-        for i in range(1, min(60, len(rsv))):
-            val = rsv.iloc[-i]
-            if pd.isna(val):
-                continue
-            if float(val) > 0:
-                dias_rsv_positivo += 1
-            else:
-                break
-
-        dias_rsv_negativo = 0
-        for i in range(1, min(60, len(rsv))):
-            val = rsv.iloc[-i]
-            if pd.isna(val):
-                continue
-            if float(val) < 0:
-                dias_rsv_negativo += 1
-            else:
-                break
-
-        # Usa a nova função com granularidade nos dois lados
-        rsv_forca, rsv_lado = classificar_rsv_forca(dias_rsv_positivo, dias_rsv_negativo)
-
-        print(f"[DEBUG] {ticker_limpo}: dias_rsv_pos={dias_rsv_positivo}, dias_rsv_neg={dias_rsv_negativo}, forca={rsv_forca}")
+        vol_ratio    = vol_h / volma_h if volma_h > 0 else 0
+        contracao    = r5_h / r20_h   if r20_h  > 0 else 1
+        stop         = round(min5_h, 2)
+        risco_pct    = round((preco - min5_h) / preco * 100, 2) if preco > 0 else None
 
         resultado = {
-            'ticker': ticker_limpo,
-            'preco': round(preco, 2),
-            'mrs': round(mrs_atual, 2),
-            'rsv': round(rsv_atual, 2),
-            'dias_rsv_positivo': int(dias_rsv_positivo),
-            'dias_rsv_negativo': int(dias_rsv_negativo),
-            'rsv_forca': rsv_forca,
-            'rsv_lado': rsv_lado,
-            'sinais': []
+            'ticker':      ticker.replace('.SA',''),
+            'preco':       round(preco, 2),
+            'ma50':        round(ma50_h, 2),
+            'ma200':       round(ma200_h, 2),
+            'acima_ma50':  preco > ma50_h,
+            'acima_ma200': preco > ma200_h,
+            'vol_ratio':   round(vol_ratio, 2),
+            'contracao':   round(contracao, 2),
+            'stop':        stop,
+            'risco_pct':   risco_pct,
+            'estado':      None,   # SINAL | CONTRACAO | WATCHLIST | None
         }
 
-        # Sinal de COMPRA HOJE
-        if mrs_ontem <= 0 and mrs_atual > 0 and rsv_atual > 0:
-            resultado['sinais'].append({'tipo': 'COMPRA_HOJE', 'emoji': '🟢'})
+        # Filtros base obrigatórios
+        tendencia_ok = preco > ma50_h and preco > ma200_h
+        preco_ok     = preco >= PRECO_MIN
+        liquidez_ok  = volma_h >= VOL_MEDIO_MIN
 
-        # Sinal de VENDA HOJE
-        if mrs_ontem >= 0 and mrs_atual < 0 and rsv_atual < 0:
-            resultado['sinais'].append({'tipo': 'VENDA_HOJE', 'emoji': '🔴'})
+        if not (tendencia_ok and preco_ok and liquidez_ok):
+            return resultado   # retorna sem estado — não aparece em nenhuma lista
 
-        # Próximo de cruzar
-        if -2 <= mrs_atual < 0 and rsv_atual > 0:
-            if len(mrs) >= 3 and mrs.iloc[-3] < mrs.iloc[-2] < mrs_atual:
-                resultado['sinais'].append({
-                    'tipo': 'PROXIMO_COMPRA',
-                    'emoji': '🔶',
-                    'distancia': round(abs(mrs_atual), 2)
-                })
+        em_contracao = contracao < CONTRACAO_FATOR
 
-        # Cruzamentos recentes
-        for i in range(2, min(6, len(mrs))):
-            if mrs.iloc[-i-1] <= 0 and mrs.iloc[-i] > 0 and rsv.iloc[-i] > 0:
-                resultado['sinais'].append({
-                    'tipo': 'COMPRA_RECENTE',
-                    'emoji': '🟢',
-                    'dias_atras': i
-                })
-                break
+        if em_contracao:
+            breakout = preco > max10_h
+            vol_ok   = vol_ratio >= VOLUME_FATOR
 
-        for i in range(2, min(6, len(mrs))):
-            if mrs.iloc[-i-1] >= 0 and mrs.iloc[-i] < 0 and rsv.iloc[-i] < 0:
-                resultado['sinais'].append({
-                    'tipo': 'VENDA_RECENTE',
-                    'emoji': '🔴',
-                    'dias_atras': i
-                })
-                break
-
-        # Sinal amarelo
-        if (mrs_atual < 0 and len(mrs) >= 3 and
-                mrs.iloc[-3] < mrs.iloc[-2] < mrs_atual and
-                rsv_atual > 0 and rsv.iloc[-2] > 0 and rsv.iloc[-3] > 0):
-            resultado['sinais'].append({'tipo': 'ATENCAO', 'emoji': '🟡'})
-
-        # ---- Sinal de RECUPERAÇÃO ----
-        # Ação ainda abaixo do BOVA11 mas mostrando virada:
-        #   - MRS negativo porém subindo (janela 5-10d, tolerância de 1 tropeço)
-        #   - RSV recentemente virou positivo (1-10 dias)
-        #   - Não está em queda livre (mrs > -5%)
-        if mrs_atual < 0 and mrs_atual > -5 and rsv_atual > 0 and 1 <= dias_rsv_positivo <= 10:
-            janela = min(10, len(mrs) - 1)
-            mrs_janela = [float(mrs.iloc[-i]) for i in range(1, janela + 1)]
-            mrs_crescente = list(reversed(mrs_janela))  # do mais antigo ao mais recente
-
-            # Tolerância de 1 dia: aceita até 1 "tropeço" na sequência crescente
-            quebras = sum(
-                1 for i in range(len(mrs_crescente) - 1)
-                if mrs_crescente[i] >= mrs_crescente[i + 1]
-            )
-
-            if quebras <= 1:
-                resultado['sinais'].append({
-                    'tipo': 'RECUPERACAO',
-                    'emoji': '🔼',
-                    'dias_subindo': janela,
-                    'dias_rsv_positivo': dias_rsv_positivo,
-                    'quebras': quebras
-                })
+            if breakout and vol_ok:
+                resultado['estado'] = 'SINAL'
+            else:
+                resultado['estado'] = 'CONTRACAO'
+                resultado['falta_breakout'] = not breakout
+                resultado['falta_volume']   = not vol_ok
+        else:
+            resultado['estado'] = 'WATCHLIST'
 
         return resultado
 
     except Exception as e:
-        print(f"[ERROR] {ticker}: {e}")
+        print(f"[ERROR] {ticker} VCP: {e}")
         return None
 
-
+# ── Processamento principal ───────────────────────────────
 def processar_screener():
-    """Processa o screener completo"""
-    print(f"[INFO] Iniciando processamento do screener...")
+    print("[INFO] Iniciando processamento VCP...")
 
-    bova_data = baixar_dados('BOVA11.SA')
-    if bova_data is None:
-        print("[ERROR] BOVA11.SA indisponível")
-        return None
-
-    print(f"[INFO] BOVA11 baixado com sucesso: {len(bova_data)} dias")
-
-    todas_acoes = []
-    sinais_hoje = []
-    proximos_cruzar = []
-    cruzamentos_recentes = []
-    recuperacoes = []
+    sinais      = []   # VCP completo — entrar amanhã
+    contracoes  = []   # Comprimindo — monitorar
+    watchlist   = []   # Tendência ok mas sem contração
 
     for i, ticker in enumerate(ACOES_PRINCIPAIS, 1):
-        print(f"[INFO] Processando {i}/{len(ACOES_PRINCIPAIS)}: {ticker}")
-        resultado = calcular_sinais(ticker, bova_data)
+        print(f"[INFO] {i}/{len(ACOES_PRINCIPAIS)}: {ticker}")
+        df = baixar_dados(ticker)
+        if df is None:
+            continue
+        res = calcular_vcp(ticker, df)
+        if res is None or res['estado'] is None:
+            continue
 
-        if resultado:
-            todas_acoes.append(resultado)
+        if res['estado'] == 'SINAL':
+            sinais.append(res)
+        elif res['estado'] == 'CONTRACAO':
+            contracoes.append(res)
+        elif res['estado'] == 'WATCHLIST':
+            watchlist.append(res)
 
-            for sinal in resultado['sinais']:
-                # Campos comuns a todos os sinais — agora inclui RSV consistência
-                item = {
-                    'ticker': resultado['ticker'],
-                    'mrs': resultado['mrs'],
-                    'rsv': resultado['rsv'],
-                    'preco': resultado['preco'],
-                    'dias_rsv_positivo': resultado['dias_rsv_positivo'],
-                    'dias_rsv_negativo': resultado['dias_rsv_negativo'],
-                    'rsv_forca': resultado['rsv_forca'],
-                    'rsv_lado': resultado['rsv_lado'],
-                }
+    # Ordena contrações pela mais comprimida primeiro
+    contracoes.sort(key=lambda x: x['contracao'])
+    # Ordena sinais pelo maior volume ratio
+    sinais.sort(key=lambda x: x['vol_ratio'], reverse=True)
+    # Watchlist: ordena por contração (as mais próximas de comprimir primeiro)
+    watchlist.sort(key=lambda x: x['contracao'])
 
-                if sinal['tipo'] in ['COMPRA_HOJE', 'VENDA_HOJE']:
-                    item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
-                    item['emoji'] = sinal['emoji']
-                    sinais_hoje.append(item)
+    agora_br = datetime.utcnow() - timedelta(hours=3)
 
-                elif sinal['tipo'] == 'PROXIMO_COMPRA':
-                    item['distancia'] = sinal['distancia']
-                    proximos_cruzar.append(item)
-
-                elif sinal['tipo'] in ['COMPRA_RECENTE', 'VENDA_RECENTE']:
-                    item['tipo'] = 'COMPRA' if 'COMPRA' in sinal['tipo'] else 'VENDA'
-                    item['diasAtras'] = sinal['dias_atras']
-                    cruzamentos_recentes.append(item)
-
-                elif sinal['tipo'] == 'RECUPERACAO':
-                    item['dias_subindo'] = sinal['dias_subindo']
-                    item['dias_rsv_positivo'] = sinal['dias_rsv_positivo']
-                    item['quebras'] = sinal['quebras']
-                    recuperacoes.append(item)
-
-    # ==================== TOP MRS ====================
-    todas_acoes_ordenadas = sorted(todas_acoes, key=lambda x: x['mrs'], reverse=True)
-    top_mrs = [
-        {
-            'ticker': a['ticker'],
-            'mrs': a['mrs'],
-            'rsv': a['rsv'],
-            'preco': a['preco'],
-            'dias_rsv_positivo': a['dias_rsv_positivo'],
-            'dias_rsv_negativo': a['dias_rsv_negativo'],
-            'rsv_forca': a['rsv_forca'],
-            'rsv_lado': a['rsv_lado'],
-        }
-        for a in todas_acoes_ordenadas[:10]
-    ]
-
-    # ==================== TOP RSV CONSISTENTE (POSITIVO) ====================
-    # Ações que sustentam volume acima do mercado há mais dias consecutivos
-    acoes_rsv_positivo = [a for a in todas_acoes if a['dias_rsv_positivo'] > 0]
-    acoes_rsv_positivo_ord = sorted(acoes_rsv_positivo, key=lambda x: x['dias_rsv_positivo'], reverse=True)
-    top_rsv_consistente = [
-        {
-            'ticker': a['ticker'],
-            'mrs': a['mrs'],
-            'rsv': a['rsv'],
-            'preco': a['preco'],
-            'dias_rsv_positivo': a['dias_rsv_positivo'],
-            'rsv_forca': a['rsv_forca'],
-        }
-        for a in acoes_rsv_positivo_ord[:10]
-    ]
-
-    # ==================== TOP RSV FRACO (NEGATIVO) ====================
-    # Ações que sustentam volume abaixo do mercado há mais dias consecutivos
-    acoes_rsv_negativo = [a for a in todas_acoes if a['dias_rsv_negativo'] > 0]
-    acoes_rsv_negativo_ord = sorted(acoes_rsv_negativo, key=lambda x: x['dias_rsv_negativo'], reverse=True)
-    top_rsv_fraco = [
-        {
-            'ticker': a['ticker'],
-            'mrs': a['mrs'],
-            'rsv': a['rsv'],
-            'preco': a['preco'],
-            'dias_rsv_negativo': a['dias_rsv_negativo'],
-            'rsv_forca': a['rsv_forca'],
-        }
-        for a in acoes_rsv_negativo_ord[:10]
-    ]
-
-    # ==================== RECUPERAÇÕES ====================
-    # Ordena por dias_rsv_positivo (volume mais consolidado primeiro),
-    # depois por dias_subindo como desempate
-    recuperacoes_ord = sorted(
-        recuperacoes,
-        key=lambda x: (x['dias_rsv_positivo'], x['dias_subindo']),
-        reverse=True
-    )
-
-    # Obter última data de dados
-    ultima_data = bova_data.index[-1].strftime('%d/%m/%Y')
-
-    agora_utc = datetime.utcnow()
-    agora_br = agora_utc - timedelta(hours=3)
-
-    resposta = {
-        'lastUpdate': agora_br.strftime('%d/%m/%Y %H:%M:%S'),
-        'dataDados': ultima_data,
-        'timestamp': int(agora_utc.timestamp()),
-        'totalAcoes': len(ACOES_PRINCIPAIS),
-        'sinaisHoje': sinais_hoje,
-        'proximosCruzar': proximos_cruzar,
-        'cruzamentosRecentes': cruzamentos_recentes,
-        'topMRS': top_mrs,
-        'topRSVConsistente': top_rsv_consistente,   # maiores RSV positivos consecutivos
-        'topRSVFraco': top_rsv_fraco,               # maiores RSV negativos consecutivos
-        'recuperacoes': recuperacoes_ord,            # virada em andamento: MRS subindo + RSV virando
+    return {
+        'lastUpdate':   agora_br.strftime('%d/%m/%Y %H:%M:%S'),
+        'totalAcoes':   len(ACOES_PRINCIPAIS),
+        'sinais':       sinais,
+        'contracoes':   contracoes[:20],
+        'watchlist':    watchlist[:20],
         'cacheInfo': {
             'cached': False,
             'dataProcessamento': obter_data_pregao_atual().isoformat()
         }
     }
 
-    print(f"[INFO] Processamento concluído: {len(sinais_hoje)} sinais hoje, {len(recuperacoes_ord)} recuperações")
-    return resposta
-
-
+# ── Handler HTTP ─────────────────────────────────────────
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -414,28 +196,21 @@ class handler(BaseHTTPRequestHandler):
 
         try:
             if cache_valido():
-                print("[INFO] Usando cache do dia")
                 resposta = _cache_diario['data'].copy()
                 resposta['cacheInfo']['cached'] = True
                 self.wfile.write(json.dumps(resposta).encode())
                 return
 
             if _cache_diario['em_processamento']:
-                print("[INFO] Processamento em andamento, aguardando...")
                 if _cache_diario['data']:
                     resposta = _cache_diario['data'].copy()
                     resposta['cacheInfo']['cached'] = True
-                    resposta['cacheInfo']['processando'] = True
                     self.wfile.write(json.dumps(resposta).encode())
                 else:
-                    self.wfile.write(json.dumps({
-                        'error': 'Processamento em andamento, tente novamente em 30 segundos'
-                    }).encode())
+                    self.wfile.write(json.dumps({'error': 'Processando, tente em 30s'}).encode())
                 return
 
             _cache_diario['em_processamento'] = True
-            print("[INFO] Cache inválido, processando nova análise...")
-
             resposta = processar_screener()
 
             if resposta:
@@ -443,24 +218,11 @@ class handler(BaseHTTPRequestHandler):
                 _cache_diario['data_processamento'] = obter_data_pregao_atual()
                 self.wfile.write(json.dumps(resposta).encode())
             else:
-                self.wfile.write(json.dumps({
-                    'error': 'Dados temporariamente indisponíveis',
-                    'message': 'O Yahoo Finance está com problemas no BOVA11. Tente novamente em alguns minutos.',
-                    'retry': True,
-                    'timestamp': datetime.utcnow().isoformat()
-                }).encode())
+                self.wfile.write(json.dumps({'error': 'Dados indisponíveis', 'retry': True}).encode())
 
         except Exception as e:
-            print(f"[ERROR] Erro crítico: {e}")
             import traceback
-            error_details = traceback.format_exc()
-            print(error_details)
-            self.wfile.write(json.dumps({
-                'error': 'Erro ao processar screener',
-                'details': str(e),
-                'trace': error_details if 'VERCEL_ENV' not in os.environ else None
-            }).encode())
-
+            self.wfile.write(json.dumps({'error': str(e), 'trace': traceback.format_exc()}).encode())
         finally:
             _cache_diario['em_processamento'] = False
 
@@ -468,5 +230,4 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()

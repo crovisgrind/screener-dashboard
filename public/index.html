@@ -3,641 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Screener Ibovespa — MRS/RSV</title>
+<title>Screener VCP — Ibovespa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:       #0d0f14;
-    --surface:  #161a23;
-    --border:   #252b38;
-    --text:     #e8ecf4;
-    --muted:    #5a6478;
-    --buy:      #00e5a0;
-    --sell:     #ff4d6d;
-    --warn:     #ffb020;
-    --purple:   #a78bfa;
-    --mono:     'DM Mono', monospace;
-    --display:  'Syne', sans-serif;
-    --body:     'DM Sans', sans-serif;
+    --bg:      #0d0f14;
+    --surface: #161a23;
+    --border:  #252b38;
+    --text:    #e8ecf4;
+    --muted:   #5a6478;
+    --buy:     #00e5a0;
+    --sell:    #ff4d6d;
+    --warn:    #ffb020;
+    --purple:  #a78bfa;
+    --mono:    'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body:    'DM Sans', sans-serif;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--body);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 32px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: rgba(13,15,20,0.92);
-    backdrop-filter: blur(12px);
-    z-index: 100;
-  }
-
-  .topbar-left {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-  }
-
-  .logo {
-    font-family: var(--display);
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
-
-  .logo span {
-    color: var(--buy);
-  }
-
-  .tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 2px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-  }
-
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .update-info {
-    text-align: right;
-  }
-
-  .update-label {
-    font-size: 10px;
-    color: var(--muted);
-    font-family: var(--mono);
-  }
-
-  .update-time {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text);
-  }
-
-  .dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--buy);
-    margin-right: 5px;
-    animation: blink 2s infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.2; }
-  }
-
-  .btn-refresh {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.3px;
-  }
-
-  .btn-refresh:hover {
-    border-color: var(--purple);
-    color: var(--purple);
-  }
-
-  /* ── MAIN ── */
-  .main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 32px 80px;
-  }
-
-  /* ── STAT STRIP ── */
-  .stat-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 40px;
-  }
-
-  .stat {
-    background: var(--surface);
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .stat-label {
-    font-size: 10px;
-    color: var(--muted);
-    font-family: var(--mono);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-  }
-
-  .stat-value {
-    font-family: var(--display);
-    font-size: 32px;
-    font-weight: 800;
-    line-height: 1;
-  }
-
-  .stat-value.buy  { color: var(--buy); }
-  .stat-value.warn { color: var(--warn); }
-  .stat-value.muted{ color: var(--purple); }
-
-  /* ── SECTION HEADER ── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .section-title {
-    font-family: var(--display);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.2px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .section-title .count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    font-weight: 400;
-  }
-
-  .section-hint {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  /* ── SIGNAL ROW (hoje) ── */
-  .signals-table {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 40px;
-  }
-
-  .sig-row {
-    display: grid;
-    grid-template-columns: 90px 1fr 90px 90px 90px 100px;
-    align-items: center;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-    gap: 16px;
-  }
-
-  .sig-row:last-child { border-bottom: none; }
-  .sig-row:hover { background: rgba(255,255,255,0.025); }
-
-  .sig-row.header {
-    background: var(--surface);
-    padding: 10px 20px;
-  }
-
-  .col-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-  }
-
-  .ticker-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .type-pill {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-  }
-
-  .type-pill.buy  { background: rgba(0,229,160,0.12); color: var(--buy);  border: 1px solid rgba(0,229,160,0.25); }
-  .type-pill.sell { background: rgba(255,77,109,0.12); color: var(--sell); border: 1px solid rgba(255,77,109,0.25); }
-
-  .ticker-name {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
-
-  .price {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .metric {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 500;
-    text-align: right;
-  }
-
-  .metric.pos { color: var(--buy); }
-  .metric.neg { color: var(--sell); }
-  .metric.neutral { color: var(--text); }
-
-  /* ── RSV BADGE ── */
-  .rsv-badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .rsv-badge.fire    { background: rgba(255,80,30,0.15); color: #ff6b3d; border: 1px solid rgba(255,80,30,0.2); }
-  .rsv-badge.strong  { background: rgba(255,176,32,0.12); color: var(--warn); border: 1px solid rgba(255,176,32,0.2); }
-  .rsv-badge.mod     { background: rgba(0,229,160,0.1);  color: var(--buy);  border: 1px solid rgba(0,229,160,0.2); }
-  .rsv-badge.start   { background: rgba(0,229,160,0.06); color: #5fe8b8; border: 1px solid rgba(0,229,160,0.15); }
-  .rsv-badge.cold    { background: rgba(99,130,255,0.1);  color: #7fa4ff; border: 1px solid rgba(99,130,255,0.2); }
-  .rsv-badge.neutral { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-
-  /* ── TWO-COL LAYOUT ── */
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 40px;
-  }
-
-  .panel {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .panel-head {
-    background: var(--surface);
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .panel-body {
-    padding: 0;
-  }
-
-  /* ── RANK ROW ── */
-  .rank-row {
-    display: flex;
-    align-items: center;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    gap: 14px;
-    transition: background 0.1s;
-  }
-
-  .rank-row:last-child { border-bottom: none; }
-  .rank-row:hover { background: rgba(255,255,255,0.025); }
-
-  .rank-num {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    width: 18px;
-    flex-shrink: 0;
-  }
-
-  .rank-ticker {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 500;
-    flex: 1;
-  }
-
-  .rank-price {
-    font-size: 11px;
-    color: var(--muted);
-    font-family: var(--mono);
-  }
-
-  .rank-mrs {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 500;
-    width: 70px;
-    text-align: right;
-  }
-
-  /* ── NEAR CROSS GRID ── */
-  .near-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-
-  .near-card {
-    border: 1px solid rgba(255,176,32,0.2);
-    background: rgba(255,176,32,0.04);
-    border-radius: 10px;
-    padding: 16px 18px;
-    transition: background 0.15s;
-  }
-
-  .near-card:hover { background: rgba(255,176,32,0.08); }
-
-  .near-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .near-ticker {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 500;
-  }
-
-  .near-dist {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--warn);
-    background: rgba(255,176,32,0.1);
-    border: 1px solid rgba(255,176,32,0.2);
-    padding: 2px 7px;
-    border-radius: 4px;
-  }
-
-  .near-price {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .near-metrics {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .metric-pair {
-    display: flex;
-    gap: 12px;
-    font-family: var(--mono);
-    font-size: 12px;
-  }
-
-  .metric-pair .lbl { color: var(--muted); }
-
-  /* ── RECENT GRID ── */
-  .recent-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-
-  .recent-card {
-    border-radius: 10px;
-    padding: 16px 18px;
-    transition: background 0.15s;
-  }
-
-  .recent-card.buy  {
-    border: 1px solid rgba(0,229,160,0.2);
-    background: rgba(0,229,160,0.04);
-  }
-
-  .recent-card.buy:hover  { background: rgba(0,229,160,0.08); }
-
-  .recent-card.sell {
-    border: 1px solid rgba(255,77,109,0.2);
-    background: rgba(255,77,109,0.04);
-  }
-
-  .recent-card.sell:hover { background: rgba(255,77,109,0.08); }
-
-  .recent-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .recent-ticker {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 500;
-  }
-
-  .recent-when {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  .recent-price {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .recent-metrics {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  /* ── RECUPERAÇÃO CARDS ── */
-  .recup-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-
-  .recup-card {
-    border: 1px solid rgba(139,92,246,0.25);
-    background: rgba(139,92,246,0.05);
-    border-radius: 10px;
-    padding: 16px 18px;
-    transition: background 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .recup-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(139,92,246,0.6), transparent);
-  }
-
-  .recup-card:hover { background: rgba(139,92,246,0.09); }
-
-  .recup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .recup-ticker {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 500;
-  }
-
-  .recup-badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 4px;
-    background: rgba(139,92,246,0.15);
-    color: #c4b5fd;
-    border: 1px solid rgba(139,92,246,0.25);
-  }
-
-  .recup-price {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .recup-metrics {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-
-  .recup-progress {
-    margin-top: 10px;
-  }
-
-  .recup-progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .recup-bar-bg {
-    height: 3px;
-    background: rgba(255,255,255,0.07);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .recup-bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: linear-gradient(90deg, #7c3aed, #a78bfa);
-    transition: width 0.6s ease;
-  }
-
-  .tolerance-dot {
-    display: inline-block;
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    margin-right: 3px;
-    vertical-align: middle;
-  }
-
-  /* ── SECTION DIVIDER ── */
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 0 0 40px;
-  }
-
-  /* ── EMPTY STATE ── */
-  .empty {
-    text-align: center;
-    padding: 32px;
-    color: var(--muted);
-    font-size: 13px;
-    font-family: var(--mono);
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .main { padding: 20px 16px 60px; }
-    .topbar { padding: 14px 16px; }
-    .stat-strip { grid-template-columns: repeat(2, 1fr); }
-    .two-col { grid-template-columns: 1fr; }
-    .near-grid { grid-template-columns: 1fr 1fr; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .sig-row { grid-template-columns: 1fr 80px 80px 90px; }
-    .sig-row .col-price, .sig-row .cell-price { display: none; }
-    .sig-row.header .col-price { display: none; }
-  }
-
-  @media (max-width: 600px) {
-    .near-grid { grid-template-columns: 1fr; }
-    .stat-strip { grid-template-columns: 1fr 1fr; }
-    .sig-row { grid-template-columns: 1fr 75px 75px; }
-    .sig-row .col-rsv, .sig-row .cell-rsv, 
-    .sig-row .col-rsv-badge, .sig-row .cell-rsv-badge { display: none; }
-    .update-info { display: none; }
-  }
-
-  .fade-in {
-    animation: fadeUp 0.4s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .fade-in:nth-child(1) { animation-delay: 0.05s; }
-  .fade-in:nth-child(2) { animation-delay: 0.10s; }
-  .fade-in:nth-child(3) { animation-delay: 0.15s; }
-  .fade-in:nth-child(4) { animation-delay: 0.20s; }
-  .fade-in:nth-child(5) { animation-delay: 0.25s; }
-  .fade-in:nth-child(6) { animation-delay: 0.30s; }
+  body { background: var(--bg); color: var(--text); font-family: var(--body); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(13,15,20,0.94); backdrop-filter:blur(12px); z-index:100; }
+  .topbar-left { display:flex; align-items:baseline; gap:12px; }
+  .logo { font-family:var(--display); font-size:20px; font-weight:800; letter-spacing:-0.5px; }
+  .logo span { color:var(--buy); }
+  .tag { font-family:var(--mono); font-size:10px; color:var(--muted); background:var(--surface); border:1px solid var(--border); padding:2px 8px; border-radius:4px; letter-spacing:0.5px; }
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+  .update-info { text-align:right; }
+  .update-label { font-size:10px; color:var(--muted); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.5px; }
+  .update-time { font-family:var(--mono); font-size:12px; color:var(--text); display:flex; align-items:center; gap:6px; justify-content:flex-end; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--buy); display:inline-block; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .btn-refresh { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 16px; border-radius:8px; font-family:var(--mono); font-size:12px; cursor:pointer; transition:all .2s; }
+  .btn-refresh:hover { border-color:var(--buy); color:var(--buy); }
+
+  /* MAIN */
+  .main { max-width:1200px; margin:0 auto; padding:32px 32px 80px; }
+
+  /* STAT STRIP */
+  .stat-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:40px; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+  .stat-label { display:block; font-size:11px; color:var(--muted); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+  .stat-value { font-family:var(--mono); font-size:28px; font-weight:500; }
+  .stat-value.buy  { color:var(--buy); }
+  .stat-value.warn { color:var(--warn); }
+  .stat-value.muted{ color:var(--muted); }
+
+  /* SECTION */
+  .section-header { display:flex; align-items:baseline; gap:12px; margin:40px 0 16px; }
+  .section-title { font-family:var(--display); font-size:16px; font-weight:700; }
+  .section-hint { font-size:12px; color:var(--muted); font-family:var(--mono); }
+  .count { display:inline-flex; align-items:center; justify-content:center; background:var(--surface); border:1px solid var(--border); border-radius:20px; font-family:var(--mono); font-size:11px; padding:1px 8px; margin-left:6px; color:var(--muted); }
+
+  /* TABLE */
+  .vcp-table { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:8px; }
+  .vcp-row { display:grid; grid-template-columns: 90px 70px 70px 70px 70px 70px 70px 1fr; align-items:center; padding:10px 20px; border-bottom:1px solid var(--border); gap:8px; }
+  .vcp-row:last-child { border-bottom:none; }
+  .vcp-row.header { background:rgba(255,255,255,0.02); padding:8px 20px; }
+  .col-label { font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .col-label.right { text-align:right; }
+
+  .ticker-name { font-family:var(--mono); font-size:14px; font-weight:500; color:var(--text); }
+  .price { font-family:var(--mono); font-size:13px; color:var(--muted); }
+  .metric { font-family:var(--mono); font-size:13px; text-align:right; }
+  .metric.pos { color:var(--buy); }
+  .metric.neg { color:var(--sell); }
+  .metric.neutral { color:var(--text); }
+  .metric.warn { color:var(--warn); }
+
+  /* Badges MA */
+  .ma-badge { font-family:var(--mono); font-size:11px; padding:2px 7px; border-radius:4px; }
+  .ma-badge.ok  { background:rgba(0,229,160,0.12); color:var(--buy); }
+  .ma-badge.bad { background:rgba(255,77,109,0.12); color:var(--sell); }
+
+  /* Estado pills */
+  .state-pill { font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:20px; font-weight:500; white-space:nowrap; }
+  .state-pill.sinal    { background:rgba(0,229,160,0.15); color:var(--buy); border:1px solid rgba(0,229,160,0.3); }
+  .state-pill.contracao{ background:rgba(255,176,32,0.15); color:var(--warn); border:1px solid rgba(255,176,32,0.3); }
+  .state-pill.watchlist{ background:rgba(167,139,250,0.12); color:var(--purple); border:1px solid rgba(167,139,250,0.25); }
+
+  /* Stop badge */
+  .stop-info { font-family:var(--mono); font-size:12px; }
+  .stop-val { color:var(--sell); }
+  .stop-pct { color:var(--muted); font-size:11px; margin-left:4px; }
+
+  /* Contração bar */
+  .contr-wrap { display:flex; align-items:center; gap:8px; }
+  .contr-bar-bg { flex:1; height:4px; background:var(--border); border-radius:2px; min-width:40px; max-width:80px; }
+  .contr-bar-fill { height:100%; border-radius:2px; background:var(--warn); }
+  .contr-val { font-family:var(--mono); font-size:12px; color:var(--warn); min-width:32px; text-align:right; }
+
+  /* Falta badge */
+  .falta { font-family:var(--mono); font-size:10px; color:var(--muted); display:flex; gap:4px; flex-wrap:wrap; }
+  .falta span { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:4px; padding:1px 6px; }
+
+  .empty { color:var(--muted); font-family:var(--mono); font-size:13px; padding:24px 20px; }
+
+  /* Responsive */
+  @media (max-width:900px) {
+    .main { padding:20px 16px 60px; }
+    .topbar { padding:14px 16px; }
+    .stat-strip { grid-template-columns:repeat(2,1fr); }
+    .vcp-row { grid-template-columns: 80px 60px 60px 1fr; }
+    .vcp-row .col-ma50, .vcp-row .col-ma200,
+    .vcp-row .cell-ma50, .vcp-row .cell-ma200 { display:none; }
+  }
+  @media (max-width:600px) {
+    .vcp-row { grid-template-columns: 1fr 60px 60px; }
+    .vcp-row .col-vol, .vcp-row .cell-vol,
+    .vcp-row .col-contr, .vcp-row .cell-contr { display:none; }
+    .update-info { display:none; }
+  }
+
+  .fade-in { animation:fadeUp .4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in:nth-child(1){animation-delay:.05s}
+  .fade-in:nth-child(2){animation-delay:.10s}
+  .fade-in:nth-child(3){animation-delay:.15s}
+  .fade-in:nth-child(4){animation-delay:.20s}
 </style>
 </head>
 <body>
@@ -645,8 +130,8 @@
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-left">
-    <span class="logo">MRS<span>/</span>RSV</span>
-    <span class="tag">IBOVESPA</span>
+    <span class="logo">VCP<span>·</span>IBOV</span>
+    <span class="tag">QULLAMAGGIE</span>
   </div>
   <div class="topbar-right">
     <div class="update-info">
@@ -658,347 +143,254 @@
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
-  <!-- STAT STRIP -->
+  <!-- STATS -->
   <div class="stat-strip" style="margin-bottom:40px">
     <div class="stat fade-in">
       <span class="stat-label">Sinais Hoje</span>
-      <span class="stat-value" id="statTotal">—</span>
+      <span class="stat-value buy" id="statSinais">—</span>
     </div>
     <div class="stat fade-in">
-      <span class="stat-label">Compras</span>
-      <span class="stat-value buy" id="statCompras">—</span>
+      <span class="stat-label">Em Contração</span>
+      <span class="stat-value warn" id="statContr">—</span>
     </div>
     <div class="stat fade-in">
-      <span class="stat-label">Próx. de Cruzar</span>
-      <span class="stat-value warn" id="statProximos">—</span>
+      <span class="stat-label">Watchlist</span>
+      <span class="stat-value muted" id="statWatch">—</span>
     </div>
     <div class="stat fade-in">
-      <span class="stat-label">Ações Analisadas</span>
-      <span class="stat-value muted" id="statAcoes">—</span>
+      <span class="stat-label">Analisadas</span>
+      <span class="stat-value muted" id="statTotal">—</span>
     </div>
   </div>
 
-  <!-- SINAIS DE HOJE -->
+  <!-- HEADER DA TABELA -->
   <div class="section-header fade-in">
-    <span class="section-title">Sinais de Hoje <span class="count">3</span></span>
-    <span class="section-hint">cruzamento MRS + RSV confirmado</span>
+    <span class="section-title">🟢 Sinais VCP <span class="count" id="countSinais">0</span></span>
+    <span class="section-hint">VCP completo hoje · entrar na abertura de amanhã</span>
   </div>
-
-  <div class="signals-table fade-in">
-    <div class="sig-row header">
-      <span class="col-label">tipo</span>
+  <div class="vcp-table fade-in">
+    <div class="vcp-row header">
       <span class="col-label">ticker</span>
-      <span class="col-label col-price" style="text-align:right">preço</span>
-      <span class="col-label" style="text-align:right">MRS</span>
-      <span class="col-label col-rsv" style="text-align:right">RSV</span>
-      <span class="col-label col-rsv-badge" style="text-align:right">RSV streak</span>
+      <span class="col-label right">preço</span>
+      <span class="col-label right col-ma50">MA50</span>
+      <span class="col-label right col-ma200">MA200</span>
+      <span class="col-label right col-vol">vol ratio</span>
+      <span class="col-label right col-contr">contração</span>
+      <span class="col-label right">stop</span>
+      <span class="col-label"></span>
     </div>
-    <div id="sinaisRows"></div>
+    <div id="sinaisRows"><p class="empty">Carregando...</p></div>
   </div>
 
-  <!-- PRÓXIMOS DE CRUZAR -->
+  <!-- CONTRAÇÕES -->
   <div class="section-header fade-in">
-    <span class="section-title">Próximos de Cruzar <span class="count">3</span></span>
-    <span class="section-hint">MRS entre −2% e 0%, RSV positivo</span>
+    <span class="section-title">🟡 Em Contração <span class="count" id="countContr">0</span></span>
+    <span class="section-hint">volatilidade comprimindo · aguardando breakout + volume</span>
+  </div>
+  <div class="vcp-table fade-in">
+    <div class="vcp-row header">
+      <span class="col-label">ticker</span>
+      <span class="col-label right">preço</span>
+      <span class="col-label right col-ma50">MA50</span>
+      <span class="col-label right col-ma200">MA200</span>
+      <span class="col-label right col-vol">vol ratio</span>
+      <span class="col-label right col-contr">contração</span>
+      <span class="col-label right">stop</span>
+      <span class="col-label">falta</span>
+    </div>
+    <div id="contracaoRows"><p class="empty">Carregando...</p></div>
   </div>
 
-  <div class="near-grid" id="nearGrid"></div>
-
-  <!-- CRUZAMENTOS RECENTES -->
+  <!-- WATCHLIST -->
   <div class="section-header fade-in">
-    <span class="section-title">Cruzamentos Últimos 5 Dias</span>
-    <span class="section-hint">sinal gerado nos últimos pregões</span>
+    <span class="section-title">🟣 Watchlist <span class="count" id="countWatch">0</span></span>
+    <span class="section-hint">MA50 + MA200 ok · sem contração ainda · ordenado pela mais próxima</span>
   </div>
-
-  <div class="recent-grid fade-in" id="recentGrid"></div>
-
-  <!-- TOP MRS + VOLUME -->
-  <div class="two-col fade-in">
-    <div class="panel">
-      <div class="panel-head"><div class="section-title">Top MRS</div></div>
-      <div class="panel-body" id="topMRSRows"></div>
+  <div class="vcp-table fade-in">
+    <div class="vcp-row header">
+      <span class="col-label">ticker</span>
+      <span class="col-label right">preço</span>
+      <span class="col-label right col-ma50">MA50</span>
+      <span class="col-label right col-ma200">MA200</span>
+      <span class="col-label right col-vol">vol ratio</span>
+      <span class="col-label right col-contr">contração</span>
+      <span class="col-label right">stop</span>
+      <span class="col-label"></span>
     </div>
-    <div class="panel">
-      <div class="panel-head"><div class="section-title">🔥 Maior Volume Sustentado</div></div>
-      <div class="panel-body" id="topRSVConRows"></div>
-    </div>
+    <div id="watchlistRows"><p class="empty">Carregando...</p></div>
   </div>
-
-  <!-- MENOR VOLUME -->
-  <div class="two-col fade-in">
-    <div class="panel">
-      <div class="panel-head"><div class="section-title">🧊 Menor Volume Sustentado</div></div>
-      <div class="panel-body" id="topRSVFracoRows"></div>
-    </div>
-    <div></div>
-  </div>
-
-  <!-- RECUPERAÇÕES EM ANDAMENTO -->
-  <div class="section-header fade-in">
-    <span class="section-title">🔼 Virada em Andamento <span class="count" id="countRecup">0</span></span>
-    <span class="section-hint">MRS negativo mas subindo · RSV recém-positivo (1–10d)</span>
-  </div>
-
-  <div class="recup-grid fade-in" id="recupGrid"></div>
 
 </div><!-- /main -->
 
 <script>
-// ==================== HELPERS ====================
-function fmt(n, sign=false) {
-    const s = Math.abs(n).toFixed(2) + '%';
-    return sign ? (n >= 0 ? '+' : '−') + s : (n < 0 ? '−' : '') + s;
+// ── Helpers ─────────────────────────────────────────────
+function fmtR(n) { return 'R$ ' + n.toFixed(2); }
+function fmtPct(n) { return (n >= 0 ? '+' : '−') + Math.abs(n).toFixed(2) + '%'; }
+
+function maBadge(preco, ma, label) {
+  const ok = preco > ma;
+  return `<span class="ma-badge ${ok ? 'ok' : 'bad'}">${label} ${fmtR(ma)}</span>`;
 }
 
-function rsvBadge(diasPos, diasNeg) {
-    diasPos = diasPos || 0;
-    diasNeg = diasNeg || 0;
-    if (diasPos >= 20) return `<span class="rsv-badge fire">🔥 ${diasPos}d</span>`;
-    if (diasPos >= 10) return `<span class="rsv-badge strong">💪 ${diasPos}d</span>`;
-    if (diasPos >= 5)  return `<span class="rsv-badge mod">📈 ${diasPos}d</span>`;
-    if (diasPos >= 1)  return `<span class="rsv-badge start">🌱 ${diasPos}d</span>`;
-    if (diasNeg >= 20) return `<span class="rsv-badge cold">🧊 −${diasNeg}d</span>`;
-    if (diasNeg >= 10) return `<span class="rsv-badge cold">❄️ −${diasNeg}d</span>`;
-    if (diasNeg >= 5)  return `<span class="rsv-badge cold">📉 −${diasNeg}d</span>`;
-    if (diasNeg >= 1)  return `<span class="rsv-badge cold">🔻 −${diasNeg}d</span>`;
-    return `<span class="rsv-badge neutral">⚪ 0d</span>`;
+function contrBar(contracao) {
+  // contracao é range5/range20: quanto menor, mais comprimido
+  // 0.50 = limite; 0 = máxima contração
+  const pct = Math.min(100, Math.round((contracao / 0.5) * 100));
+  const color = contracao < 0.3 ? 'var(--buy)' : contracao < 0.4 ? 'var(--warn)' : 'var(--muted)';
+  return `
+    <div class="contr-wrap">
+      <div class="contr-bar-bg"><div class="contr-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="contr-val" style="color:${color}">${contracao.toFixed(2)}x</span>
+    </div>`;
 }
 
-// ==================== DADOS DE EXEMPLO ====================
-const dadosExemplo = {
-    lastUpdate: new Date().toLocaleString('pt-BR'),
-    totalAcoes: 98,
-    sinaisHoje: [
-        { ticker:'PRIO3',  tipo:'COMPRA', mrs: 0.87, rsv: 28.88,  preco:45.73, dias_rsv_positivo:3,  dias_rsv_negativo:0 },
-        { ticker:'TIMS3',  tipo:'COMPRA', mrs: 0.49, rsv: 88.72,  preco:24.21, dias_rsv_positivo:12, dias_rsv_negativo:0 },
-        { ticker:'FLRY3',  tipo:'VENDA',  mrs:-0.15, rsv:-41.08,  preco:15.53, dias_rsv_positivo:0,  dias_rsv_negativo:8 }
-    ],
-    proximosCruzar: [
-        { ticker:'ITUB4', mrs:-0.33, rsv: -6.06, preco:39.84, distancia:0.33, dias_rsv_positivo:0, dias_rsv_negativo:5  },
-        { ticker:'WEGE3', mrs:-1.08, rsv:-39.61, preco:46.51, distancia:1.08, dias_rsv_positivo:0, dias_rsv_negativo:12 },
-        { ticker:'BBDC4', mrs:-0.84, rsv:-15.22, preco:19.11, distancia:0.84, dias_rsv_positivo:0, dias_rsv_negativo:3  }
-    ],
-    cruzamentosRecentes: [
-        { ticker:'CVCB3',  tipo:'COMPRA', mrs:-0.84, rsv: 229.10, preco: 2.48, diasAtras:2, dias_rsv_positivo:21, dias_rsv_negativo:0 },
-        { ticker:'SANB11', tipo:'COMPRA', mrs: 1.41, rsv:  32.32, preco:33.92, diasAtras:2, dias_rsv_positivo:7,  dias_rsv_negativo:0 },
-        { ticker:'RDOR3',  tipo:'VENDA',  mrs:-1.94, rsv: -52.41, preco:39.91, diasAtras:5, dias_rsv_positivo:0,  dias_rsv_negativo:6 }
-    ],
-    topMRS: [
-        { ticker:'VALE3',  mrs:24.08, rsv: 12.50, preco:79.83, dias_rsv_positivo:8, dias_rsv_negativo:0 },
-        { ticker:'BBDC4',  mrs: 3.10, rsv: -6.06, preco:19.11, dias_rsv_positivo:0, dias_rsv_negativo:5 },
-        { ticker:'SANB11', mrs: 1.41, rsv: 32.32, preco:33.92, dias_rsv_positivo:7, dias_rsv_negativo:0 }
-    ],
-    topRSVConsistente: [
-        { ticker:'CVCB3', mrs:-0.84, rsv:229.10, preco: 2.48, dias_rsv_positivo:21 },
-        { ticker:'TIMS3', mrs: 0.49, rsv: 88.72, preco:24.21, dias_rsv_positivo:12 },
-        { ticker:'VALE3', mrs:24.08, rsv: 12.50, preco:79.83, dias_rsv_positivo: 8 }
-    ],
-    topRSVFraco: [
-        { ticker:'WEGE3', mrs:-1.08, rsv:-39.61, preco:46.51, dias_rsv_negativo:12 },
-        { ticker:'RDOR3', mrs:-1.94, rsv:-52.41, preco:39.91, dias_rsv_negativo: 6 },
-        { ticker:'ITUB4', mrs:-0.33, rsv: -6.06, preco:39.84, dias_rsv_negativo: 5 }
-    ],
-    recuperacoes: [
-        { ticker:'MGLU3',  mrs:-1.82, rsv: 14.20, preco: 9.54, dias_rsv_positivo:7, dias_subindo:9, quebras:0 },
-        { ticker:'COGN3',  mrs:-3.40, rsv: 22.10, preco: 5.21, dias_rsv_positivo:5, dias_subindo:8, quebras:1 },
-        { ticker:'HAPV3',  mrs:-2.10, rsv:  8.55, preco:12.87, dias_rsv_positivo:4, dias_subindo:7, quebras:0 },
-        { ticker:'BHIA3',  mrs:-4.70, rsv: 31.00, preco: 3.10, dias_rsv_positivo:3, dias_subindo:6, quebras:1 }
-    ]
+function volColor(r) {
+  if (r >= 2.0) return 'pos';
+  if (r >= 1.0) return 'neutral';
+  return 'neg';
+}
+
+function rowSinal(a) {
+  return `
+    <div class="vcp-row">
+      <div><span class="ticker-name">${a.ticker}</span></div>
+      <div class="metric neutral" style="text-align:right">${fmtR(a.preco)}</div>
+      <div class="metric neutral col-ma50" style="text-align:right">${fmtR(a.ma50)}</div>
+      <div class="metric neutral col-ma200" style="text-align:right">${fmtR(a.ma200)}</div>
+      <div class="metric ${volColor(a.vol_ratio)} col-vol" style="text-align:right">${a.vol_ratio.toFixed(2)}x</div>
+      <div class="col-contr">${contrBar(a.contracao)}</div>
+      <div class="stop-info"><span class="stop-val">${fmtR(a.stop)}</span><span class="stop-pct">(−${a.risco_pct}%)</span></div>
+      <div><span class="state-pill sinal">▶ entrar amanhã</span></div>
+    </div>`;
+}
+
+function rowContracao(a) {
+  const faltas = [];
+  if (a.falta_breakout) faltas.push('<span>sem breakout</span>');
+  if (a.falta_volume)   faltas.push('<span>vol < 2x</span>');
+  return `
+    <div class="vcp-row">
+      <div><span class="ticker-name">${a.ticker}</span></div>
+      <div class="metric neutral" style="text-align:right">${fmtR(a.preco)}</div>
+      <div class="metric neutral col-ma50" style="text-align:right">${fmtR(a.ma50)}</div>
+      <div class="metric neutral col-ma200" style="text-align:right">${fmtR(a.ma200)}</div>
+      <div class="metric ${volColor(a.vol_ratio)} col-vol" style="text-align:right">${a.vol_ratio.toFixed(2)}x</div>
+      <div class="col-contr">${contrBar(a.contracao)}</div>
+      <div class="stop-info"><span class="stop-val">${fmtR(a.stop)}</span><span class="stop-pct">(−${a.risco_pct}%)</span></div>
+      <div class="falta">${faltas.join('')}</div>
+    </div>`;
+}
+
+function rowWatch(a) {
+  return `
+    <div class="vcp-row">
+      <div><span class="ticker-name">${a.ticker}</span></div>
+      <div class="metric neutral" style="text-align:right">${fmtR(a.preco)}</div>
+      <div class="metric neutral col-ma50" style="text-align:right">${fmtR(a.ma50)}</div>
+      <div class="metric neutral col-ma200" style="text-align:right">${fmtR(a.ma200)}</div>
+      <div class="metric ${volColor(a.vol_ratio)} col-vol" style="text-align:right">${a.vol_ratio.toFixed(2)}x</div>
+      <div class="col-contr">${contrBar(a.contracao)}</div>
+      <div class="stop-info"><span class="stop-val">${fmtR(a.stop)}</span><span class="stop-pct">(−${a.risco_pct}%)</span></div>
+      <div><span class="state-pill watchlist">monitorar</span></div>
+    </div>`;
+}
+
+// ── Render ───────────────────────────────────────────────
+function renderizarDados(dados) {
+  const isDemo = dados._demo === true;
+
+  // Header
+  const updateEl = document.getElementById('updateTime');
+  if (updateEl) updateEl.innerHTML = isDemo
+    ? `<span style="color:var(--warn)">⚠️ dados de exemplo</span>`
+    : `<span class="dot"></span>${dados.lastUpdate}`;
+
+  if (dados.cacheInfo && !isDemo) {
+    const el = document.getElementById('cacheInfo');
+    if (el) el.textContent = (dados.cacheInfo.cached ? '💾 cache' : '🔄 processado agora');
+  }
+
+  // Stats
+  document.getElementById('statSinais').textContent = dados.sinais.length;
+  document.getElementById('statContr').textContent  = dados.contracoes.length;
+  document.getElementById('statWatch').textContent  = dados.watchlist.length;
+  document.getElementById('statTotal').textContent  = dados.totalAcoes;
+  document.getElementById('countSinais').textContent = dados.sinais.length;
+  document.getElementById('countContr').textContent  = dados.contracoes.length;
+  document.getElementById('countWatch').textContent  = dados.watchlist.length;
+
+  // Sinais
+  document.getElementById('sinaisRows').innerHTML = dados.sinais.length
+    ? dados.sinais.map(rowSinal).join('')
+    : `<p class="empty">Nenhum sinal VCP completo hoje</p>`;
+
+  // Contrações
+  document.getElementById('contracaoRows').innerHTML = dados.contracoes.length
+    ? dados.contracoes.map(rowContracao).join('')
+    : `<p class="empty">Nenhuma ação em contração</p>`;
+
+  // Watchlist
+  document.getElementById('watchlistRows').innerHTML = dados.watchlist.length
+    ? dados.watchlist.map(rowWatch).join('')
+    : `<p class="empty">Nenhuma ação na watchlist</p>`;
+}
+
+// ── Demo data ─────────────────────────────────────────────
+const dadosDemo = {
+  _demo: true,
+  lastUpdate: new Date().toLocaleString('pt-BR'),
+  totalAcoes: 100,
+  sinais: [
+    { ticker:'CURY3',  preco:22.10, ma50:20.40, ma200:18.90, vol_ratio:3.12, contracao:0.28, stop:20.80, risco_pct:5.88 },
+    { ticker:'PETR4',  preco:38.50, ma50:36.20, ma200:34.10, vol_ratio:2.45, contracao:0.35, stop:36.90, risco_pct:4.16 },
+  ],
+  contracoes: [
+    { ticker:'VALE3',  preco:79.20, ma50:74.10, ma200:70.30, vol_ratio:1.20, contracao:0.38, stop:75.40, risco_pct:4.80, falta_breakout:false, falta_volume:true  },
+    { ticker:'ITUB4',  preco:39.80, ma50:37.50, ma200:35.20, vol_ratio:0.90, contracao:0.42, stop:37.80, risco_pct:5.03, falta_breakout:true,  falta_volume:true  },
+    { ticker:'WEGE3',  preco:48.60, ma50:45.30, ma200:42.10, vol_ratio:1.80, contracao:0.44, stop:45.90, risco_pct:5.56, falta_breakout:true,  falta_volume:false },
+  ],
+  watchlist: [
+    { ticker:'BBAS3',  preco:25.40, ma50:23.80, ma200:22.10, vol_ratio:1.10, contracao:0.62, stop:23.50, risco_pct:7.48 },
+    { ticker:'SUZB3',  preco:62.30, ma50:59.10, ma200:55.40, vol_ratio:0.95, contracao:0.71, stop:58.80, risco_pct:5.62 },
+  ]
 };
 
-// ==================== RENDER ====================
-function renderizarDados(dados) {
-    // Header
-    const updateEl = document.getElementById('updateTime');
-    const isExemplo = dados === dadosExemplo;
-    if (updateEl) {
-        updateEl.innerHTML = isExemplo
-            ? `<span style="color:var(--warn)">⚠️ dados de exemplo</span>`
-            : `<span class="dot"></span>${dados.lastUpdate}`;
-    }
-    if (dados.cacheInfo && !isExemplo) {
-        const cacheEl = document.getElementById('cacheInfo');
-        if (cacheEl) {
-            const cached = dados.cacheInfo.cached ? '💾 cache' : '🔄 processado agora';
-            const dataDados = dados.dataDados ? ` · dados de ${dados.dataDados}` : '';
-            cacheEl.textContent = cached + dataDados;
-        }
-    }
-
-    // Stats
-    const compras = dados.sinaisHoje.filter(s => s.tipo === 'COMPRA').length;
-    document.getElementById('statTotal').textContent    = dados.sinaisHoje.length;
-    document.getElementById('statCompras').textContent  = compras;
-    document.getElementById('statProximos').textContent = dados.proximosCruzar.length;
-    document.getElementById('statAcoes').textContent    = dados.totalAcoes;
-
-    // Sinais de hoje
-    document.getElementById('sinaisRows').innerHTML = dados.sinaisHoje.length
-        ? dados.sinaisHoje.map(s => `
-            <div class="sig-row">
-                <div><span class="type-pill ${s.tipo === 'COMPRA' ? 'buy' : 'sell'}">${s.tipo}</span></div>
-                <div class="ticker-cell"><span class="ticker-name">${s.ticker}</span></div>
-                <div class="metric neutral cell-price" style="text-align:right">R$ ${s.preco.toFixed(2)}</div>
-                <div class="metric ${s.mrs >= 0 ? 'pos' : 'neg'}" style="text-align:right">${fmt(s.mrs, true)}</div>
-                <div class="metric ${s.rsv >= 0 ? 'pos' : 'neg'} cell-rsv" style="text-align:right">${fmt(s.rsv, true)}</div>
-                <div class="cell-rsv-badge" style="text-align:right">${rsvBadge(s.dias_rsv_positivo, s.dias_rsv_negativo)}</div>
-            </div>`).join('')
-        : `<div class="sig-row"><span style="color:var(--muted);font-family:var(--mono);font-size:13px">Nenhum sinal hoje</span></div>`;
-
-    // Próximos de cruzar
-    document.getElementById('nearGrid').innerHTML = dados.proximosCruzar.length
-        ? dados.proximosCruzar.map(a => `
-            <div class="near-card">
-                <div class="near-header">
-                    <span class="near-ticker">${a.ticker}</span>
-                    <span class="near-dist">falta ${a.distancia.toFixed(2)}%</span>
-                </div>
-                <div class="near-price">R$ ${a.preco.toFixed(2)}</div>
-                <div class="near-metrics">
-                    <div class="metric-pair">
-                        <span class="lbl">MRS</span><span class="metric ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
-                        <span class="lbl">RSV</span><span class="metric ${a.rsv >= 0 ? 'pos' : 'neg'}">${fmt(a.rsv, true)}</span>
-                    </div>
-                    ${rsvBadge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
-                </div>
-            </div>`).join('')
-        : `<p class="empty" style="grid-column:1/-1">Nenhuma ação próxima de cruzar</p>`;
-
-    // Cruzamentos recentes
-    document.getElementById('recentGrid').innerHTML = dados.cruzamentosRecentes.length
-        ? dados.cruzamentosRecentes.map(a => `
-            <div class="recent-card ${a.tipo === 'COMPRA' ? 'buy' : 'sell'}">
-                <div class="recent-header">
-                    <span class="recent-ticker">${a.ticker}</span>
-                    <span class="recent-when">${a.tipo} · há ${a.diasAtras}d</span>
-                </div>
-                <div class="recent-price">R$ ${a.preco.toFixed(2)}</div>
-                <div class="recent-metrics">
-                    <div class="metric-pair">
-                        <span class="lbl">MRS</span><span class="metric ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
-                        <span class="lbl">RSV</span><span class="metric ${a.rsv >= 0 ? 'pos' : 'neg'}">${fmt(a.rsv, true)}</span>
-                    </div>
-                    ${rsvBadge(a.dias_rsv_positivo, a.dias_rsv_negativo)}
-                </div>
-            </div>`).join('')
-        : `<p class="empty" style="grid-column:1/-1">Nenhum cruzamento recente</p>`;
-
-    // Top MRS
-    document.getElementById('topMRSRows').innerHTML = dados.topMRS.map((a, i) => `
-        <div class="rank-row">
-            <span class="rank-num">${i + 1}</span>
-            <div style="flex:1"><div class="rank-ticker">${a.ticker}</div><div class="rank-price">R$ ${a.preco.toFixed(2)}</div></div>
-            <span style="margin-right:10px">${rsvBadge(a.dias_rsv_positivo, a.dias_rsv_negativo)}</span>
-            <span class="rank-mrs ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
-        </div>`).join('');
-
-    // Top RSV Consistente
-    document.getElementById('topRSVConRows').innerHTML = (dados.topRSVConsistente || []).map((a, i) => `
-        <div class="rank-row">
-            <span class="rank-num">${i + 1}</span>
-            <div style="flex:1"><div class="rank-ticker">${a.ticker}</div><div class="rank-price">R$ ${a.preco.toFixed(2)}</div></div>
-            <span style="margin-right:10px">${rsvBadge(a.dias_rsv_positivo, 0)}</span>
-            <span class="rank-mrs ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
-        </div>`).join('');
-
-    // Top RSV Fraco
-    document.getElementById('topRSVFracoRows').innerHTML = (dados.topRSVFraco || []).map((a, i) => `
-        <div class="rank-row">
-            <span class="rank-num">${i + 1}</span>
-            <div style="flex:1"><div class="rank-ticker">${a.ticker}</div><div class="rank-price">R$ ${a.preco.toFixed(2)}</div></div>
-            <span style="margin-right:10px">${rsvBadge(0, a.dias_rsv_negativo)}</span>
-            <span class="rank-mrs ${a.mrs >= 0 ? 'pos' : 'neg'}">${fmt(a.mrs, true)}</span>
-        </div>`).join('');
-
-    // Recuperações em andamento
-    const recups = dados.recuperacoes || [];
-    const countEl = document.getElementById('countRecup');
-    if (countEl) countEl.textContent = recups.length;
-
-    document.getElementById('recupGrid').innerHTML = recups.length
-        ? recups.map(a => {
-            // Barra de progresso: RSV 1–10d → 0–100%
-            const pct = Math.round((a.dias_rsv_positivo / 10) * 100);
-            // Qualidade da tendência
-            const qualLabel = a.quebras === 0
-                ? `<span class="tolerance-dot" style="background:#a78bfa"></span>tendência limpa`
-                : `<span class="tolerance-dot" style="background:var(--warn)"></span>1 tropeço`;
-            return `
-            <div class="recup-card">
-                <div class="recup-header">
-                    <span class="recup-ticker">${a.ticker}</span>
-                    <span class="recup-badge">🔼 ${a.dias_subindo}d subindo</span>
-                </div>
-                <div class="recup-price">R$ ${a.preco.toFixed(2)}</div>
-                <div class="recup-metrics">
-                    <div class="metric-pair">
-                        <span class="lbl">MRS</span>
-                        <span class="metric neg">${fmt(a.mrs, true)}</span>
-                        <span class="lbl">RSV</span>
-                        <span class="metric pos">${fmt(a.rsv, true)}</span>
-                    </div>
-                    ${rsvBadge(a.dias_rsv_positivo, 0)}
-                </div>
-                <div class="recup-progress">
-                    <div class="recup-progress-label">
-                        <span style="font-size:9px;color:var(--muted)">${qualLabel}</span>
-                        <span>RSV positivo: ${a.dias_rsv_positivo}/10d</span>
-                    </div>
-                    <div class="recup-bar-bg">
-                        <div class="recup-bar-fill" style="width:${pct}%"></div>
-                    </div>
-                </div>
-            </div>`;
-        }).join('')
-        : `<p class="empty" style="grid-column:1/-1">Nenhuma virada detectada hoje</p>`;
-}
-
-// ==================== FETCH ====================
+// ── Fetch ─────────────────────────────────────────────────
 async function atualizarDados(tentativa = 1, maxTentativas = 3) {
-    try {
-        const response = await fetch('/api/screener', { cache: 'default' });
-        if (response.status === 404) throw new Error('API não encontrada (404)');
-        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
-        const dados = await response.json();
-
-        if (dados.error && dados.retry) {
-            const el = document.getElementById('updateTime');
-            if (el) el.innerHTML = `<span style="color:var(--warn)">⏳ ${dados.message} (${tentativa}/${maxTentativas})</span>`;
-            if (tentativa < maxTentativas) {
-                setTimeout(() => atualizarDados(tentativa + 1, maxTentativas), 10000);
-            } else {
-                if (el) el.innerHTML = `<span style="color:var(--sell)">❌ Tente mais tarde</span>`;
-            }
-            return;
-        }
-        renderizarDados(dados);
-    } catch (error) {
-        console.error('[ERROR]', error.message);
-        const el = document.getElementById('updateTime');
-        if (el) el.innerHTML = `<span style="color:var(--sell)">❌ ${error.message}</span>`;
-        renderizarDados(dadosExemplo);
+  try {
+    const resp = await fetch('/api/screener', { cache: 'default' });
+    if (resp.status === 404) throw new Error('API não encontrada (404)');
+    if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+    const dados = await resp.json();
+    if (dados.error && dados.retry) {
+      const el = document.getElementById('updateTime');
+      if (el) el.innerHTML = `<span style="color:var(--warn)">⏳ ${dados.error} (${tentativa}/${maxTentativas})</span>`;
+      if (tentativa < maxTentativas) setTimeout(() => atualizarDados(tentativa+1, maxTentativas), 10000);
+      return;
     }
+    renderizarDados(dados);
+  } catch (err) {
+    console.error('[ERROR]', err.message);
+    document.getElementById('updateTime').innerHTML = `<span style="color:var(--sell)">❌ ${err.message} — exibindo demo</span>`;
+    renderizarDados(dadosDemo);
+  }
 }
 
 async function forceUpdate(event) {
-    const btn = event.currentTarget;
-    btn.disabled = true;
-    btn.textContent = '⏳ atualizando...';
-    try {
-        const response = await fetch(`/api/screener?force=${Date.now()}`, { cache: 'no-store' });
-        if (!response.ok) throw new Error('Erro na API');
-        const dados = await response.json();
-        renderizarDados(dados);
-        btn.textContent = '✅ atualizado!';
-    } catch (error) {
-        console.error('Erro ao atualizar:', error);
-        btn.textContent = '❌ erro';
-    } finally {
-        setTimeout(() => { btn.textContent = '↻ atualizar'; btn.disabled = false; }, 2000);
-    }
+  const btn = event.currentTarget;
+  btn.disabled = true; btn.textContent = '⏳ atualizando...';
+  try {
+    const resp = await fetch(`/api/screener?force=${Date.now()}`, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('Erro na API');
+    renderizarDados(await resp.json());
+    btn.textContent = '✅ atualizado!';
+  } catch (e) {
+    btn.textContent = '❌ erro';
+  } finally {
+    setTimeout(() => { btn.textContent = '↻ atualizar'; btn.disabled = false; }, 2000);
+  }
 }
 
 atualizarDados();
