@@ -1,6 +1,6 @@
 # api/screener.py
-# Screener VCP (Qullamaggie) para Ibovespa
-# Três estados por ação: SINAL (VCP completo), CONTRACAO (aguardando breakout), WATCHLIST (tendência ok)
+# Screener unificado: MRS/RSV (sinais de cruzamento) + APGAR (score 0-10)
+# Uma única chamada calcula tudo para cada ação.
 
 from http.server import BaseHTTPRequestHandler
 import json
@@ -11,37 +11,45 @@ from datetime import datetime, time, timedelta
 import os
 
 ACOES_PRINCIPAIS = [
-    "ALOS3.SA","ABEV3.SA","ANIM3.SA","ASAI3.SA","AURE3.SA","AXIA3.SA","AXIA6.SA","AXIA7.SA","AZZA3.SA","B3SA3.SA","BBSE3.SA","BBDC3.SA","BBDC4.SA","BRAP4.SA","BBAS3.SA","BRKM5.SA","BRAV3.SA","BPAC11.SA","CXSE3.SA","BHIA3.SA","CBAV3.SA","CEAB3.SA","CMIG4.SA","COGN3.SA","CSMG3.SA","CPLE3.SA","CSAN3.SA","CPFE3.SA","CMIN3.SA","CURY3.SA","CVCB3.SA","CYRE3.SA","CYRE4.SA","DIRR3.SA","ECOR3.SA","EMBJ3.SA","ENGI11.SA","ENEV3.SA","EGIE3.SA","EQTL3.SA","EZTC3.SA","FLRY3.SA","GGBR4.SA","GOAU4.SA","GGPS3.SA","GMAT3.SA","HAPV3.SA","HYPE3.SA","IGTI11.SA","INTB3.SA","IRBR3.SA","ISAE4.SA","ITSA4.SA","ITUB4.SA","KLBN11.SA","RENT3.SA","RENT4.SA","LREN3.SA","LWSA3.SA","MGLU3.SA","POMO4.SA","MBRF3.SA","BEEF3.SA","MOTV3.SA","MOVI3.SA","MRVE3.SA","MULT3.SA","NATU3.SA","NEOE3.SA","PCAR3.SA","PETR3.SA","PETR4.SA","RECV3.SA","PRIO3.SA","AUAU3.SA","PSSA3.SA","RADL3.SA","RAIZ4.SA","RAPT4.SA","RDOR3.SA","RAIL3.SA","SBSP3.SA","SAPR11.SA","SANB11.SA","SMTO3.SA","CSNA3.SA","SIMH3.SA","SLCE3.SA","SMFT3.SA","SUZB3.SA","TAEE11.SA","VIVT3.SA","TEND3.SA","TIMS3.SA","TOTS3.SA","UGPA3.SA","USIM5.SA","VALE3.SA","VAMO3.SA","VBBR3.SA","VIVA3.SA","WEGE3.SA","YDUQ3.SA"
+    "ALOS3.SA","ABEV3.SA","ANIM3.SA","ASAI3.SA","AURE3.SA","AXIA3.SA","AXIA6.SA","AXIA7.SA",
+    "AZZA3.SA","B3SA3.SA","BBSE3.SA","BBDC3.SA","BBDC4.SA","BRAP4.SA","BBAS3.SA","BRKM5.SA",
+    "BRAV3.SA","BPAC11.SA","CXSE3.SA","BHIA3.SA","CBAV3.SA","CEAB3.SA","CMIG4.SA","COGN3.SA",
+    "CSMG3.SA","CPLE3.SA","CSAN3.SA","CPFE3.SA","CMIN3.SA","CURY3.SA","CVCB3.SA","CYRE3.SA",
+    "CYRE4.SA","DIRR3.SA","ECOR3.SA","EMBJ3.SA","ENGI11.SA","ENEV3.SA","EGIE3.SA","EQTL3.SA",
+    "EZTC3.SA","FLRY3.SA","GGBR4.SA","GOAU4.SA","GGPS3.SA","GMAT3.SA","HAPV3.SA","HYPE3.SA",
+    "IGTI11.SA","INTB3.SA","IRBR3.SA","ISAE4.SA","ITSA4.SA","ITUB4.SA","KLBN11.SA","RENT3.SA",
+    "RENT4.SA","LREN3.SA","LWSA3.SA","MGLU3.SA","POMO4.SA","MBRF3.SA","BEEF3.SA","MOTV3.SA",
+    "MOVI3.SA","MRVE3.SA","MULT3.SA","NATU3.SA","NEOE3.SA","PCAR3.SA","PETR3.SA","PETR4.SA",
+    "RECV3.SA","PRIO3.SA","AUAU3.SA","PSSA3.SA","RADL3.SA","RAIZ4.SA","RAPT4.SA","RDOR3.SA",
+    "RAIL3.SA","SBSP3.SA","SAPR11.SA","SANB11.SA","SMTO3.SA","CSNA3.SA","SIMH3.SA","SLCE3.SA",
+    "SMFT3.SA","SUZB3.SA","TAEE11.SA","VIVT3.SA","TEND3.SA","TIMS3.SA","TOTS3.SA","UGPA3.SA",
+    "USIM5.SA","VALE3.SA","VAMO3.SA","VBBR3.SA","VIVA3.SA","WEGE3.SA","YDUQ3.SA",
 ]
 
-# ── Parâmetros VCP ──────────────────────────────────────
-PRECO_MIN        = 5.00
+# ── Parâmetros ────────────────────────────────────────────
+LENGTH           = 200
 MA_FAST          = 50
+MA_MED           = 150
 MA_SLOW          = 200
-VOL_MEDIO_MIN    = 500_000
 CONTRACAO_JANELA = 5
 CONTRACAO_REF    = 20
-CONTRACAO_FATOR  = 0.50   # range5d / range20d < este valor
 BREAKOUT_JANELA  = 10
-VOLUME_FATOR     = 2.0    # vol hoje > X * vol_ma20
 
-# ── Cache ────────────────────────────────────────────────
-_cache_diario = {'data': None, 'data_processamento': None, 'em_processamento': False}
+# ── Cache ─────────────────────────────────────────────────
+_cache = {'data': None, 'data_proc': None, 'processando': False}
 
-def obter_data_pregao_atual():
+def data_pregao():
     agora_br = datetime.utcnow() - timedelta(hours=3)
     if agora_br.time() < time(18, 30):
         return (agora_br - timedelta(days=1)).date()
     return agora_br.date()
 
 def cache_valido():
-    if _cache_diario['data'] is None:
-        return False
-    return _cache_diario['data_processamento'] == obter_data_pregao_atual()
+    return _cache['data'] is not None and _cache['data_proc'] == data_pregao()
 
-# ── Download ─────────────────────────────────────────────
-def baixar_dados(ticker, max_retries=2):
-    for tentativa in range(max_retries):
+# ── Download ──────────────────────────────────────────────
+def baixar(ticker, retries=2):
+    for t in range(retries):
         try:
             df = yf.download(ticker, period='2y', interval='1d',
                              progress=False, auto_adjust=True,
@@ -50,139 +58,279 @@ def baixar_dados(ticker, max_retries=2):
                 continue
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
-            required = ['Open','High','Low','Close','Volume']
-            if any(c not in df.columns for c in required):
-                return None
-            if len(df) < MA_SLOW + CONTRACAO_REF + 5:
+            if len(df) < MA_SLOW + 30:
                 return None
             return df
         except Exception as e:
-            print(f"[ERROR] {ticker} tentativa {tentativa+1}: {e}")
-            if tentativa < max_retries - 1:
-                import time as t; t.sleep(1)
+            print(f"[ERR] {ticker} t{t+1}: {e}")
+            if t < retries - 1:
+                import time as tm; tm.sleep(1)
     return None
 
-# ── Calcular VCP ─────────────────────────────────────────
-def calcular_vcp(ticker, df):
+# ── RSV: força da streak ──────────────────────────────────
+def classificar_rsv_forca(dias_pos, dias_neg):
+    if dias_pos >= 20: return '🔥 Muito forte', 'positivo'
+    if dias_pos >= 10: return '💪 Forte',       'positivo'
+    if dias_pos >= 5:  return '📈 Moderado',    'positivo'
+    if dias_pos >= 1:  return '🌱 Início',      'positivo'
+    if dias_neg >= 20: return '🧊 Muito fraco', 'negativo'
+    if dias_neg >= 10: return '❄️ Fraco',       'negativo'
+    if dias_neg >= 5:  return '📉 Mod. neg.',   'negativo'
+    if dias_neg >= 1:  return '🔻 Início neg.', 'negativo'
+    return '⚪ Neutro', 'neutro'
+
+# ── Cálculo unificado por ação ────────────────────────────
+def calcular_tudo(ticker, df, bova_df):
     try:
-        c   = df['Close']
-        h   = df['High']
-        l   = df['Low']
-        v   = df['Volume']
+        c  = df['Close']
+        h  = df['High']
+        l  = df['Low']
+        v  = df['Volume']
 
-        ma50   = c.rolling(MA_FAST).mean()
-        ma200  = c.rolling(MA_SLOW).mean()
-        vol_ma = v.rolling(20).mean()
-        r5d    = h.rolling(CONTRACAO_JANELA).max() - l.rolling(CONTRACAO_JANELA).min()
-        r20d   = h.rolling(CONTRACAO_REF).max()    - l.rolling(CONTRACAO_REF).min()
-        max10d = h.rolling(BREAKOUT_JANELA).max().shift(1)
-        min5d  = l.rolling(CONTRACAO_JANELA).min().shift(1)
+        # Alinha com BOVA11
+        idx  = c.index.intersection(bova_df['Close'].index)
+        c_a  = c.loc[idx];   bc_a = bova_df['Close'].loc[idx]
+        v_a  = v.loc[idx];   bv_a = bova_df['Volume'].loc[idx]
+        h_a  = h.loc[idx];   l_a  = l.loc[idx]
 
-        # Valores atuais
-        preco    = float(c.iloc[-1])
-        ma50_h   = float(ma50.iloc[-1])
-        ma200_h  = float(ma200.iloc[-1])
-        vol_h    = float(v.iloc[-1])
-        volma_h  = float(vol_ma.iloc[-1])
-        r5_h     = float(r5d.iloc[-1])
-        r20_h    = float(r20d.iloc[-1])
-        max10_h  = float(max10d.iloc[-1])
-        min5_h   = float(min5d.iloc[-1])
-
-        if any(np.isnan(x) for x in [ma50_h, ma200_h, volma_h, r5_h, r20_h, max10_h, min5_h]):
+        if len(c_a) < MA_SLOW + 20:
             return None
 
-        vol_ratio    = vol_h / volma_h if volma_h > 0 else 0
-        contracao    = r5_h / r20_h   if r20_h  > 0 else 1
-        stop         = round(min5_h, 2)
-        risco_pct    = round((preco - min5_h) / preco * 100, 2) if preco > 0 else None
+        # ── Indicadores base ─────────────────────────────
+        ma50   = c_a.rolling(MA_FAST).mean()
+        ma150  = c_a.rolling(MA_MED).mean()
+        ma200  = c_a.rolling(MA_SLOW).mean()
+        vol_ma = v_a.rolling(20).mean()
+        r5d    = h_a.rolling(CONTRACAO_JANELA).max() - l_a.rolling(CONTRACAO_JANELA).min()
+        r20d   = h_a.rolling(CONTRACAO_REF).max()    - l_a.rolling(CONTRACAO_REF).min()
+        max10d = h_a.rolling(BREAKOUT_JANELA).max().shift(1)
+        min5d  = l_a.rolling(CONTRACAO_JANELA).min().shift(1)
 
-        resultado = {
-            'ticker':      ticker.replace('.SA',''),
-            'preco':       round(preco, 2),
-            'ma50':        round(ma50_h, 2),
-            'ma200':       round(ma200_h, 2),
-            'acima_ma50':  preco > ma50_h,
-            'acima_ma200': preco > ma200_h,
-            'vol_ratio':   round(vol_ratio, 2),
-            'contracao':   round(contracao, 2),
-            'stop':        stop,
-            'risco_pct':   risco_pct,
-            'estado':      None,   # SINAL | CONTRACAO | WATCHLIST | None
+        # MRS e RSV
+        rp_c = c_a / bc_a
+        rp_v = v_a / bv_a
+        mrs  = (rp_c / rp_c.rolling(LENGTH).mean() - 1) * 100
+        rsv  = (rp_v / rp_v.rolling(LENGTH).mean() - 1) * 100
+
+        # Valores atuais
+        preco   = float(c_a.iloc[-1])
+        ma50_h  = float(ma50.iloc[-1])
+        ma150_h = float(ma150.iloc[-1])
+        ma200_h = float(ma200.iloc[-1])
+        vol_h   = float(v_a.iloc[-1])
+        volma_h = float(vol_ma.iloc[-1])
+        r5_h    = float(r5d.iloc[-1])
+        r20_h   = float(r20d.iloc[-1])
+        max10_h = float(max10d.iloc[-1])
+        min5_h  = float(min5d.iloc[-1])
+        mrs_h   = float(mrs.iloc[-1])
+        mrs_d1  = float(mrs.iloc[-2])
+        rsv_h   = float(rsv.iloc[-1])
+
+        if any(np.isnan(x) for x in [ma50_h, ma150_h, ma200_h, volma_h,
+                                       r5_h, r20_h, max10_h, mrs_h, rsv_h]):
+            return None
+
+        vol_ratio  = vol_h / volma_h if volma_h > 0 else 0
+        contracao  = r5_h  / r20_h  if r20_h  > 0 else 1
+        dist_ma200 = (preco / ma200_h - 1) * 100 if ma200_h > 0 else 0
+        breakout   = preco > max10_h
+        stop       = round(min5_h, 2)
+        risco_pct  = round((preco - min5_h) / preco * 100, 2) if preco > 0 else None
+
+        ma200_20d  = float(ma200.iloc[-21]) if len(ma200) > 21 else np.nan
+        ma200_sub  = (not np.isnan(ma200_20d)) and (ma200_h > ma200_20d)
+
+        # ── RSV streak ───────────────────────────────────
+        dias_rsv_pos = 0
+        for i in range(1, min(60, len(rsv))):
+            val = rsv.iloc[-i]
+            if pd.isna(val): continue
+            if float(val) > 0: dias_rsv_pos += 1
+            else: break
+
+        dias_rsv_neg = 0
+        for i in range(1, min(60, len(rsv))):
+            val = rsv.iloc[-i]
+            if pd.isna(val): continue
+            if float(val) < 0: dias_rsv_neg += 1
+            else: break
+
+        rsv_forca, rsv_lado = classificar_rsv_forca(dias_rsv_pos, dias_rsv_neg)
+
+        # ── Sinais MRS/RSV ───────────────────────────────
+        sinais = []
+
+        if mrs_d1 <= 0 and mrs_h > 0 and rsv_h > 0:
+            sinais.append({'tipo': 'COMPRA_HOJE', 'emoji': '🟢'})
+        if mrs_d1 >= 0 and mrs_h < 0 and rsv_h < 0:
+            sinais.append({'tipo': 'VENDA_HOJE', 'emoji': '🔴'})
+        if -2 <= mrs_h < 0 and rsv_h > 0 and len(mrs) >= 3:
+            if mrs.iloc[-3] < mrs.iloc[-2] < mrs_h:
+                sinais.append({'tipo': 'PROXIMO_COMPRA', 'emoji': '🔶', 'distancia': round(abs(mrs_h), 2)})
+        for i in range(2, min(6, len(mrs))):
+            if mrs.iloc[-i-1] <= 0 and mrs.iloc[-i] > 0 and rsv.iloc[-i] > 0:
+                sinais.append({'tipo': 'COMPRA_RECENTE', 'emoji': '🟢', 'dias_atras': i}); break
+        for i in range(2, min(6, len(mrs))):
+            if mrs.iloc[-i-1] >= 0 and mrs.iloc[-i] < 0 and rsv.iloc[-i] < 0:
+                sinais.append({'tipo': 'VENDA_RECENTE', 'emoji': '🔴', 'dias_atras': i}); break
+        if (mrs_h < 0 and mrs_h > -5 and rsv_h > 0 and 1 <= dias_rsv_pos <= 10):
+            janela = min(10, len(mrs) - 1)
+            mrs_j  = list(reversed([float(mrs.iloc[-i]) for i in range(1, janela + 1)]))
+            quebras = sum(1 for i in range(len(mrs_j)-1) if mrs_j[i] >= mrs_j[i+1])
+            if quebras <= 1:
+                sinais.append({'tipo': 'RECUPERACAO', 'emoji': '🔼',
+                               'dias_subindo': janela, 'dias_rsv_positivo': dias_rsv_pos, 'quebras': quebras})
+
+        # ── Score APGAR ──────────────────────────────────
+        scores = {}
+
+        # C1 Tendência macro
+        if preco > ma50_h > ma150_h > ma200_h and ma200_sub:
+            scores['tendencia'] = 2
+        elif preco > ma50_h and preco > ma200_h:
+            scores['tendencia'] = 1
+        else:
+            scores['tendencia'] = 0
+
+        # C2 Stage
+        if preco < ma200_h:
+            scores['estagio'] = 0
+        elif dist_ma200 <= 25:
+            scores['estagio'] = 2
+        else:
+            scores['estagio'] = 1
+
+        # C3 Força relativa
+        if mrs_h > 5:   scores['forca_relativa'] = 2
+        elif mrs_h >= 0:scores['forca_relativa'] = 1
+        else:           scores['forca_relativa'] = 0
+
+        # C4 Contração
+        if contracao < 0.35:  scores['contracao'] = 2
+        elif contracao < 0.50:scores['contracao'] = 1
+        else:                 scores['contracao'] = 0
+
+        # C5 Breakout + volume
+        if breakout and vol_ratio >= 2.0:     scores['breakout'] = 2
+        elif breakout or vol_ratio >= 1.5:    scores['breakout'] = 1
+        else:                                 scores['breakout'] = 0
+
+        score_total = sum(scores.values())
+        if score_total >= 9:   classe, cemoji = 'FORTE',    '🟢'
+        elif score_total >= 7: classe, cemoji = 'POSITIVO', '🟡'
+        elif score_total >= 5: classe, cemoji = 'NEUTRO',   '⚪'
+        else:                  classe, cemoji = 'FRACO',    '🔴'
+
+        return {
+            'ticker':          ticker.replace('.SA', ''),
+            'preco':           round(preco, 2),
+            # MRS/RSV
+            'mrs':             round(mrs_h, 2),
+            'rsv':             round(rsv_h, 2),
+            'dias_rsv_positivo': int(dias_rsv_pos),
+            'dias_rsv_negativo': int(dias_rsv_neg),
+            'rsv_forca':       rsv_forca,
+            'rsv_lado':        rsv_lado,
+            'sinais':          sinais,
+            # APGAR
+            'score':           score_total,
+            'classe':          classe,
+            'emoji':           cemoji,
+            'scores':          scores,
+            'ma50':            round(ma50_h, 2),
+            'ma150':           round(ma150_h, 2),
+            'ma200':           round(ma200_h, 2),
+            'ma200_subindo':   ma200_sub,
+            'vol_ratio':       round(vol_ratio, 2),
+            'contracao':       round(contracao, 2),
+            'breakout':        breakout,
+            'stop':            stop,
+            'risco_pct':       risco_pct,
+            'dist_ma200':      round(dist_ma200, 1),
         }
 
-        # Filtros base obrigatórios
-        tendencia_ok = preco > ma50_h and preco > ma200_h
-        preco_ok     = preco >= PRECO_MIN
-        liquidez_ok  = volma_h >= VOL_MEDIO_MIN
-
-        if not (tendencia_ok and preco_ok and liquidez_ok):
-            return resultado   # retorna sem estado — não aparece em nenhuma lista
-
-        em_contracao = contracao < CONTRACAO_FATOR
-
-        if em_contracao:
-            breakout = preco > max10_h
-            vol_ok   = vol_ratio >= VOLUME_FATOR
-
-            if breakout and vol_ok:
-                resultado['estado'] = 'SINAL'
-            else:
-                resultado['estado'] = 'CONTRACAO'
-                resultado['falta_breakout'] = not breakout
-                resultado['falta_volume']   = not vol_ok
-        else:
-            resultado['estado'] = 'WATCHLIST'
-
-        return resultado
-
     except Exception as e:
-        print(f"[ERROR] {ticker} VCP: {e}")
+        print(f"[ERR] {ticker}: {e}")
         return None
 
 # ── Processamento principal ───────────────────────────────
 def processar_screener():
-    print("[INFO] Iniciando processamento VCP...")
+    print("[INFO] Iniciando screener unificado...")
 
-    sinais      = []   # VCP completo — entrar amanhã
-    contracoes  = []   # Comprimindo — monitorar
-    watchlist   = []   # Tendência ok mas sem contração
+    bova = baixar('BOVA11.SA')
+    if bova is None:
+        return None
 
+    todas = []
     for i, ticker in enumerate(ACOES_PRINCIPAIS, 1):
         print(f"[INFO] {i}/{len(ACOES_PRINCIPAIS)}: {ticker}")
-        df = baixar_dados(ticker)
+        df = baixar(ticker)
         if df is None:
             continue
-        res = calcular_vcp(ticker, df)
-        if res is None or res['estado'] is None:
-            continue
+        res = calcular_tudo(ticker, df, bova)
+        if res:
+            todas.append(res)
 
-        if res['estado'] == 'SINAL':
-            sinais.append(res)
-        elif res['estado'] == 'CONTRACAO':
-            contracoes.append(res)
-        elif res['estado'] == 'WATCHLIST':
-            watchlist.append(res)
+    # ── MRS/RSV: monta listas de sinais ──────────────────
+    sinais_hoje, proximos, recentes, recuperacoes = [], [], [], []
+    for a in todas:
+        base = {k: a[k] for k in ['ticker','mrs','rsv','preco',
+                                    'dias_rsv_positivo','dias_rsv_negativo',
+                                    'rsv_forca','rsv_lado']}
+        for s in a['sinais']:
+            item = {**base}
+            if s['tipo'] in ('COMPRA_HOJE','VENDA_HOJE'):
+                item['tipo']  = 'COMPRA' if 'COMPRA' in s['tipo'] else 'VENDA'
+                item['emoji'] = s['emoji']
+                sinais_hoje.append(item)
+            elif s['tipo'] == 'PROXIMO_COMPRA':
+                item['distancia'] = s['distancia']
+                proximos.append(item)
+            elif s['tipo'] in ('COMPRA_RECENTE','VENDA_RECENTE'):
+                item['tipo']     = 'COMPRA' if 'COMPRA' in s['tipo'] else 'VENDA'
+                item['diasAtras']= s['dias_atras']
+                recentes.append(item)
+            elif s['tipo'] == 'RECUPERACAO':
+                item['dias_subindo']      = s['dias_subindo']
+                item['dias_rsv_positivo'] = s['dias_rsv_positivo']
+                item['quebras']           = s['quebras']
+                recuperacoes.append(item)
 
-    # Ordena contrações pela mais comprimida primeiro
-    contracoes.sort(key=lambda x: x['contracao'])
-    # Ordena sinais pelo maior volume ratio
-    sinais.sort(key=lambda x: x['vol_ratio'], reverse=True)
-    # Watchlist: ordena por contração (as mais próximas de comprimir primeiro)
-    watchlist.sort(key=lambda x: x['contracao'])
+    top_mrs = sorted(todas, key=lambda x: x['mrs'], reverse=True)[:10]
+    top_rsv_pos = sorted([a for a in todas if a['dias_rsv_positivo'] > 0],
+                          key=lambda x: x['dias_rsv_positivo'], reverse=True)[:10]
+    top_rsv_neg = sorted([a for a in todas if a['dias_rsv_negativo'] > 0],
+                          key=lambda x: x['dias_rsv_negativo'], reverse=True)[:10]
+    recuperacoes.sort(key=lambda x: (x['dias_rsv_positivo'], x['dias_subindo']), reverse=True)
+
+    # ── APGAR: ordenado por score ─────────────────────────
+    apgar_lista = sorted(todas, key=lambda x: (x['score'], x['mrs']), reverse=True)
 
     agora_br = datetime.utcnow() - timedelta(hours=3)
-
     return {
-        'lastUpdate':   agora_br.strftime('%d/%m/%Y %H:%M:%S'),
-        'totalAcoes':   len(ACOES_PRINCIPAIS),
-        'sinais':       sinais,
-        'contracoes':   contracoes[:20],
-        'watchlist':    watchlist[:20],
-        'cacheInfo': {
-            'cached': False,
-            'dataProcessamento': obter_data_pregao_atual().isoformat()
-        }
+        'lastUpdate': agora_br.strftime('%d/%m/%Y %H:%M:%S'),
+        'dataDados':  bova.index[-1].strftime('%d/%m/%Y'),
+        'totalAcoes': len(ACOES_PRINCIPAIS),
+        # MRS/RSV
+        'sinaisHoje':         sinais_hoje,
+        'proximosCruzar':     proximos,
+        'cruzamentosRecentes':recentes,
+        'recuperacoes':       recuperacoes,
+        'topMRS':             [{k: a[k] for k in ['ticker','mrs','rsv','preco','dias_rsv_positivo','dias_rsv_negativo','rsv_forca','rsv_lado']} for a in top_mrs],
+        'topRSVConsistente':  [{k: a[k] for k in ['ticker','mrs','rsv','preco','dias_rsv_positivo','rsv_forca']} for a in top_rsv_pos],
+        'topRSVFraco':        [{k: a[k] for k in ['ticker','mrs','rsv','preco','dias_rsv_negativo','rsv_forca']} for a in top_rsv_neg],
+        # APGAR
+        'apgar': {
+            'acoes': apgar_lista,
+            'resumo': {
+                'forte':    sum(1 for a in apgar_lista if a['score'] >= 9),
+                'positivo': sum(1 for a in apgar_lista if 7 <= a['score'] < 9),
+                'neutro':   sum(1 for a in apgar_lista if 5 <= a['score'] < 7),
+                'fraco':    sum(1 for a in apgar_lista if a['score'] < 5),
+            }
+        },
+        'cacheInfo': {'cached': False, 'dataProcessamento': data_pregao().isoformat()}
     }
 
 # ── Handler HTTP ─────────────────────────────────────────
@@ -193,41 +341,32 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Cache-Control', 'public, max-age=3600')
         self.end_headers()
-
         try:
             if cache_valido():
-                resposta = _cache_diario['data'].copy()
-                resposta['cacheInfo']['cached'] = True
-                self.wfile.write(json.dumps(resposta).encode())
-                return
-
-            if _cache_diario['em_processamento']:
-                if _cache_diario['data']:
-                    resposta = _cache_diario['data'].copy()
-                    resposta['cacheInfo']['cached'] = True
-                    self.wfile.write(json.dumps(resposta).encode())
+                r = _cache['data'].copy(); r['cacheInfo']['cached'] = True
+                self.wfile.write(json.dumps(r).encode()); return
+            if _cache['processando']:
+                if _cache['data']:
+                    r = _cache['data'].copy(); r['cacheInfo']['cached'] = True
+                    self.wfile.write(json.dumps(r).encode())
                 else:
-                    self.wfile.write(json.dumps({'error': 'Processando, tente em 30s'}).encode())
+                    self.wfile.write(json.dumps({'error':'Processando, tente em 30s'}).encode())
                 return
-
-            _cache_diario['em_processamento'] = True
-            resposta = processar_screener()
-
-            if resposta:
-                _cache_diario['data'] = resposta
-                _cache_diario['data_processamento'] = obter_data_pregao_atual()
-                self.wfile.write(json.dumps(resposta).encode())
+            _cache['processando'] = True
+            r = processar_screener()
+            if r:
+                _cache['data'] = r; _cache['data_proc'] = data_pregao()
+                self.wfile.write(json.dumps(r).encode())
             else:
-                self.wfile.write(json.dumps({'error': 'Dados indisponíveis', 'retry': True}).encode())
-
+                self.wfile.write(json.dumps({'error':'Dados indisponíveis','retry':True}).encode())
         except Exception as e:
             import traceback
-            self.wfile.write(json.dumps({'error': str(e), 'trace': traceback.format_exc()}).encode())
+            self.wfile.write(json.dumps({'error':str(e),'trace':traceback.format_exc()}).encode())
         finally:
-            _cache_diario['em_processamento'] = False
+            _cache['processando'] = False
 
     def do_OPTIONS(self):
         self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Origin','*')
+        self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
         self.end_headers()
