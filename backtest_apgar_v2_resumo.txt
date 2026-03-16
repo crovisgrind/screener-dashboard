@@ -1,0 +1,147 @@
+================================================================
+  BACKTEST — APGAR Score v2 · Stop Loss no Open D+1
+================================================================
+
+  ──────────────────────────────────────────────────────────────
+  ESTRATÉGIA A — Entrada ≥5, saída score ≥7 ou +5%
+  Entrada score≥5 | Saída score≥7 OU +5% | Time stop 10d
+  Período: 2022-02-09 → 2026-03-16
+  ──────────────────────────────────────────────────────────────
+  Total trades      : 8782
+  Ações únicas      : 81
+  Winrate           : 52.2%
+  Retorno médio     : -0.15%  (mediana +0.25%)
+  Ganho médio       : +2.79%
+  Perda média       : -3.35%
+  Payoff ratio      : 0.83x
+  Profit factor     : 0.91
+  Expectancy        : -0.15% por trade
+  Ret rel. BOVA11   : -0.32%
+  Max loss streak   : 13
+  Duração média     : 3.4 dias
+  Score entrada médio: 6.3
+  Evolução score médio: -0.1 pts
+  P25 / P75         : -2.4% / +2.6%
+
+    Por motivo de saída:
+    Motivo                     N   Winrate   Ret médio     Dur
+    stop_loss               1589      1.3%      -5.86%    4.6d
+    take_profit_ret         1303    100.0%      +5.00%    3.7d
+    take_profit_score       5173     55.9%      +0.26%    2.1d
+    time_stop                717     51.6%      +0.25%   10.0d
+
+    Por score de entrada:
+    Score        N   Winrate   Ret médio    Evol score
+    5         2238     49.9%      -0.44%        -0.1pts
+    6         2517     54.1%      -0.12%        +0.2pts
+    7         2943     51.7%      -0.06%        -0.1pts
+    8         1012     54.4%      +0.18%        -0.5pts
+    9           69     47.8%      +0.01%        -1.2pts
+    10           3     33.3%      -1.87%        -2.3pts
+
+    Top ações (≥2 trades):
+          n  winrate  ret_medio  ret_rel  evol_score
+ticker                                              
+ALOS3   103    61.17       0.64     0.33       -0.09
+AURE3    61    49.18       0.58     0.17       -0.34
+AXIA6   133    55.64       0.49     0.36        0.08
+UGPA3   119    56.30       0.41     0.14       -0.03
+VBBR3   119    54.62       0.41     0.16        0.03
+GGPS3    90    56.67       0.41     0.29       -0.01
+NEOE3   149    60.40       0.35     0.44       -0.01
+SBSP3   238    55.88       0.35     0.32        0.14
+
+    Bottom ações (≥2 trades):
+          n  winrate  ret_medio  ret_rel  evol_score
+ticker                                              
+RAIZ4    21    52.38      -4.63    -5.40       -0.38
+BHIA3    23    30.43      -3.47    -3.93       -0.43
+MGLU3    49    34.69      -3.35    -3.33       -0.57
+CVCB3    48    45.83      -2.46    -2.56       -0.52
+SMFT3   111    47.75      -2.30    -2.42       -0.14
+
+    Distribuição de retornos:
+         < −5%   934  ███
+      −5 a −2%  1505  ██████
+       −2 a 0%  1758  ███████
+       0 a +2%  1955  ████████
+      +2 a +5%  2620  ██████████
+         > +5%    10  
+
+  ──────────────────────────────────────────────────────────────
+  ESTRATÉGIA B — Entrada 5–8 + Breakout, saída score ≥9 ou +5%
+  Entrada score 5–8 + B=2 | Saída score≥9 OU +5% | Time stop 10d
+  Período: 2022-02-10 → 2026-03-11
+  ──────────────────────────────────────────────────────────────
+  Total trades      : 498
+  Ações únicas      : 81
+  Winrate           : 55.4%
+  Retorno médio     : +0.12%  (mediana +0.97%)
+  Ganho médio       : +4.11%
+  Perda média       : -4.83%
+  Payoff ratio      : 0.85x
+  Profit factor     : 1.06
+  Expectancy        : +0.12% por trade
+  Ret rel. BOVA11   : -0.46%
+  Max loss streak   : 7
+  Duração média     : 6.3 dias
+  Score entrada médio: 6.8
+  Evolução score médio: -1.2 pts
+  P25 / P75         : -4.2% / +5.0%
+
+    Por motivo de saída:
+    Motivo                     N   Winrate   Ret médio     Dur
+    stop_loss                161      2.5%      -5.76%    5.2d
+    take_profit_ret          186    100.0%      +5.00%    4.2d
+    take_profit_score          5     60.0%      +0.36%    7.2d
+    time_stop                146     56.8%      +0.39%   10.0d
+
+    Por score de entrada:
+    Score        N   Winrate   Ret médio    Evol score
+    5           59     49.2%      +0.03%        -1.1pts
+    6          102     59.8%      +0.36%        -0.9pts
+    7          210     52.9%      -0.18%        -1.2pts
+    8          127     59.1%      +0.48%        -1.4pts
+
+    Top ações (≥2 trades):
+         n  winrate  ret_medio  ret_rel  evol_score
+ticker                                             
+BEEF3    7   100.00       5.00     4.39       -1.00
+BHIA3    3   100.00       5.00     5.14        0.33
+GGPS3    5   100.00       4.16     2.92        0.00
+PETR4    9    88.89       4.04     2.52       -0.56
+CSAN3    2   100.00       4.02     0.27        0.00
+BBDC3    4   100.00       3.39     1.92       -1.75
+EZTC3    7    71.43       3.13     2.47       -0.71
+TAEE11  10   100.00       2.58     0.95       -0.80
+
+    Bottom ações (≥2 trades):
+        n  winrate  ret_medio  ret_rel  evol_score
+ticker                                            
+RECV3   3     0.00      -9.26    -7.42       -1.00
+MGLU3   2     0.00      -7.78    -7.59       -2.00
+YDUQ3   7    14.29      -4.85    -5.00       -1.29
+ASAI3   2     0.00      -3.57    -2.66       -1.00
+RENT3   6    33.33      -3.52    -4.20       -2.50
+
+    Distribuição de retornos:
+         < −5%    84  ██████
+      −5 a −2%    93  ██████
+       −2 a 0%    45  ███
+       0 a +2%    49  ███
+      +2 a +5%   225  ████████████████
+         > +5%     2  
+
+────────────────────────────────────────────────────────────────
+  COMPARATIVO
+  Métrica                         Estrat. A     Estrat. B
+  ───────────────────────────────────────────────────────
+  Trades                               8782           498
+  Winrate                             52.2%         55.4%
+  Retorno médio                      -0.15%        +0.12%
+  Profit factor                        0.91          1.06
+  Expectancy                         -0.15%        +0.12%
+  Ret rel BOVA11                     -0.32%        -0.46%
+  Evol score médio                  -0.1pts       -1.2pts
+
+================================================================

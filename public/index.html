@@ -209,6 +209,57 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade{animation:fadeUp .45s ease both}
+
+/* ═══ ABA TRACKER ═══ */
+.tracker-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:32px}
+
+.trk-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px}
+.trk-hdr{display:grid;grid-template-columns:90px 70px 72px 72px 80px 80px 80px 72px 1fr;align-items:center;padding:9px 18px;border-bottom:1px solid var(--border);gap:8px}
+.trk-row{display:grid;grid-template-columns:90px 70px 72px 72px 80px 80px 80px 72px 1fr;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(30,39,56,.5);gap:8px;transition:.15s}
+.trk-row:hover{background:var(--surf2)}
+.trk-row:last-child{border-bottom:none}
+.trk-row.closed{opacity:.55}
+
+.status-pill{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:20px;white-space:nowrap;font-weight:600}
+.status-pill.open{background:rgba(0,240,160,.12);color:var(--green);border:1px solid rgba(0,240,160,.25)}
+.status-pill.tp{background:rgba(77,158,255,.12);color:var(--blue);border:1px solid rgba(77,158,255,.25)}
+.status-pill.ts{background:rgba(90,100,120,.15);color:var(--muted);border:1px solid var(--border)}
+
+.days-bar-bg{width:60px;height:4px;background:var(--border);border-radius:2px;display:inline-block;vertical-align:middle;margin-right:4px}
+.days-bar-fill{height:100%;border-radius:2px;background:var(--green);transition:.3s}
+
+.btn-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;transition:.15s;font-family:var(--mono)}
+.btn-del:hover{color:var(--red);background:rgba(255,61,90,.1)}
+
+.btn-add-signal{background:rgba(0,240,160,.08);border:1px solid rgba(0,240,160,.2);color:var(--green);padding:7px 16px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:.2s;letter-spacing:.5px}
+.btn-add-signal:hover{background:rgba(0,240,160,.15)}
+.btn-clr{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:.2s}
+.btn-clr:hover{border-color:var(--red);color:var(--red)}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:360px;max-width:90vw}
+.modal-title{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:20px}
+.form-field{margin-bottom:14px}
+.form-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px}
+.form-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none}
+.form-input:focus{border-color:var(--green)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.btn-confirm{flex:1;background:var(--green);color:#080a0f;border:none;padding:10px;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer}
+.btn-cancel{flex:1;background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px;border-radius:8px;font-family:var(--mono);font-size:12px;cursor:pointer}
+.btn-cancel:hover{border-color:var(--text);color:var(--text)}
+
+@media(max-width:900px){
+  .trk-hdr,.trk-row{grid-template-columns:80px 60px 70px 70px 70px 1fr}
+  .trk-col-rel,.trk-col-ibov{display:none}
+}
+@media(max-width:600px){
+  .trk-hdr,.trk-row{grid-template-columns:80px 60px 1fr 70px}
+  .trk-col-score,.trk-col-dias,.trk-col-dias-bar{display:none}
+  .tracker-stats{grid-template-columns:repeat(2,1fr)}
+}
+
 </style>
 </head>
 <body>
@@ -237,6 +288,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 <div class="tabs-bar">
   <button class="tab-btn active" onclick="setTab('mrs',this)">MRS · RSV</button>
   <button class="tab-btn" onclick="setTab('apgar',this)">APGAR SCORE</button>
+  <button class="tab-btn" onclick="setTab('tracker',this)">📊 TRACKER</button>
 </div>
 
 <!-- ══════ ABA MRS/RSV ══════ -->
@@ -336,6 +388,113 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   </div>
 
 </div>
+</div>
+
+<!-- ══════ ABA TRACKER ══════ -->
+<div class="tab-pane" id="tab-tracker">
+<div class="main">
+
+  <!-- Stats -->
+  <div class="tracker-stats fade" style="animation-delay:.05s">
+    <div class="stat"><span class="stat-label">Abertas</span><span class="stat-value g" id="trkAbertas">—</span></div>
+    <div class="stat"><span class="stat-label">Fechadas</span><span class="stat-value d" id="trkFechadas">—</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value g" id="trkWin">—</span></div>
+    <div class="stat"><span class="stat-label">P&amp;L Médio</span><span class="stat-value" id="trkPnlMed">—</span></div>
+    <div class="stat"><span class="stat-label">P&amp;L Total</span><span class="stat-value" id="trkPnlTot">—</span></div>
+  </div>
+
+  <!-- Ações -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px" class="fade">
+    <div class="sec-header" style="margin:0">
+      <span class="sec-title">Posições</span>
+      <span class="sec-hint">sinais VCP detectados · atualiza com preço atual</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-add-signal" onclick="abrirModal()">+ Adicionar</button>
+      <button class="btn-clr" onclick="limparFechadas()">Limpar fechadas</button>
+    </div>
+  </div>
+
+  <!-- Tabela abertas -->
+  <div class="sec-header fade" style="margin-top:0;margin-bottom:10px">
+    <span class="sec-title" style="font-size:12px">🟢 Posições Abertas</span>
+    <span class="cnt" id="cntAbertas">0</span>
+  </div>
+  <div class="trk-table fade">
+    <div class="trk-hdr">
+      <span class="th">ticker</span>
+      <span class="th r trk-col-score">score</span>
+      <span class="th r">entrada</span>
+      <span class="th r">atual</span>
+      <span class="th r">P&amp;L %</span>
+      <span class="th r trk-col-ibov">vs IBOV</span>
+      <span class="th r trk-col-rel">dias</span>
+      <span class="th">status</span>
+      <span class="th"></span>
+    </div>
+    <div id="trkAbertasRows"><div class="empty">Nenhuma posição aberta</div></div>
+  </div>
+
+  <!-- Tabela fechadas -->
+  <div class="sec-header fade" style="margin-bottom:10px">
+    <span class="sec-title" style="font-size:12px">⬜ Últimas Fechadas</span>
+    <span class="cnt" id="cntFechadas">0</span>
+  </div>
+  <div class="trk-table fade">
+    <div class="trk-hdr">
+      <span class="th">ticker</span>
+      <span class="th r trk-col-score">score</span>
+      <span class="th r">entrada</span>
+      <span class="th r">saída</span>
+      <span class="th r">P&amp;L %</span>
+      <span class="th r trk-col-ibov">vs IBOV</span>
+      <span class="th r trk-col-rel">dias</span>
+      <span class="th">motivo</span>
+      <span class="th"></span>
+    </div>
+    <div id="trkFechadasRows"><div class="empty">Nenhuma posição fechada</div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- MODAL adicionar sinal -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-title">+ REGISTRAR SINAL VCP</div>
+    <div class="form-field">
+      <label class="form-label">Ticker</label>
+      <input class="form-input" id="mTicker" placeholder="ex: PETR4" style="text-transform:uppercase">
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Preço de Entrada (R$)</label>
+        <input class="form-input" id="mEntrada" type="number" step="0.01" placeholder="38.50">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Score APGAR</label>
+        <input class="form-input" id="mScore" type="number" min="0" max="10" placeholder="7">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Data do Sinal</label>
+        <input class="form-input" id="mData" type="date">
+      </div>
+      <div class="form-field">
+        <label class="form-label">IBOV na entrada</label>
+        <input class="form-input" id="mIbov" type="number" step="0.01" placeholder="opcional">
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Notas</label>
+      <input class="form-input" id="mNotas" placeholder="observação opcional">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-confirm" onclick="salvarSinal()">Salvar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -534,6 +693,8 @@ function setSearch(v){ _search=v; if(_dados) renderAPGAR(_dados); }
 // ── Render geral ──────────────────────────────────────────
 function renderizarDados(d){
   const isDemo=d._demo===true;
+  if(!isDemo){ autoRegistrarSinaisVCP(d); atualizarPrecos(d); }
+  renderTracker();
   document.getElementById('updateTime').innerHTML=isDemo
     ?`<span style="color:var(--yellow)">⚠ demo</span>`
     :d.lastUpdate;
@@ -615,6 +776,264 @@ async function forceUpdate(event){
   }catch(e){btn.textContent='❌ erro';}
   finally{setTimeout(()=>{btn.textContent='↻ atualizar';btn.disabled=false},2000);}
 }
+
+// ══════════════════════════════════════════════
+// TRACKER — localStorage
+// ══════════════════════════════════════════════
+
+const LS_KEY   = 'ibov_tracker_v1';
+const TP_PCT   = 0.05;   // +5%
+const TIME_STOP= 5;      // dias úteis → usamos dias corridos ≈ 7 dias
+
+function carregarPosicoes(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }
+  catch(e){ return []; }
+}
+function salvarPosicoes(arr){
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+
+function diasCorridos(dataStr){
+  const d0 = new Date(dataStr + 'T00:00:00');
+  const d1 = new Date();
+  return Math.floor((d1 - d0) / 86400000);
+}
+
+function statusPosicao(pos, precoAtual){
+  const pnl = (precoAtual / pos.entrada - 1) * 100;
+  const dias = diasCorridos(pos.data);
+  if(pos.fechada) return pos.motivo_fechamento || 'fechada';
+  if(pnl >= TP_PCT * 100) return 'tp';
+  if(dias >= 7) return 'time_stop';   // 5 dias úteis ≈ 7 corridos
+  return 'open';
+}
+
+// Busca preço atual via API do screener
+function precoAtualDe(ticker, dadosScreener){
+  if(!dadosScreener) return null;
+  // Tenta encontrar nas listas APGAR
+  const acoes = dadosScreener.apgar?.acoes || [];
+  const acao  = acoes.find(a => a.ticker === ticker);
+  if(acao) return acao.preco;
+  // Tenta top MRS
+  const topMrs = dadosScreener.topMRS || [];
+  const t2 = topMrs.find(a => a.ticker === ticker);
+  if(t2) return t2.preco;
+  return null;
+}
+
+function ibovAtual(dadosScreener){
+  // Usa MRS do BOVA11 como proxy — pega o preco da primeira ação para calcular
+  // Na prática, vamos usar o preço do BOVA11 que está no cache do screener
+  return dadosScreener?._ibov_preco || null;
+}
+
+// ── Render tracker ────────────────────────────
+function renderTracker(){
+  const posicoes  = carregarPosicoes();
+  const abertas   = posicoes.filter(p => !p.fechada);
+  const fechadas  = posicoes.filter(p =>  p.fechada).slice(-20).reverse();
+
+  // Stats
+  const todas_fechadas = posicoes.filter(p => p.fechada);
+  const wins     = todas_fechadas.filter(p => (p.pnl_fechamento||0) > 0).length;
+  const winrate  = todas_fechadas.length > 0 ? Math.round(wins/todas_fechadas.length*100) : 0;
+  const pnls     = todas_fechadas.map(p => p.pnl_fechamento||0);
+  const pnlMed   = pnls.length > 0 ? pnls.reduce((a,b)=>a+b,0)/pnls.length : 0;
+  const pnlTot   = pnls.reduce((a,b)=>a+b,0);
+
+  document.getElementById('trkAbertas').textContent  = abertas.length;
+  document.getElementById('trkFechadas').textContent = todas_fechadas.length;
+  document.getElementById('trkWin').textContent      = todas_fechadas.length > 0 ? winrate+'%' : '—';
+  document.getElementById('cntAbertas').textContent  = abertas.length;
+  document.getElementById('cntFechadas').textContent = fechadas.length;
+
+  const pnlMedEl  = document.getElementById('trkPnlMed');
+  const pnlTotEl  = document.getElementById('trkPnlTot');
+  pnlMedEl.textContent = pnls.length > 0 ? (pnlMed>=0?'+':'')+pnlMed.toFixed(2)+'%' : '—';
+  pnlMedEl.className   = 'stat-value '+(pnlMed>=0?'g':'r');
+  pnlTotEl.textContent = pnls.length > 0 ? (pnlTot>=0?'+':'')+pnlTot.toFixed(2)+'%' : '—';
+  pnlTotEl.className   = 'stat-value '+(pnlTot>=0?'g':'r');
+
+  // Tabela abertas
+  document.getElementById('trkAbertasRows').innerHTML = abertas.length
+    ? abertas.map(p => rowAberta(p)).join('')
+    : '<div class="empty">Nenhuma posição aberta — sinais VCP aparecem aqui automaticamente</div>';
+
+  // Tabela fechadas
+  document.getElementById('trkFechadasRows').innerHTML = fechadas.length
+    ? fechadas.map(p => rowFechada(p)).join('')
+    : '<div class="empty">Nenhuma posição fechada ainda</div>';
+}
+
+function rowAberta(p){
+  const precoAtual = p._preco_atual || p.entrada;
+  const pnl        = (precoAtual / p.entrada - 1) * 100;
+  const dias       = diasCorridos(p.data);
+  const st         = statusPosicao(p, precoAtual);
+  const pct_dias   = Math.min(100, Math.round(dias/7*100));
+  const rel        = p.ibov_entrada ? pnl - ((precoAtual/p.ibov_entrada-1)*100) : null;
+
+  // Auto-fecha se TP ou time stop atingido
+  if(st === 'tp' || st === 'time_stop'){
+    const posicoes = carregarPosicoes();
+    const idx = posicoes.findIndex(x=>x.id===p.id);
+    if(idx>=0 && !posicoes[idx].fechada){
+      posicoes[idx].fechada = true;
+      posicoes[idx].preco_saida = precoAtual;
+      posicoes[idx].pnl_fechamento = pnl;
+      posicoes[idx].motivo_fechamento = st;
+      posicoes[idx].dias_aberta = dias;
+      salvarPosicoes(posicoes);
+    }
+  }
+
+  const pillClass = st==='open' ? 'open' : st==='tp' ? 'tp' : 'ts';
+  const pillLabel = st==='open' ? '● aberta' : st==='tp' ? '✓ TP +5%' : '⏱ time stop';
+
+  return `<div class="trk-row">
+    <div><span class="tkr">${p.ticker}</span>${p.notas?`<div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${p.notas}</div>`:''}
+    </div>
+    <div class="m neu trk-col-score" style="text-align:right">${p.score||'—'}</div>
+    <div class="m neu" style="text-align:right">R$ ${p.entrada.toFixed(2)}</div>
+    <div class="m neu" style="text-align:right">R$ ${precoAtual.toFixed(2)}</div>
+    <div class="m ${pnl>=0?'pos':'neg'}" style="text-align:right;font-weight:600">${(pnl>=0?'+':'')+pnl.toFixed(2)}%</div>
+    <div class="m ${rel!==null?(rel>=0?'pos':'neg'):'dim'} trk-col-ibov" style="text-align:right">${rel!==null?(rel>=0?'+':'')+rel.toFixed(2)+'%':'—'}</div>
+    <div class="trk-col-rel" style="display:flex;align-items:center;gap:4px">
+      <div class="days-bar-bg"><div class="days-bar-fill" style="width:${pct_dias}%;background:${dias>=7?'var(--red)':dias>=5?'var(--yellow)':'var(--green)'}"></div></div>
+      <span class="m neu" style="font-size:11px">${dias}d</span>
+    </div>
+    <div><span class="status-pill ${pillClass}">${pillLabel}</span></div>
+    <div style="text-align:right"><button class="btn-del" onclick="removerPosicao('${p.id}')" title="Remover">✕</button></div>
+  </div>`;
+}
+
+function rowFechada(p){
+  const pnl  = p.pnl_fechamento || 0;
+  const rel  = (p.pnl_rel_ibov !== undefined) ? p.pnl_rel_ibov : null;
+  const dias = p.dias_aberta || 0;
+  const mot  = p.motivo_fechamento || '—';
+  const pillClass = mot==='tp'?'tp':'ts';
+  const pillLabel = mot==='tp'?'✓ TP +5%':mot==='time_stop'?'⏱ time stop':'fechada';
+
+  return `<div class="trk-row closed">
+    <div><span class="tkr">${p.ticker}</span></div>
+    <div class="m neu trk-col-score" style="text-align:right">${p.score||'—'}</div>
+    <div class="m neu" style="text-align:right">R$ ${p.entrada.toFixed(2)}</div>
+    <div class="m neu" style="text-align:right">${p.preco_saida?'R$ '+p.preco_saida.toFixed(2):'—'}</div>
+    <div class="m ${pnl>=0?'pos':'neg'}" style="text-align:right;font-weight:600">${(pnl>=0?'+':'')+pnl.toFixed(2)}%</div>
+    <div class="m ${rel!==null?(rel>=0?'pos':'neg'):'dim'} trk-col-ibov" style="text-align:right">${rel!==null?(rel>=0?'+':'')+rel.toFixed(2)+'%':'—'}</div>
+    <div class="m neu trk-col-rel" style="text-align:right">${dias}d</div>
+    <div><span class="status-pill ${pillClass}">${pillLabel}</span></div>
+    <div style="text-align:right"><button class="btn-del" onclick="removerPosicao('${p.id}')" title="Remover">✕</button></div>
+  </div>`;
+}
+
+// ── Auto-detecta sinais VCP da aba APGAR ──────
+function autoRegistrarSinaisVCP(dados){
+  if(!dados?.apgar?.acoes) return;
+  const hoje = new Date().toISOString().split('T')[0];
+  const posicoes = carregarPosicoes();
+  const tickers_existentes = new Set(posicoes.filter(p=>p.data===hoje).map(p=>p.ticker));
+
+  dados.apgar.acoes.forEach(a => {
+    // Sinal VCP: score 5-8 + B=2 + MRS>0 + RSV>0
+    if(a.score>=5 && a.score<=8 && a.scores?.breakout===2
+       && a.mrs>0 && a.rsv>0
+       && !tickers_existentes.has(a.ticker)){
+      const nova = {
+        id:       Date.now()+'_'+a.ticker,
+        ticker:   a.ticker,
+        entrada:  a.preco,
+        score:    a.score,
+        data:     hoje,
+        ibov_entrada: null,
+        notas:    'VCP auto',
+        fechada:  false,
+      };
+      posicoes.push(nova);
+      tickers_existentes.add(a.ticker);
+    }
+  });
+  salvarPosicoes(posicoes);
+}
+
+// ── Atualiza preços das posições abertas ──────
+function atualizarPrecos(dados){
+  if(!dados) return;
+  const posicoes = carregarPosicoes();
+  let updated = false;
+  posicoes.forEach(p => {
+    if(p.fechada) return;
+    const preco = precoAtualDe(p.ticker, dados);
+    if(preco && preco !== p._preco_atual){
+      p._preco_atual = preco;
+      updated = true;
+    }
+  });
+  if(updated) salvarPosicoes(posicoes);
+}
+
+// ── Modal ──────────────────────────────────────
+function abrirModal(){
+  document.getElementById('mData').value = new Date().toISOString().split('T')[0];
+  document.getElementById('mTicker').value='';
+  document.getElementById('mEntrada').value='';
+  document.getElementById('mScore').value='';
+  document.getElementById('mIbov').value='';
+  document.getElementById('mNotas').value='';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('mTicker').focus(), 100);
+}
+
+function fecharModal(e){
+  if(!e || e.target===document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function salvarSinal(){
+  const ticker  = document.getElementById('mTicker').value.trim().toUpperCase();
+  const entrada = parseFloat(document.getElementById('mEntrada').value);
+  const score   = parseInt(document.getElementById('mScore').value)||null;
+  const data    = document.getElementById('mData').value;
+  const ibov    = parseFloat(document.getElementById('mIbov').value)||null;
+  const notas   = document.getElementById('mNotas').value.trim();
+
+  if(!ticker || isNaN(entrada) || !data){
+    alert('Preencha ticker, preço de entrada e data.'); return;
+  }
+
+  const posicoes = carregarPosicoes();
+  posicoes.push({
+    id:           Date.now()+'_'+ticker,
+    ticker, entrada, score, data,
+    ibov_entrada: ibov,
+    notas,
+    fechada:      false,
+    _preco_atual: entrada,
+  });
+  salvarPosicoes(posicoes);
+  document.getElementById('modalOverlay').classList.remove('open');
+  renderTracker();
+}
+
+function removerPosicao(id){
+  const posicoes = carregarPosicoes().filter(p=>p.id!==id);
+  salvarPosicoes(posicoes);
+  renderTracker();
+}
+
+function limparFechadas(){
+  if(!confirm('Remover todas as posições fechadas?')) return;
+  const posicoes = carregarPosicoes().filter(p=>!p.fechada);
+  salvarPosicoes(posicoes);
+  renderTracker();
+}
+
+// Teclado: ESC fecha modal
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') fecharModal();
+});
 
 atualizarDados();
 </script>

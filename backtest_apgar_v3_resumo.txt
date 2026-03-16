@@ -1,0 +1,260 @@
+================================================================
+  BACKTEST — APGAR + Filtros MRS/RSV · IBRX100
+  Base: score 5–8 + B=2 | TP +5% | Time stop 10d
+================================================================
+
+  ──────────────────────────────────────────────────────────────
+  VARIAÇÃO BASE — Sem filtro MRS/RSV (referência)
+  Sem filtro MRS/RSV (referência)
+  Período: 2022-02-14 → 2026-03-13
+  ──────────────────────────────────────────────────────────────
+  Total trades    : 590
+  Ações únicas    : 96
+  Winrate         : 64.2%
+  Retorno médio   : +0.60%  (mediana +2.55%)
+  Ganho médio     : +4.03%
+  Perda média     : -5.54%
+  Payoff ratio    : 0.73x
+  Profit factor   : 1.30
+  Expectancy      : +0.60% por trade
+  Ret rel. BOVA11 : -0.17%
+  Max loss streak : 7
+  Duração média   : 7.5 dias
+  P25 / P75       : -1.9% / +5.0%
+
+    Por motivo de saída:
+    Motivo              N   Winrate   Ret médio     Dur
+    take_profit       259    100.0%      +5.00%    4.4d
+    time_stop         331     36.3%      -2.84%   10.0d
+
+    Por score de entrada:
+    Score        N   Winrate   Ret médio
+    5           72     58.3%      -0.09%
+    6          118     69.5%      +1.39%
+    7          249     61.4%      +0.44%
+    8          151     67.5%      +0.59%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+BEEF3   6   100.00       5.00     4.04
+LWSA3   3   100.00       5.00     1.57
+BHIA3   3   100.00       5.00     5.14
+AXIA3   7   100.00       4.23     1.37
+GGPS3   5   100.00       4.16     2.92
+PETR4   9    88.89       4.04     2.52
+CMIN3   4   100.00       3.94     1.75
+B3SA3   6   100.00       3.86     2.67
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+HAPV3   4    25.00      -7.79    -7.00
+RECV3   3    33.33      -6.29    -5.30
+RENT3   6    33.33      -5.20    -5.13
+VAMO3   5    60.00      -3.48    -3.43
+YDUQ3   7    42.86      -3.06    -4.33
+
+    Distribuição de retornos:
+         < −5%    92  █████
+      −5 a −2%    48  ██
+       −2 a 0%    71  ████
+       0 a +2%    68  ████
+      +2 a +5%   311  ██████████████████
+         > +5%     0  
+
+  ──────────────────────────────────────────────────────────────
+  VARIAÇÃO H1 — H1 — MRS > 0 (ação batendo o índice)
+  H1 — MRS > 0 (ação batendo o índice)
+  Período: 2022-02-14 → 2026-03-11
+  ──────────────────────────────────────────────────────────────
+  Total trades    : 496
+  Ações únicas    : 94
+  Winrate         : 64.7%
+  Retorno médio   : +0.60%  (mediana +2.55%)
+  Ganho médio     : +4.00%
+  Perda média     : -5.63%
+  Payoff ratio    : 0.71x
+  Profit factor   : 1.30
+  Expectancy      : +0.60% por trade
+  Ret rel. BOVA11 : -0.18%
+  Max loss streak : 11
+  Duração média   : 7.6 dias
+  P25 / P75       : -1.8% / +5.0%
+
+    Por motivo de saída:
+    Motivo              N   Winrate   Ret médio     Dur
+    take_profit       218    100.0%      +5.00%    4.4d
+    time_stop         278     37.1%      -2.85%   10.0d
+
+    Por score de entrada:
+    Score        N   Winrate   Ret médio
+    5            5     80.0%      +1.24%
+    6           96     66.7%      +1.02%
+    7          244     61.9%      +0.43%
+    8          151     67.5%      +0.59%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+BEEF3   5    100.0       5.00     3.70
+AXIA3   4    100.0       4.49     3.39
+PETR4   6    100.0       4.41     3.11
+GGPS3   5    100.0       4.16     2.92
+CMIN3   4    100.0       3.94     1.75
+WEGE3   4    100.0       3.83     1.46
+BRAP4   3    100.0       3.41     1.84
+BBDC3   4    100.0       3.39     1.92
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+HAPV3   3     0.00     -12.06   -10.33
+RECV3   3    33.33      -6.29    -5.30
+RENT3   5    40.00      -4.97    -4.44
+USIM5   4    25.00      -3.73    -4.55
+VAMO3   5    60.00      -3.48    -3.43
+
+    Distribuição de retornos:
+         < −5%    78  █████
+      −5 a −2%    38  ██
+       −2 a 0%    59  ████
+       0 a +2%    61  ████
+      +2 a +5%   260  ██████████████████
+         > +5%     0  
+
+  ──────────────────────────────────────────────────────────────
+  VARIAÇÃO H2 — H2 — MRS > 0 E RSV > 0 (volume e preço acima do mercado)
+  H2 — MRS > 0 E RSV > 0 (volume e preço acima do mercado)
+  Período: 2022-02-14 → 2026-03-11
+  ──────────────────────────────────────────────────────────────
+  Total trades    : 483
+  Ações únicas    : 94
+  Winrate         : 65.0%
+  Retorno médio   : +0.63%  (mediana +2.68%)
+  Ganho médio     : +4.00%
+  Perda média     : -5.62%
+  Payoff ratio    : 0.71x
+  Profit factor   : 1.32
+  Expectancy      : +0.63% por trade
+  Ret rel. BOVA11 : -0.16%
+  Max loss streak : 11
+  Duração média   : 7.5 dias
+  P25 / P75       : -1.6% / +5.0%
+
+    Por motivo de saída:
+    Motivo              N   Winrate   Ret médio     Dur
+    take_profit       214    100.0%      +5.00%    4.4d
+    time_stop         269     37.2%      -2.84%   10.0d
+
+    Por score de entrada:
+    Score        N   Winrate   Ret médio
+    5            5     80.0%      +1.24%
+    6           95     66.3%      +0.98%
+    7          235     62.1%      +0.49%
+    8          148     68.2%      +0.62%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+BEEF3   5    100.0       5.00     3.70
+AXIA3   4    100.0       4.49     3.39
+PETR4   6    100.0       4.41     3.11
+GGPS3   5    100.0       4.16     2.92
+CMIN3   4    100.0       3.94     1.75
+WEGE3   4    100.0       3.83     1.46
+BRAP4   3    100.0       3.41     1.84
+BBDC3   4    100.0       3.39     1.92
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+HAPV3   3     0.00     -12.06   -10.33
+RECV3   3    33.33      -6.29    -5.30
+RENT3   5    40.00      -4.97    -4.44
+USIM5   4    25.00      -3.73    -4.55
+VAMO3   5    60.00      -3.48    -3.43
+
+    Distribuição de retornos:
+         < −5%    77  █████
+      −5 a −2%    34  ██
+       −2 a 0%    58  ████
+       0 a +2%    59  ████
+      +2 a +5%   255  ███████████████████
+         > +5%     0  
+
+  ──────────────────────────────────────────────────────────────
+  VARIAÇÃO H3 — H3 — MRS acelerando: MRS hoje > MRS 3d atrás E MRS > 0
+  H3 — MRS acelerando: MRS hoje > MRS 3d atrás E MRS > 0
+  Período: 2022-02-14 → 2026-03-11
+  ──────────────────────────────────────────────────────────────
+  Total trades    : 473
+  Ações únicas    : 94
+  Winrate         : 64.1%
+  Retorno médio   : +0.51%  (mediana +2.48%)
+  Ganho médio     : +4.00%
+  Perda média     : -5.69%
+  Payoff ratio    : 0.70x
+  Profit factor   : 1.25
+  Expectancy      : +0.51% por trade
+  Ret rel. BOVA11 : -0.23%
+  Max loss streak : 11
+  Duração média   : 7.6 dias
+  P25 / P75       : -1.9% / +5.0%
+
+    Por motivo de saída:
+    Motivo              N   Winrate   Ret médio     Dur
+    take_profit       207    100.0%      +5.00%    4.5d
+    time_stop         266     36.1%      -2.98%   10.0d
+
+    Por score de entrada:
+    Score        N   Winrate   Ret médio
+    5            4     75.0%      +1.33%
+    6           93     65.6%      +0.89%
+    7          234     61.5%      +0.38%
+    8          142     66.9%      +0.48%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+BEEF3   4    100.0       5.00     3.68
+PETR4   6    100.0       4.41     3.11
+AXIA3   3    100.0       4.32     3.41
+CMIN3   4    100.0       3.94     1.75
+WEGE3   4    100.0       3.83     1.46
+BRAP4   3    100.0       3.41     1.84
+BBDC3   4    100.0       3.39     1.92
+B3SA3   3    100.0       3.38     2.03
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+HAPV3   3     0.00     -12.06   -10.33
+RECV3   3    33.33      -6.29    -5.30
+RENT3   5    40.00      -4.97    -4.44
+USIM5   4    25.00      -3.73    -4.55
+VAMO3   5    60.00      -3.48    -3.43
+
+    Distribuição de retornos:
+         < −5%    77  █████
+      −5 a −2%    36  ██
+       −2 a 0%    57  ████
+       0 a +2%    59  ████
+      +2 a +5%   244  ██████████████████
+         > +5%     0  
+
+────────────────────────────────────────────────────────────────
+  COMPARATIVO RÁPIDO
+  Métrica                         BASE          H1          H2          H3
+  ────────────────────────────────────────────────────────────────────
+  Trades                           590         496         483         473
+  Ações únicas                      96          94          94          94
+  Winrate                        64.2%       64.7%       65.0%       64.1%
+  Ret médio                     +0.60%      +0.60%      +0.63%      +0.51%
+  Profit factor                   1.30        1.30        1.32        1.25
+  Expectancy                    +0.60%      +0.60%      +0.63%      +0.51%
+  Ret rel BOVA11                -0.17%      -0.18%      -0.16%      -0.23%
+  Duração média                   7.5d        7.6d        7.5d        7.6d
+  Max streak                         7          11          11          11
+
+================================================================

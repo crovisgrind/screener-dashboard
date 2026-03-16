@@ -1,0 +1,141 @@
+================================================================
+  BACKTEST — APGAR Score · Ibovespa
+================================================================
+
+  ──────────────────────────────────────────────────────────────
+  ESTRATÉGIA A — APGAR ≥ 7  (qualidade pura)
+  Score≥7 | TP +5% | Time stop 10d
+  Período: 2022-02-09 → 2026-03-16
+  ──────────────────────────────────────────────────────────────
+  Total trades    : 2182
+  Ações únicas    : 81
+  Winrate         : 57.8%
+  Retorno médio   : -0.03%  (mediana +1.20%)
+  Ganho médio     : +3.75%
+  Perda média     : -5.21%
+  Payoff ratio    : 0.72x
+  Profit factor   : 0.99
+  Expectancy      : -0.03% por trade
+  Ret rel. BOVA11 : -0.48%
+  Max loss streak : 7
+  Duração média   : 8.4 dias
+  Score médio     : 7.2
+  P25 / P75       : -3.1% / +5.0%
+
+    Por motivo de saída:
+    Motivo              N   Winrate   Ret médio     Dur
+    take_profit       738    100.0%      +5.00%    5.1d
+    time_stop        1444     36.2%      -2.60%   10.0d
+
+    Por score:
+    Score        N   Winrate   Ret médio
+    7         1797     57.3%      -0.06%
+    8          354     59.9%      +0.05%
+    9           30     63.3%      +0.34%
+    10           1    100.0%      +5.00%
+
+    Top ações (≥2 trades):
+         n  winrate  ret_medio  ret_rel
+ticker                                 
+CSNA3    9    77.78       2.29     1.86
+ALOS3   25    76.00       2.12     0.75
+UGPA3   31    70.97       1.99     0.48
+BRAP4   20    75.00       1.78     1.11
+GGPS3   19    73.68       1.44     0.04
+BBDC3   21    66.67       1.36     0.83
+CURY3   60    65.00       1.34     0.98
+USIM5   14    64.29       1.30     0.65
+
+    Bottom ações (≥2 trades):
+         n  winrate  ret_medio  ret_rel
+ticker                                 
+BHIA3    3    33.33     -12.85   -14.34
+BRKM5    5     0.00      -9.16    -7.79
+HAPV3    6    16.67      -9.11    -8.94
+MGLU3   11    36.36      -7.99    -7.62
+CSAN3    5    40.00      -4.56    -2.12
+
+    Distribuição de retornos:
+         < −5%   360  █████
+      −5 a −2%   314  █████
+       −2 a 0%   247  ████
+       0 a +2%   289  ████
+      +2 a +5%   972  ████████████████
+         > +5%     0  
+
+  ──────────────────────────────────────────────────────────────
+  ESTRATÉGIA B — APGAR ≥ 5 + Breakout  (setup técnico confirmado)
+  Score≥5 + B=2 | TP +5% | Time stop 10d
+  Período: 2022-02-10 → 2026-03-11
+  ──────────────────────────────────────────────────────────────
+  Total trades    : 515
+  Ações únicas    : 81
+  Winrate         : 62.5%
+  Retorno médio   : +0.44%  (mediana +2.00%)
+  Ganho médio     : +3.90%
+  Perda média     : -5.34%
+  Payoff ratio    : 0.73x
+  Profit factor   : 1.22
+  Expectancy      : +0.44% por trade
+  Ret rel. BOVA11 : -0.35%
+  Max loss streak : 6
+  Duração média   : 7.8 dias
+  Score médio     : 6.9
+  P25 / P75       : -1.9% / +5.0%
+
+    Por motivo de saída:
+    Motivo              N   Winrate   Ret médio     Dur
+    take_profit       207    100.0%      +5.00%    4.6d
+    time_stop         308     37.3%      -2.63%   10.0d
+
+    Por score:
+    Score        N   Winrate   Ret médio
+    5           59     55.9%      -0.07%
+    6          100     67.0%      +1.01%
+    7          207     61.4%      +0.40%
+    8          127     66.9%      +0.57%
+    9           19     42.1%      -1.27%
+    10           3     66.7%      -1.61%
+
+    Top ações (≥2 trades):
+         n  winrate  ret_medio  ret_rel
+ticker                                 
+BEEF3    7   100.00       5.00     4.39
+BHIA3    3   100.00       5.00     5.14
+CSAN3    2   100.00       4.02     0.27
+B3SA3    6   100.00       3.86     2.67
+AZZA3    2   100.00       3.47     0.25
+WEGE3    7    85.71       3.41     2.56
+CMIN3    5   100.00       3.19     1.79
+PETR4   10    80.00       3.15     1.96
+
+    Bottom ações (≥2 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+MGLU3   2     0.00     -18.96   -17.48
+HAPV3   4    25.00      -7.79    -7.00
+UGPA3   2    50.00      -6.30    -3.81
+RECV3   3    33.33      -6.29    -5.30
+RENT3   6    33.33      -5.20    -5.13
+
+    Distribuição de retornos:
+         < −5%    80  █████
+      −5 a −2%    48  ███
+       −2 a 0%    65  ████
+       0 a +2%    65  ████
+      +2 a +5%   257  █████████████████
+         > +5%     0  
+
+================================================================
+
+  COMPARATIVO RÁPIDO
+  Métrica                      Estrat. A     Estrat. B
+  ────────────────────────────────────────────────────
+  Trades                            2182           515
+  Winrate                          57.8%         62.5%
+  Retorno médio                   -0.03%        +0.44%
+  Profit factor                     0.99          1.22
+  Expectancy                      -0.03%        +0.44%
+  Ret rel BOVA11                  -0.48%        -0.35%
+
+================================================================
