@@ -211,8 +211,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 .fade{animation:fadeUp .45s ease both}
 
 /* ═══ SPRITE ANIMATIONS ═══ */
-/* Frame: 1920x1080 | 5 colunas | 12 linhas | 58 frames total */
-/* Grupos: celebração 0-9 | loading 10-33 | andando 34-57      */
+/* Sheet: 9600x12960 | frames úteis na metade esquerda (4800px) */
+/* Frame útil: 960x1080px | 5 cols | 12 rows | 58 frames       */
+/* Grupos: celebração 0-9 | loading 10-33 | andando 34-57       */
 
 #sprite-celebracao,
 #sprite-loading,
@@ -224,13 +225,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   background-image: url('sprite.png');
   background-repeat: no-repeat;
   pointer-events: none;
+  overflow: hidden;
 }
 
 /* ── CELEBRAÇÃO (frames 0-9): canto inferior direito ── */
+/* Frame 960x1080 → exibir como 135x152 (mantém proporção) */
 #sprite-celebracao {
-  width: 192px;
-  height: 108px;
-  background-size: calc(9600px * (192/1920)) calc(12960px * (192/1920));
+  width: 135px;
+  height: 152px;
   bottom: 20px;
   right: 20px;
   display: none;
@@ -238,12 +240,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   filter: drop-shadow(0 4px 16px rgba(0,240,160,0.4));
 }
 
-/* ── LOADING (frames 10-33): centro da tela, visível no mobile ── */
+/* ── LOADING (frames 10-33): centro da tela ── */
+/* Frame 960x1080 → exibir grande no mobile, contido no desktop */
 #sprite-loading {
-  width: min(90vw, 480px);
+  width: min(80vw, 360px);
   height: auto;
-  aspect-ratio: 16/9;
-  background-size: calc(5 * min(90vw, 480px)) calc(12 * min(90vw, 480px) * 9/16);
+  aspect-ratio: 960 / 1080;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -255,20 +257,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(8,10,15,0.85);
+  background: rgba(8,10,15,0.88);
   z-index: 998;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 
 /* ── ANDANDO (frames 34-57): percorre da esquerda para direita ── */
+/* Frame 960x1080 → exibir como 80x90 (pequeno, proporcional) */
 #sprite-andando {
-  width: 120px;
-  height: 68px;
-  background-size: calc(9600px * (120/1920)) calc(12960px * (120/1920));
+  width: 80px;
+  height: 90px;
   bottom: 70px;
-  left: -130px;
+  left: -100px;
   display: none;
-  transition: left 0.05s linear;
 }
 
 
@@ -1105,29 +1106,36 @@ document.addEventListener('keydown', e => {
 
 // ══════════════════════════════════════════════
 // SPRITE ENGINE
-// 1920x1080 por frame | 5 cols | 12 rows | 58 frames
+// Sheet: 9600x12960 | frames úteis: metade esquerda (4800px)
+// Frame útil: 960x1080 | 5 cols | 12 rows | 58 frames
 // ══════════════════════════════════════════════
 
 const SPRITE = {
-  FRAME_W: 1920, FRAME_H: 1080,
+  // Dimensões do frame útil (metade esquerda do sheet)
+  FRAME_W: 960, FRAME_H: 1080,
+  // O sheet completo tem 9600 de largura, mas usamos só 4800 (5 cols × 960)
+  // background-size deve cobrir o sheet INTEIRO para posicionar corretamente
+  SHEET_W: 9600, SHEET_H: 12960,
   COLS: 5, ROWS: 12,
   TOTAL: 58,
-  // Grupos
   CELEBRACAO: { start:0,  end:9  },
   LOADING:    { start:10, end:33 },
   ANDANDO:    { start:34, end:57 },
 };
 
-// Calcula posição background para um frame
+// Calcula background-position e background-size para um frame
+// displayW/H = tamanho do elemento HTML (o frame visível)
 function spritePos(frameIdx, displayW, displayH) {
-  const scaleX = displayW / SPRITE.FRAME_W;
+  const scaleX = displayW / SPRITE.FRAME_W;   // escala baseada no frame útil
   const scaleY = displayH / SPRITE.FRAME_H;
   const col    = frameIdx % SPRITE.COLS;
   const row    = Math.floor(frameIdx / SPRITE.COLS);
+  // Posição no sheet (usando coordenadas do frame útil escalado)
   const x      = -(col * SPRITE.FRAME_W * scaleX);
   const y      = -(row * SPRITE.FRAME_H * scaleY);
-  const bsW    = SPRITE.COLS   * SPRITE.FRAME_W * scaleX;
-  const bsH    = SPRITE.ROWS   * SPRITE.FRAME_H * scaleY;
+  // background-size = sheet INTEIRO escalado (para posicionamento correto)
+  const bsW    = SPRITE.SHEET_W * scaleX;
+  const bsH    = SPRITE.SHEET_H * scaleY;
   return { x, y, bsW, bsH };
 }
 
@@ -1184,10 +1192,10 @@ function triggerCelebracao(tickerList) {
 
   // Toca a animação 2x e some
   let ciclos = 0;
-  animarSprite('celebracao', SPRITE.CELEBRACAO, 12, () => {
+  animarSprite('celebracao', SPRITE.CELEBRACAO, 20, () => {
     ciclos++;
     if(ciclos < 2) {
-      animarSprite('celebracao', SPRITE.CELEBRACAO, 12, () => {
+      animarSprite('celebracao', SPRITE.CELEBRACAO, 20, () => {
         el.style.display = 'none';
       });
     } else {
@@ -1198,21 +1206,29 @@ function triggerCelebracao(tickerList) {
 
 // ── LOADING ──────────────────────────────────────
 // Aparece ao pressionar atualizar, some quando os dados chegam
+let _loadingStartTime = 0;
+const LOADING_MIN_MS  = 2000;  // mínimo 2s de animação visível
+
 function mostrarLoading() {
   const el  = document.getElementById('sprite-loading');
   const ov  = document.getElementById('sprite-loading-overlay');
   if(!el || !ov) return;
+  _loadingStartTime = Date.now();
   ov.style.display = 'block';
   el.style.display = 'block';
-  animarSprite('loading', SPRITE.LOADING, 15);  // loop
+  animarSprite('loading', SPRITE.LOADING, 20);  // loop 20fps
 }
 
 function esconderLoading() {
-  const el = document.getElementById('sprite-loading');
-  const ov = document.getElementById('sprite-loading-overlay');
-  pararSprite('loading');
-  if(el) el.style.display = 'none';
-  if(ov) ov.style.display = 'none';
+  const elapsed = Date.now() - _loadingStartTime;
+  const restante = Math.max(0, LOADING_MIN_MS - elapsed);
+  setTimeout(() => {
+    const el = document.getElementById('sprite-loading');
+    const ov = document.getElementById('sprite-loading-overlay');
+    pararSprite('loading');
+    if(el) el.style.display = 'none';
+    if(ov) ov.style.display = 'none';
+  }, restante);
 }
 
 // ── ANDANDO (tab transition) ──────────────────
@@ -1231,7 +1247,7 @@ function triggerAndando() {
   el.style.display = 'block';
   el.style.transition = 'none';
 
-  animarSprite('andando', SPRITE.ANDANDO, 16);  // loop enquanto anda
+  animarSprite('andando', SPRITE.ANDANDO, 20);  // loop 20fps
 
   // Movimento horizontal suave via requestAnimationFrame
   let posX    = -130;
