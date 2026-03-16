@@ -210,6 +210,68 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade{animation:fadeUp .45s ease both}
 
+/* ═══ SPRITE ANIMATIONS ═══ */
+/* Frame: 1920x1080 | 5 colunas | 12 linhas | 58 frames total */
+/* Grupos: celebração 0-9 | loading 10-33 | andando 34-57      */
+
+#sprite-celebracao,
+#sprite-loading,
+#sprite-andando {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  position: fixed;
+  z-index: 999;
+  background-image: url('sprite.png');
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* ── CELEBRAÇÃO (frames 0-9): canto inferior direito ── */
+#sprite-celebracao {
+  width: 192px;
+  height: 108px;
+  background-size: calc(9600px * (192/1920)) calc(12960px * (192/1920));
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  border-radius: 8px;
+  filter: drop-shadow(0 4px 16px rgba(0,240,160,0.4));
+}
+
+/* ── LOADING (frames 10-33): centro da tela, visível no mobile ── */
+#sprite-loading {
+  width: min(90vw, 480px);
+  height: auto;
+  aspect-ratio: 16/9;
+  background-size: calc(5 * min(90vw, 480px)) calc(12 * min(90vw, 480px) * 9/16);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  border-radius: 12px;
+  filter: drop-shadow(0 8px 32px rgba(0,0,0,0.8));
+}
+#sprite-loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,10,15,0.85);
+  z-index: 998;
+  backdrop-filter: blur(4px);
+}
+
+/* ── ANDANDO (frames 34-57): percorre da esquerda para direita ── */
+#sprite-andando {
+  width: 120px;
+  height: 68px;
+  background-size: calc(9600px * (120/1920)) calc(12960px * (120/1920));
+  bottom: 70px;
+  left: -130px;
+  display: none;
+  transition: left 0.05s linear;
+}
+
+
 /* ═══ ABA TRACKER ═══ */
 .tracker-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:32px}
 
@@ -496,6 +558,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
     </div>
   </div>
 </div>
+
+<!-- SPRITES -->
+<div id="sprite-loading-overlay"></div>
+<div id="sprite-celebracao"></div>
+<div id="sprite-loading"></div>
+<div id="sprite-andando"></div>
 
 <script>
 // ── State ─────────────────────────────────────────────────
@@ -1034,6 +1102,194 @@ function limparFechadas(){
 document.addEventListener('keydown', e => {
   if(e.key==='Escape') fecharModal();
 });
+
+// ══════════════════════════════════════════════
+// SPRITE ENGINE
+// 1920x1080 por frame | 5 cols | 12 rows | 58 frames
+// ══════════════════════════════════════════════
+
+const SPRITE = {
+  FRAME_W: 1920, FRAME_H: 1080,
+  COLS: 5, ROWS: 12,
+  TOTAL: 58,
+  // Grupos
+  CELEBRACAO: { start:0,  end:9  },
+  LOADING:    { start:10, end:33 },
+  ANDANDO:    { start:34, end:57 },
+};
+
+// Calcula posição background para um frame
+function spritePos(frameIdx, displayW, displayH) {
+  const scaleX = displayW / SPRITE.FRAME_W;
+  const scaleY = displayH / SPRITE.FRAME_H;
+  const col    = frameIdx % SPRITE.COLS;
+  const row    = Math.floor(frameIdx / SPRITE.COLS);
+  const x      = -(col * SPRITE.FRAME_W * scaleX);
+  const y      = -(row * SPRITE.FRAME_H * scaleY);
+  const bsW    = SPRITE.COLS   * SPRITE.FRAME_W * scaleX;
+  const bsH    = SPRITE.ROWS   * SPRITE.FRAME_H * scaleY;
+  return { x, y, bsW, bsH };
+}
+
+function applyFrame(el, frameIdx) {
+  const w   = el.offsetWidth  || parseInt(getComputedStyle(el).width);
+  const h   = el.offsetHeight || parseInt(getComputedStyle(el).height);
+  const pos = spritePos(frameIdx, w, h);
+  el.style.backgroundPosition = `${pos.x}px ${pos.y}px`;
+  el.style.backgroundSize     = `${pos.bsW}px ${pos.bsH}px`;
+}
+
+// ── timers ──────────────────────────────────────
+const _spriteTimers = {};
+
+function pararSprite(nome) {
+  if(_spriteTimers[nome]) {
+    clearInterval(_spriteTimers[nome]);
+    delete _spriteTimers[nome];
+  }
+}
+
+function animarSprite(nome, { start, end }, fps, onEnd) {
+  pararSprite(nome);
+  const el    = document.getElementById('sprite-' + nome);
+  if(!el) return;
+  let frame   = start;
+  const delay = Math.round(1000 / fps);
+
+  applyFrame(el, frame);
+  _spriteTimers[nome] = setInterval(() => {
+    frame++;
+    if(frame > end) {
+      if(onEnd) { clearInterval(_spriteTimers[nome]); delete _spriteTimers[nome]; onEnd(); return; }
+      frame = start;  // loop
+    }
+    applyFrame(el, frame);
+  }, delay);
+}
+
+// ── CELEBRAÇÃO ──────────────────────────────────
+// Aparece no canto inferior direito por 3s quando um sinal VCP é detectado
+let _ultimoCelebrado = null;
+
+function triggerCelebracao(tickerList) {
+  if(!tickerList || tickerList.length === 0) return;
+  const key = tickerList.join(',');
+  if(key === _ultimoCelebrado) return;   // já celebrou esse set hoje
+  _ultimoCelebrado = key;
+
+  const el = document.getElementById('sprite-celebracao');
+  if(!el) return;
+  pararSprite('celebracao');
+  el.style.display = 'block';
+
+  // Toca a animação 2x e some
+  let ciclos = 0;
+  animarSprite('celebracao', SPRITE.CELEBRACAO, 12, () => {
+    ciclos++;
+    if(ciclos < 2) {
+      animarSprite('celebracao', SPRITE.CELEBRACAO, 12, () => {
+        el.style.display = 'none';
+      });
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+// ── LOADING ──────────────────────────────────────
+// Aparece ao pressionar atualizar, some quando os dados chegam
+function mostrarLoading() {
+  const el  = document.getElementById('sprite-loading');
+  const ov  = document.getElementById('sprite-loading-overlay');
+  if(!el || !ov) return;
+  ov.style.display = 'block';
+  el.style.display = 'block';
+  animarSprite('loading', SPRITE.LOADING, 15);  // loop
+}
+
+function esconderLoading() {
+  const el = document.getElementById('sprite-loading');
+  const ov = document.getElementById('sprite-loading-overlay');
+  pararSprite('loading');
+  if(el) el.style.display = 'none';
+  if(ov) ov.style.display = 'none';
+}
+
+// ── ANDANDO (tab transition) ──────────────────
+// Percorre a tela da esquerda para a direita ao trocar de aba
+let _andando = false;
+
+function triggerAndando() {
+  if(_andando) return;
+  _andando = true;
+
+  const el    = document.getElementById('sprite-andando');
+  if(!el) return;
+  const largura = window.innerWidth + 160;
+
+  el.style.left    = '-130px';
+  el.style.display = 'block';
+  el.style.transition = 'none';
+
+  animarSprite('andando', SPRITE.ANDANDO, 16);  // loop enquanto anda
+
+  // Movimento horizontal suave via requestAnimationFrame
+  let posX    = -130;
+  const speed = Math.round(largura / 60);  // atravessa em ~1s a 60fps
+
+  function andar() {
+    posX += speed;
+    el.style.left = posX + 'px';
+    if(posX < largura) {
+      requestAnimationFrame(andar);
+    } else {
+      pararSprite('andando');
+      el.style.display = 'none';
+      _andando = false;
+    }
+  }
+  requestAnimationFrame(andar);
+}
+
+// ── Hook nas funções existentes ───────────────
+
+// Override do forceUpdate para mostrar loading
+const _origForceUpdate = forceUpdate;
+forceUpdate = async function(event) {
+  mostrarLoading();
+  try { await _origForceUpdate(event); }
+  finally { esconderLoading(); }
+};
+
+// Override do atualizarDados para mostrar loading na primeira carga
+const _origAtualizarDados = atualizarDados;
+atualizarDados = async function(tentativa, max) {
+  if(tentativa === undefined || tentativa === 1) mostrarLoading();
+  try { await _origAtualizarDados(tentativa, max); }
+  finally { esconderLoading(); }
+};
+
+// Override do setTab para triggar animação de andada
+const _origSetTab = setTab;
+setTab = function(id, btn) {
+  triggerAndando();
+  _origSetTab(id, btn);
+};
+
+// Hook no renderizarDados para detectar sinais e celebrar
+const _origRenderizarDados = renderizarDados;
+renderizarDados = function(d) {
+  _origRenderizarDados(d);
+  // Detecta sinais VCP novos para celebrar
+  if(d?.apgar?.acoes) {
+    const sinaisVCP = d.apgar.acoes
+      .filter(a => a.score>=5 && a.score<=8
+                && a.scores?.breakout===2
+                && a.mrs>0 && a.rsv>0)
+      .map(a => a.ticker);
+    if(sinaisVCP.length > 0) triggerCelebracao(sinaisVCP);
+  }
+};
 
 atualizarDados();
 </script>
