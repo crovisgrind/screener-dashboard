@@ -1046,7 +1046,7 @@ function rowAberta(p){
   const pillLabel = st==='open' ? '● aberta' : st==='tp' ? '✓ TP +5%' : '⏱ time stop';
 
   return `<div class="trk-row">
-    <div><span class="tkr">${p.ticker}</span>${p.notas?`<div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${p.notas}</div>`:''}
+    <div><span class="tkr">${p.ticker}</span>${p.notas?('<div style="font-size:10px;color:var(--muted);font-family:var(--mono)">'+p.notas+'</div>'):''}
     </div>
     <div class="m neu trk-col-score" style="text-align:right">${p.score||'—'}</div>
     <div class="m neu" style="text-align:right">R$ ${p.entrada.toFixed(2)}</div>
