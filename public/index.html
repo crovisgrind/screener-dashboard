@@ -210,67 +210,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade{animation:fadeUp .45s ease both}
 
+/* ═══ SPRITE APGAR — 10 frames, 5x2, 290x290 cada ═══ */
+#apgar-sprite-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  background: transparent;
+}
+#apgar-sprite-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* sprite renderizado via JS no canvas */
+}
+/* Efeito túnel no fade out */
+#apgar-sprite-overlay.tunnel-out {
+  animation: tunnelFade 0.9s ease-in forwards;
+}
+@keyframes tunnelFade {
+  0%   { transform: scale(1);    opacity: 1; filter: brightness(1); }
+  40%  { transform: scale(0.6);  opacity: 1; filter: brightness(1.4); }
+  70%  { transform: scale(0.25); opacity: 0.8; filter: brightness(2) blur(2px); }
+  100% { transform: scale(0.05); opacity: 0;   filter: brightness(4) blur(6px); }
+}
+
+
 /* ═══ SPRITE ANIMATIONS ═══ */
 /* Sheet: 9600x12960 | frames úteis na metade esquerda (4800px) */
 /* Frame útil: 960x1080px | 5 cols | 12 rows | 58 frames       */
 /* Grupos: celebração 0-9 | loading 10-33 | andando 34-57       */
 
-#sprite-celebracao,
-#sprite-loading,
-#sprite-andando {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  position: fixed;
-  z-index: 999;
-  background-image: url('sprite.png');
-  background-repeat: no-repeat;
-  pointer-events: none;
-  overflow: hidden;
-}
 
-/* ── CELEBRAÇÃO (frames 0-9): canto inferior direito ── */
-/* Frame 960x1080 → exibir como 135x152 (mantém proporção) */
-#sprite-celebracao {
-  width: 135px;
-  height: 152px;
-  bottom: 20px;
-  right: 20px;
-  display: none;
-  border-radius: 8px;
-  filter: drop-shadow(0 4px 16px rgba(0,240,160,0.4));
-}
-
-/* ── LOADING (frames 10-33): centro da tela ── */
-/* Frame 960x1080 → exibir grande no mobile, contido no desktop */
-#sprite-loading {
-  width: min(80vw, 360px);
-  height: auto;
-  aspect-ratio: 960 / 1080;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: none;
-  border-radius: 12px;
-  filter: drop-shadow(0 8px 32px rgba(0,0,0,0.8));
-}
-#sprite-loading-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(8,10,15,0.88);
-  z-index: 998;
-  backdrop-filter: blur(6px);
-}
-
-/* ── ANDANDO (frames 34-57): percorre da esquerda para direita ── */
-/* Frame 960x1080 → exibir como 80x90 (pequeno, proporcional) */
-#sprite-andando {
-  width: 80px;
-  height: 90px;
-  bottom: 70px;
-  left: -100px;
-  display: none;
-}
 
 
 /* ═══ ABA TRACKER ═══ */
@@ -560,11 +533,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   </div>
 </div>
 
-<!-- SPRITES -->
-<div id="sprite-loading-overlay"></div>
-<div id="sprite-celebracao"></div>
-<div id="sprite-loading"></div>
-<div id="sprite-andando"></div>
+
+<!-- SPRITE APGAR -->
+<div id="apgar-sprite-overlay">
+  <canvas id="apgar-sprite-canvas"></canvas>
+</div>
 
 <script>
 // ── State ─────────────────────────────────────────────────
@@ -1104,206 +1077,128 @@ document.addEventListener('keydown', e => {
   if(e.key==='Escape') fecharModal();
 });
 
+
 // ══════════════════════════════════════════════
-// SPRITE ENGINE
-// Sheet: 9600x12960 | frames úteis: metade esquerda (4800px)
-// Frame útil: 960x1080 | 5 cols | 12 rows | 58 frames
+// SPRITE APGAR — 10 frames | 5 cols × 2 rows | 290x290px
+// Ativa ao entrar na aba APGAR SCORE
+// 3 loops a 11fps → fade out efeito túnel
 // ══════════════════════════════════════════════
 
-const SPRITE = {
-  // Dimensões do frame útil (metade esquerda do sheet)
-  FRAME_W: 960, FRAME_H: 1080,
-  // O sheet completo tem 9600 de largura, mas usamos só 4800 (5 cols × 960)
-  // background-size deve cobrir o sheet INTEIRO para posicionar corretamente
-  SHEET_W: 9600, SHEET_H: 12960,
-  COLS: 5, ROWS: 12,
-  TOTAL: 58,
-  CELEBRACAO: { start:0,  end:9  },
-  LOADING:    { start:10, end:33 },
-  ANDANDO:    { start:34, end:57 },
-};
+(function() {
+  const SP = {
+    FILE  : 'sprite.png',
+    COLS  : 5, ROWS: 2, TOTAL: 10,
+    FW    : 290, FH: 290,
+    FPS   : 11,
+    LOOPS : 3,
+  };
 
-// Calcula background-position e background-size para um frame
-// displayW/H = tamanho do elemento HTML (o frame visível)
-function spritePos(frameIdx, displayW, displayH) {
-  const scaleX = displayW / SPRITE.FRAME_W;   // escala baseada no frame útil
-  const scaleY = displayH / SPRITE.FRAME_H;
-  const col    = frameIdx % SPRITE.COLS;
-  const row    = Math.floor(frameIdx / SPRITE.COLS);
-  // Posição no sheet (usando coordenadas do frame útil escalado)
-  const x      = -(col * SPRITE.FRAME_W * scaleX);
-  const y      = -(row * SPRITE.FRAME_H * scaleY);
-  // background-size = sheet INTEIRO escalado (para posicionamento correto)
-  const bsW    = SPRITE.SHEET_W * scaleX;
-  const bsH    = SPRITE.SHEET_H * scaleY;
-  return { x, y, bsW, bsH };
-}
+  let _img    = null;
+  let _loaded = false;
+  let _timer  = null;
+  let _frame  = 0;
+  let _loop   = 0;
+  let _running= false;
 
-function applyFrame(el, frameIdx) {
-  const w   = el.offsetWidth  || parseInt(getComputedStyle(el).width);
-  const h   = el.offsetHeight || parseInt(getComputedStyle(el).height);
-  const pos = spritePos(frameIdx, w, h);
-  el.style.backgroundPosition = `${pos.x}px ${pos.y}px`;
-  el.style.backgroundSize     = `${pos.bsW}px ${pos.bsH}px`;
-}
-
-// ── timers ──────────────────────────────────────
-const _spriteTimers = {};
-
-function pararSprite(nome) {
-  if(_spriteTimers[nome]) {
-    clearInterval(_spriteTimers[nome]);
-    delete _spriteTimers[nome];
+  // Pré-carrega a imagem
+  function preload() {
+    if(_img) return;
+    _img = new Image();
+    _img.onload  = () => { _loaded = true; };
+    _img.onerror = () => { console.warn('[Sprite] sprite.png não encontrado'); };
+    _img.src = SP.FILE;
   }
-}
+  preload();
 
-function animarSprite(nome, { start, end }, fps, onEnd) {
-  pararSprite(nome);
-  const el    = document.getElementById('sprite-' + nome);
-  if(!el) return;
-  let frame   = start;
-  const delay = Math.round(1000 / fps);
-
-  applyFrame(el, frame);
-  _spriteTimers[nome] = setInterval(() => {
-    frame++;
-    if(frame > end) {
-      if(onEnd) { clearInterval(_spriteTimers[nome]); delete _spriteTimers[nome]; onEnd(); return; }
-      frame = start;  // loop
-    }
-    applyFrame(el, frame);
-  }, delay);
-}
-
-// ── CELEBRAÇÃO ──────────────────────────────────
-// Aparece no canto inferior direito por 3s quando um sinal VCP é detectado
-let _ultimoCelebrado = null;
-
-function triggerCelebracao(tickerList) {
-  if(!tickerList || tickerList.length === 0) return;
-  const key = tickerList.join(',');
-  if(key === _ultimoCelebrado) return;   // já celebrou esse set hoje
-  _ultimoCelebrado = key;
-
-  const el = document.getElementById('sprite-celebracao');
-  if(!el) return;
-  pararSprite('celebracao');
-  el.style.display = 'block';
-
-  // Toca a animação 2x e some
-  let ciclos = 0;
-  animarSprite('celebracao', SPRITE.CELEBRACAO, 20, () => {
-    ciclos++;
-    if(ciclos < 2) {
-      animarSprite('celebracao', SPRITE.CELEBRACAO, 20, () => {
-        el.style.display = 'none';
-      });
-    } else {
-      el.style.display = 'none';
-    }
-  });
-}
-
-// ── LOADING ──────────────────────────────────────
-// Aparece ao pressionar atualizar, some quando os dados chegam
-let _loadingStartTime = 0;
-const LOADING_MIN_MS  = 2000;  // mínimo 2s de animação visível
-
-function mostrarLoading() {
-  const el  = document.getElementById('sprite-loading');
-  const ov  = document.getElementById('sprite-loading-overlay');
-  if(!el || !ov) return;
-  _loadingStartTime = Date.now();
-  ov.style.display = 'block';
-  el.style.display = 'block';
-  animarSprite('loading', SPRITE.LOADING, 20);  // loop 20fps
-}
-
-function esconderLoading() {
-  const elapsed = Date.now() - _loadingStartTime;
-  const restante = Math.max(0, LOADING_MIN_MS - elapsed);
-  setTimeout(() => {
-    const el = document.getElementById('sprite-loading');
-    const ov = document.getElementById('sprite-loading-overlay');
-    pararSprite('loading');
-    if(el) el.style.display = 'none';
-    if(ov) ov.style.display = 'none';
-  }, restante);
-}
-
-// ── ANDANDO (tab transition) ──────────────────
-// Percorre a tela da esquerda para a direita ao trocar de aba
-let _andando = false;
-
-function triggerAndando() {
-  if(_andando) return;
-  _andando = true;
-
-  const el    = document.getElementById('sprite-andando');
-  if(!el) return;
-  const largura = window.innerWidth + 160;
-
-  el.style.left    = '-130px';
-  el.style.display = 'block';
-  el.style.transition = 'none';
-
-  animarSprite('andando', SPRITE.ANDANDO, 20);  // loop 20fps
-
-  // Movimento horizontal suave via requestAnimationFrame
-  let posX    = -130;
-  const speed = Math.round(largura / 60);  // atravessa em ~1s a 60fps
-
-  function andar() {
-    posX += speed;
-    el.style.left = posX + 'px';
-    if(posX < largura) {
-      requestAnimationFrame(andar);
-    } else {
-      pararSprite('andando');
-      el.style.display = 'none';
-      _andando = false;
-    }
+  function getCanvas() {
+    return document.getElementById('apgar-sprite-canvas');
   }
-  requestAnimationFrame(andar);
-}
+  function getOverlay() {
+    return document.getElementById('apgar-sprite-overlay');
+  }
 
-// ── Hook nas funções existentes ───────────────
+  function drawFrame(frameIdx) {
+    const canvas = getCanvas();
+    if(!canvas || !_loaded) return;
+    const W = canvas.width  = canvas.offsetWidth  || window.innerWidth;
+    const H = canvas.height = canvas.offsetHeight || window.innerHeight;
 
-// Override do forceUpdate para mostrar loading
-const _origForceUpdate = forceUpdate;
-forceUpdate = async function(event) {
-  mostrarLoading();
-  try { await _origForceUpdate(event); }
-  finally { esconderLoading(); }
-};
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
 
-// Override do atualizarDados para mostrar loading na primeira carga
-const _origAtualizarDados = atualizarDados;
-atualizarDados = async function(tentativa, max) {
-  if(tentativa === undefined || tentativa === 1) mostrarLoading();
-  try { await _origAtualizarDados(tentativa, max); }
-  finally { esconderLoading(); }
-};
+    // Escala para cobrir a tela mantendo proporção quadrada do frame
+    const tileSize = Math.max(W, H);  // tile cobre a maior dimensão
+    // Centraliza
+    const offsetX = (W - tileSize) / 2;
+    const offsetY = (H - tileSize) / 2;
 
-// Override do setTab para triggar animação de andada
-const _origSetTab = setTab;
+    const col = frameIdx % SP.COLS;
+    const row = Math.floor(frameIdx / SP.COLS);
+    const sx  = col * SP.FW;
+    const sy  = row * SP.FH;
+
+    ctx.drawImage(_img, sx, sy, SP.FW, SP.FH, offsetX, offsetY, tileSize, tileSize);
+  }
+
+  function stopSprite() {
+    if(_timer) { clearInterval(_timer); _timer = null; }
+    _running = false;
+  }
+
+  function triggerTunnel() {
+    const ov = getOverlay();
+    if(!ov) return;
+    ov.classList.add('tunnel-out');
+    setTimeout(() => {
+      stopSprite();
+      ov.style.display = 'none';
+      ov.classList.remove('tunnel-out');
+      _frame = 0; _loop = 0;
+    }, 920);
+  }
+
+  function playSprite() {
+    if(_running) return;
+    if(!_loaded) {
+      // Tenta novamente em 300ms se ainda não carregou
+      setTimeout(playSprite, 300);
+      return;
+    }
+
+    const ov = getOverlay();
+    if(!ov) return;
+    ov.style.display = 'block';
+    ov.classList.remove('tunnel-out');
+    _frame = 0; _loop = 0; _running = true;
+
+    drawFrame(0);
+
+    _timer = setInterval(() => {
+      _frame++;
+      if(_frame >= SP.TOTAL) {
+        _frame = 0;
+        _loop++;
+        if(_loop >= SP.LOOPS) {
+          // Completou os 3 loops — inicia fade túnel
+          stopSprite();
+          triggerTunnel();
+          return;
+        }
+      }
+      drawFrame(_frame);
+    }, Math.round(1000 / SP.FPS));
+  }
+
+  // Expõe globalmente
+  window.triggerApgarSprite = playSprite;
+})();
+
+// Hook no setTab — ativa sprite ao ir para APGAR
+const _origSetTab2 = setTab;
 setTab = function(id, btn) {
-  triggerAndando();
-  _origSetTab(id, btn);
-};
-
-// Hook no renderizarDados para detectar sinais e celebrar
-const _origRenderizarDados = renderizarDados;
-renderizarDados = function(d) {
-  _origRenderizarDados(d);
-  // Detecta sinais VCP novos para celebrar
-  if(d?.apgar?.acoes) {
-    const sinaisVCP = d.apgar.acoes
-      .filter(a => a.score>=5 && a.score<=8
-                && a.scores?.breakout===2
-                && a.mrs>0 && a.rsv>0)
-      .map(a => a.ticker);
-    if(sinaisVCP.length > 0) triggerCelebracao(sinaisVCP);
+  _origSetTab2(id, btn);
+  if(id === 'apgar' && typeof window.triggerApgarSprite === 'function') {
+    window.triggerApgarSprite();
   }
 };
 
