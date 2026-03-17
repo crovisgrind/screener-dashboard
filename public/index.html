@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Screener Ibovespa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&family=Bangers&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:      #080a0f;
@@ -230,6 +230,75 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 #apgar-sprite-overlay.tunnel-out {
   animation: tunnelFade 0.9s ease-in forwards;
 }
+
+/* ═══ SPRITE2 — MRS/RSV + Atualizar ═══ */
+#fugazi-container {
+  position: fixed;
+  top: 58px;               /* abaixo da topbar */
+  left: -100vw;            /* começa fora à esquerda */
+  width: 100vw;
+  z-index: 490;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#fugazi-container.slide-in  { left: 0; }
+#fugazi-container.slide-out { left: 100vw; transition: left 0.4s cubic-bezier(0.55, 0, 1, 0.45); }
+
+/* Balão de fala */
+#fugazi-balloon {
+  position: relative;
+  background: #fff;
+  border: 4px solid #111;
+  border-radius: 28px;
+  padding: 14px 24px;
+  margin: 10px 20px 0;
+  max-width: min(88vw, 520px);
+  box-shadow: 5px 5px 0px #111;
+  /* cauda do balão apontando para baixo */
+}
+#fugazi-balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 22px solid #111;
+}
+#fugazi-balloon::before {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 18px solid #fff;
+  z-index: 1;
+}
+#fugazi-text {
+  font-family: 'Bangers', 'Impact', 'Arial Black', cursive;
+  font-size: clamp(22px, 5vw, 40px);
+  color: #111;
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 1.2;
+  -webkit-text-stroke: 0px;
+  text-shadow: 2px 2px 0 #ddd;
+  white-space: nowrap;
+}
+
+/* Canvas do personagem */
+#fugazi-canvas {
+  display: block;
+  width: 100vw;
+  /* altura calculada via JS para preencher o restante da tela */
+}
+
 @keyframes tunnelFade {
   0%   { transform: scale(1);    opacity: 1; filter: brightness(1); }
   40%  { transform: scale(0.6);  opacity: 1; filter: brightness(1.4); }
@@ -533,6 +602,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   </div>
 </div>
 
+
+
+<!-- SPRITE2 FUGAZI -->
+<div id="fugazi-container">
+  <div id="fugazi-balloon">
+    <span id="fugazi-text">It's all a Fugazi !</span>
+  </div>
+  <canvas id="fugazi-canvas"></canvas>
+</div>
 
 <!-- SPRITE APGAR -->
 <div id="apgar-sprite-overlay">
@@ -1200,6 +1278,156 @@ setTab = function(id, btn) {
   if(id === 'apgar' && typeof window.triggerApgarSprite === 'function') {
     window.triggerApgarSprite();
   }
+};
+
+// ══════════════════════════════════════════════
+// SPRITE2 — FUGAZI
+// sprite2.png | 10 frames | 5×2 | 290x290px
+// Aparece ao: atualizar dados OU entrar na aba MRS·RSV
+// Layout: balão no topo, personagem abaixo ocupando o restante
+// Entra deslizando da esquerda, some para a direita após 3 loops + 3s
+// ══════════════════════════════════════════════
+
+(function() {
+  const SP2 = {
+    FILE : 'sprite2.png',
+    COLS : 5, ROWS: 2, TOTAL: 10,
+    FW   : 290, FH: 290,
+    FPS  : 11,
+    LOOPS: 3,
+  };
+
+  let _img2    = null;
+  let _loaded2 = false;
+  let _timer2  = null;
+  let _running2= false;
+  let _hideTimeout = null;
+
+  function preload2() {
+    if(_img2) return;
+    _img2 = new Image();
+    _img2.onload  = () => { _loaded2 = true; };
+    _img2.onerror = () => { console.warn('[Sprite2] sprite2.png não encontrado'); };
+    _img2.src = SP2.FILE;
+  }
+  preload2();
+
+  function getContainer() { return document.getElementById('fugazi-container'); }
+  function getCanvas2()   { return document.getElementById('fugazi-canvas'); }
+
+  function sizeCanvas() {
+    const canvas    = getCanvas2();
+    const container = getContainer();
+    const balloon   = document.getElementById('fugazi-balloon');
+    if(!canvas || !container || !balloon) return;
+
+    // Altura disponível = viewport - topbar(58) - balloon - margem
+    const balloonH  = balloon.offsetHeight + 40; // + margem + cauda
+    const available = window.innerHeight - 58 - balloonH;
+    canvas.width    = window.innerWidth;
+    canvas.height   = Math.max(available, 120);
+  }
+
+  function drawFrame2(frameIdx) {
+    const canvas = getCanvas2();
+    if(!canvas || !_loaded2) return;
+    sizeCanvas();
+
+    const W   = canvas.width;
+    const H   = canvas.height;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+
+    // Escala o frame para preencher o canvas mantendo proporção
+    const scale    = Math.min(W / SP2.FW, H / SP2.FH);
+    const drawW    = SP2.FW * scale;
+    const drawH    = SP2.FH * scale;
+    const offsetX  = (W - drawW) / 2;
+    const offsetY  = 0; // ancora no topo do canvas
+
+    const col = frameIdx % SP2.COLS;
+    const row = Math.floor(frameIdx / SP2.COLS);
+    const sx  = col * SP2.FW;
+    const sy  = row * SP2.FH;
+
+    ctx.drawImage(_img2, sx, sy, SP2.FW, SP2.FH, offsetX, offsetY, drawW, drawH);
+  }
+
+  function stopSprite2() {
+    if(_timer2) { clearInterval(_timer2); _timer2 = null; }
+    _running2 = false;
+  }
+
+  function slideOut() {
+    const c = getContainer();
+    if(!c) return;
+    c.classList.remove('slide-in');
+    c.classList.add('slide-out');
+    setTimeout(() => {
+      c.classList.remove('slide-out');
+      stopSprite2();
+    }, 420);
+  }
+
+  function playSprite2() {
+    if(_running2) return;
+    if(!_loaded2) { setTimeout(playSprite2, 300); return; }
+
+    // Cancela hide pendente
+    if(_hideTimeout) { clearTimeout(_hideTimeout); _hideTimeout = null; }
+
+    const c = getContainer();
+    if(!c) return;
+
+    // Reseta posição e desliza para dentro
+    c.classList.remove('slide-out');
+    c.style.left = '';            // remove inline, deixa CSS controlar
+    void c.offsetWidth;           // force reflow
+    c.classList.add('slide-in');
+
+    let frame = 0, loop = 0;
+    _running2 = true;
+
+    drawFrame2(0);
+
+    _timer2 = setInterval(() => {
+      frame++;
+      if(frame >= SP2.TOTAL) {
+        frame = 0;
+        loop++;
+        if(loop >= SP2.LOOPS) {
+          stopSprite2();
+          // Aguarda 3s e desliza para fora
+          _hideTimeout = setTimeout(slideOut, 3000);
+          return;
+        }
+      }
+      drawFrame2(frame);
+    }, Math.round(1000 / SP2.FPS));
+  }
+
+  window.triggerFugazi = playSprite2;
+
+  // Redimensiona canvas ao girar a tela
+  window.addEventListener('resize', () => {
+    if(_running2) sizeCanvas();
+  });
+})();
+
+// Hook no setTab — ativa Fugazi ao ir para MRS·RSV
+const _origSetTab3 = setTab;
+setTab = function(id, btn) {
+  _origSetTab3(id, btn);
+  if(id === 'mrs' && typeof window.triggerFugazi === 'function') {
+    window.triggerFugazi();
+  }
+};
+
+// Hook no forceUpdate — ativa Fugazi ao clicar atualizar
+const _origForceUpdate2 = forceUpdate;
+forceUpdate = async function(event) {
+  if(typeof window.triggerFugazi === 'function') window.triggerFugazi();
+  return _origForceUpdate2(event);
 };
 
 atualizarDados();
