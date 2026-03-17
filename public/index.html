@@ -310,7 +310,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 #walk-sprite {
   position: fixed;
   bottom: 72px;
-  right: -200px;          /* começa fora à direita */
+  left: -200px;           /* começa fora à esquerda */
   width: 140px;
   height: 140px;
   z-index: 495;
@@ -694,11 +694,20 @@ function bkdRow(sc){
 
 // ── Render MRS/RSV ────────────────────────────────────────
 function renderMRS(d){
+  // Protege contra campos ausentes na resposta da API
+  d.sinaisHoje         = d.sinaisHoje         || [];
+  d.proximosCruzar     = d.proximosCruzar     || [];
+  d.cruzamentosRecentes= d.cruzamentosRecentes|| [];
+  d.recuperacoes       = d.recuperacoes       || [];
+  d.topMRS             = d.topMRS             || [];
+  d.topRSVConsistente  = d.topRSVConsistente  || [];
+  d.topRSVFraco        = d.topRSVFraco        || [];
+
   const compras = d.sinaisHoje.filter(s=>s.tipo==='COMPRA').length;
   document.getElementById('statTotal').textContent    = d.sinaisHoje.length;
   document.getElementById('statCompras').textContent  = compras;
   document.getElementById('statProximos').textContent = d.proximosCruzar.length;
-  document.getElementById('statAcoes').textContent    = d.totalAcoes;
+  document.getElementById('statAcoes').textContent    = d.totalAcoes || '—';
   document.getElementById('cntProx').textContent      = d.proximosCruzar.length;
 
   // Sinais
@@ -798,6 +807,7 @@ function renderMRS(d){
 
 // ── Render APGAR ──────────────────────────────────────────
 function renderAPGAR(d){
+  if(!d.apgar || !d.apgar.resumo || !d.apgar.acoes) return;
   const r=d.apgar.resumo;
   document.getElementById('hForte').textContent   =r.forte;
   document.getElementById('hPositivo').textContent=r.positivo;
@@ -1523,13 +1533,14 @@ forceUpdate = async function(event) {
     const el      = getEl();
     if(!el) return;
 
-    const totalW  = window.innerWidth + 200;   // distância a percorrer
-    let   posX    = window.innerWidth + 10;    // começa fora à direita
-    const speed   = Math.round(totalW / 80);   // ~80 frames para atravessar
+    const totalW  = window.innerWidth + 200;   // distância total a percorrer
+    let   posX    = -160;                       // começa fora à esquerda
+    // 4 segundos a 60fps = 240 frames → speed = totalW / 240
+    const speed   = Math.ceil(totalW / 240);
     let   frame   = 0;
     const delay   = Math.round(1000 / SW.FPS);
 
-    // Posiciona fora à direita e torna visível
+    // Posiciona fora à esquerda e torna visível
     el.style.right      = 'auto';
     el.style.left       = posX + 'px';
     el.style.visibility = 'visible';
@@ -1543,16 +1554,16 @@ forceUpdate = async function(event) {
       applyFrame(frame);
     }, delay);
 
-    // RAF para movimento horizontal suave da direita para a esquerda
+    // RAF para movimento horizontal suave da esquerda para a direita (~4s)
     function andar() {
-      posX -= speed;
+      posX += speed;
       el.style.left = posX + 'px';
-      if(posX > -200) {
+      if(posX < window.innerWidth + 10) {
         _animRAF = requestAnimationFrame(andar);
       } else {
         stopWalk();
         el.style.visibility = 'hidden';
-        el.style.left = (window.innerWidth + 10) + 'px';
+        el.style.left = '-160px';
       }
     }
     _animRAF = requestAnimationFrame(andar);
@@ -1563,7 +1574,7 @@ forceUpdate = async function(event) {
   window.addEventListener('resize', () => {
     if(!_running) {
       const el = getEl();
-      if(el) el.style.left = (window.innerWidth + 10) + 'px';
+      if(el) el.style.left = '-160px';
     }
   });
 })();
