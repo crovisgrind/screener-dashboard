@@ -253,13 +253,37 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
 #ldf{height:100%;background:var(--g);width:0;transition:width .3s;border-radius:3px}
 #ldm{font-size:8px;color:var(--ui-mut);letter-spacing:1px}
 
+.ricon{font-size:18px;font-style:normal;flex-shrink:0}
 @media(max-width:600px){
   #panel{width:100%;border-left:none;border-top:2px solid var(--ui-brd)}
   .rbtn span{display:none}
-  .screen-content{padding:5px}
+  .ricon{font-size:22px}
+  .rbtn{padding:0 4px}
+  .screen-content{padding:4px 5px}
   .screen-title{font-size:5px}
-  .screen-row{font-size:7px}
+  .screen-row{font-size:6px}
 }
+
+/* ── PANEL TAB ── */
+#panel-tab{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:270;
+  background:var(--ui-surf);border:2px solid var(--ui-brd);
+  border-right:none;border-radius:6px 0 0 6px;
+  padding:12px 5px;cursor:pointer;transition:.2s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:-2px 0 8px rgba(0,0,0,.12);
+}
+#panel-tab:hover{background:var(--ui-brd);padding-right:8px}
+#panel-tab.hidden{display:none}
+#panel-tab-arrow{font-size:12px;color:var(--ui-text);transition:.2s;line-height:1}
+#panel-tab-label{
+  font-family:var(--pixel);font-size:5px;color:var(--ui-mut);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  transform:rotate(180deg);letter-spacing:1px;line-height:1;
+}
+#panel-tab-dot{width:6px;height:6px;border-radius:50%;background:var(--g);
+  animation:ptdot 2s ease-in-out infinite}
+@keyframes ptdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 </style>
 </head>
 <body>
@@ -358,12 +382,12 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
     <div class="r-wall" style="background:#ECD8F0" id="wall-apgar">
 
       <!-- Janela esquerda -->
-      <div class="room-window" style="left:2%;top:8%;width:10%;height:55%;border-color:#9A7AB8">
+      <div class="room-window" style="left:2%;top:8%;width:8%;height:55%;border-color:#9A7AB8">
         <div class="window-glare"></div>
       </div>
 
       <!-- Tela SIGNAL VCP (grande, centro-esquerda) -->
-      <div class="screen-wrap sc-purple" style="left:16%;top:5%;width:30%">
+      <div class="screen-wrap sc-purple" style="left:14%;top:5%;width:30%">
         <div class="led-strip led-p"></div>
         <div class="screen-frame">
           <div class="screen-bezel" style="height:160px">
@@ -378,7 +402,7 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
       </div>
 
       <!-- Tela TOP APGAR 1 -->
-      <div class="screen-wrap sc-green" style="left:50%;top:5%;width:16%">
+      <div class="screen-wrap sc-green" style="left:47%;top:5%;width:19%">
         <div class="led-strip led-g"></div>
         <div class="screen-frame">
           <div class="screen-bezel" style="height:160px">
@@ -393,7 +417,7 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
       </div>
 
       <!-- Tela TOP APGAR 2 -->
-      <div class="screen-wrap sc-yellow" style="left:68%;top:5%;width:16%">
+      <div class="screen-wrap sc-yellow" style="left:68%;top:5%;width:19%">
         <div class="led-strip led-y"></div>
         <div class="screen-frame">
           <div class="screen-bezel" style="height:160px">
@@ -407,20 +431,6 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
         </div>
       </div>
 
-      <!-- Tela TOP APGAR 3 -->
-      <div class="screen-wrap sc-blue" style="left:86%;top:5%;width:12%">
-        <div class="led-strip led-b"></div>
-        <div class="screen-frame">
-          <div class="screen-bezel" style="height:160px">
-            <div class="screen-content">
-              <div class="screen-title">▸ NEUTRO</div>
-              <div id="sc7-rows">
-                <div class="screen-row"><span>—</span><span>—</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div style="position:absolute;bottom:1%;left:50%;transform:translateX(-50%);
         background:#2A1A30;border-radius:4px;padding:4px 14px;font-family:var(--pixel);
@@ -505,12 +515,19 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
 </div><!-- /stage -->
 
 <!-- SPRITE CANVAS -->
-<canvas id="sprite-cv" width="100" height="100"></canvas>
+<canvas id="sprite-cv" width="200" height="200"></canvas>
 
 <!-- SPEECH BALLOON -->
 <div id="balloon-wrap">
   <div class="balloon"><div class="balloon-text" id="balloon-text">It's all a Fugazi !</div></div>
   <div class="balloon-tail"></div>
+</div>
+
+<!-- PANEL TAB -->
+<div id="panel-tab" onclick="togglePanel()" title="Abrir painel">
+  <div id="panel-tab-dot"></div>
+  <div id="panel-tab-arrow">◀</div>
+  <div id="panel-tab-label">DADOS</div>
 </div>
 
 <!-- DATA PANEL -->
@@ -525,13 +542,13 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
 <!-- NAV -->
 <div id="nav">
   <button class="rbtn active rm" id="btn-mrs" onclick="goRoom('mrs',this)">
-    <span style="font-size:14px">📊</span><span>TRADING FLOOR</span>
+    <em class="ricon">📊</em><span>TRADING FLOOR</span>
   </button>
   <button class="rbtn ra" id="btn-apgar" onclick="goRoom('apgar',this)">
-    <span style="font-size:14px">🏆</span><span>RESEARCH ROOM</span>
+    <em class="ricon">🏆</em><span>RESEARCH ROOM</span>
   </button>
   <button class="rbtn rt" id="btn-tracker" onclick="goRoom('tracker',this)">
-    <span style="font-size:14px">💼</span><span>PORTFOLIO ROOM</span>
+    <em class="ricon">💼</em><span>PORTFOLIO ROOM</span>
   </button>
 </div>
 
@@ -654,16 +671,25 @@ function goRoom(id, btn) {
 }
 const TITLES = { mrs: '📊 TRADING FLOOR', apgar: '🏆 RESEARCH ROOM', tracker: '💼 PORTFOLIO ROOM' };
 
+function togglePanel() {
+  const p = document.getElementById('panel');
+  if (p.classList.contains('open')) closePanel();
+  else openPanel(_room);
+}
 function openPanel(id) {
   _room = id;
   document.getElementById('panel').classList.add('open');
   document.getElementById('ph-title').textContent = TITLES[id];
   renderPanel(id);
   updateSpriteRoomBounds(); // panel acts as right wall
+  const tab = document.getElementById('panel-tab');
+  if(tab){ tab.querySelector('#panel-tab-arrow').textContent = '▶'; }
 }
 function closePanel() {
   document.getElementById('panel').classList.remove('open');
   updateSpriteRoomBounds();
+  const tab = document.getElementById('panel-tab');
+  if(tab){ tab.querySelector('#panel-tab-arrow').textContent = '◀'; tab.classList.remove('hidden'); }
 }
 
 // ══════════════════════════════════════════════
@@ -691,7 +717,7 @@ Object.entries(SP).forEach(([k, s]) => {
 const CHAR = {
   x: 200, vx: 1.4, dir: 1,
   mode: 'walk', frame: 0, frameTick: 0,
-  size: 100,
+  size: 200,
   minX: 0, maxX: 0,   // updated per room+panel state
   idleTimer: null,
   balloonTimer: null,
