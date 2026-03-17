@@ -227,8 +227,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   /* sprite renderizado via JS no canvas */
 }
 /* Efeito túnel no fade out */
-#apgar-sprite-overlay.tunnel-out {
-  animation: tunnelFade 0.9s ease-in forwards;
+#apgar-sprite-overlay.slide-left-out {
+  animation: slideLeftOut 0.55s cubic-bezier(0.55, 0, 1, 0.45) forwards;
 }
 
 /* ═══ SPRITE2 — MRS/RSV + Atualizar ═══ */
@@ -299,11 +299,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   /* altura calculada via JS para preencher o restante da tela */
 }
 
-@keyframes tunnelFade {
-  0%   { transform: scale(1);    opacity: 1; filter: brightness(1); }
-  40%  { transform: scale(0.6);  opacity: 1; filter: brightness(1.4); }
-  70%  { transform: scale(0.25); opacity: 0.8; filter: brightness(2) blur(2px); }
-  100% { transform: scale(0.05); opacity: 0;   filter: brightness(4) blur(6px); }
+@keyframes slideLeftOut {
+  0%   { transform: translateX(0);      opacity: 1; }
+  100% { transform: translateX(-110vw); opacity: 0; }
 }
 
 
@@ -1205,7 +1203,7 @@ document.addEventListener('keydown', e => {
     ctx.clearRect(0, 0, W, H);
 
     // Escala para cobrir a tela mantendo proporção quadrada do frame
-    const tileSize = Math.max(W, H);  // tile cobre a maior dimensão
+    const tileSize = Math.max(W, H) / 2;  // metade da tela — menos pixelizado
     // Centraliza
     const offsetX = (W - tileSize) / 2;
     const offsetY = (H - tileSize) / 2;
@@ -1226,13 +1224,13 @@ document.addEventListener('keydown', e => {
   function triggerTunnel() {
     const ov = getOverlay();
     if(!ov) return;
-    ov.classList.add('tunnel-out');
+    ov.classList.add('slide-left-out');
     setTimeout(() => {
       stopSprite();
       ov.style.display = 'none';
-      ov.classList.remove('tunnel-out');
+      ov.classList.remove('slide-left-out');
       _frame = 0; _loop = 0;
-    }, 920);
+    }, 580);
   }
 
   function playSprite() {
@@ -1246,7 +1244,7 @@ document.addEventListener('keydown', e => {
     const ov = getOverlay();
     if(!ov) return;
     ov.style.display = 'block';
-    ov.classList.remove('tunnel-out');
+    ov.classList.remove('slide-left-out');
     _frame = 0; _loop = 0; _running = true;
 
     drawFrame(0);
