@@ -218,6 +218,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   z-index: 500;
   pointer-events: none;
   background: transparent;
+  visibility: hidden;
+}
+#apgar-sprite-overlay[style*="display: block"],
+#apgar-sprite-overlay[style*="display:block"] {
+  visibility: visible;
 }
 #apgar-sprite-canvas {
   position: absolute;
@@ -235,17 +240,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
 #fugazi-container {
   position: fixed;
   top: 58px;               /* abaixo da topbar */
-  left: -100vw;            /* começa fora à esquerda */
+  left: -110vw;            /* começa bem fora à esquerda */
   width: 100vw;
   z-index: 490;
   pointer-events: none;
+  visibility: hidden;      /* esconde completamente quando fora da tela */
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
-#fugazi-container.slide-in  { left: 0; }
-#fugazi-container.slide-out { left: 100vw; transition: left 0.4s cubic-bezier(0.55, 0, 1, 0.45); }
+#fugazi-container.slide-in  { left: 0; visibility: visible; }
+#fugazi-container.slide-out { left: 110vw; visibility: visible; transition: left 0.4s cubic-bezier(0.55, 0, 1, 0.45); }
 
 /* Balão de fala */
 #fugazi-balloon {
@@ -297,6 +303,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   display: block;
   width: 100vw;
   /* altura calculada via JS para preencher o restante da tela */
+}
+
+
+/* ═══ SPRITE WALK — Tracker tab ═══ */
+#walk-sprite {
+  position: fixed;
+  bottom: 72px;
+  right: -200px;          /* começa fora à direita */
+  width: 140px;
+  height: 140px;
+  z-index: 495;
+  pointer-events: none;
+  visibility: hidden;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background-image: url('sprite_walk.png');
+  background-repeat: no-repeat;
 }
 
 @keyframes slideLeftOut {
@@ -609,6 +632,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14
   </div>
   <canvas id="fugazi-canvas"></canvas>
 </div>
+
+<!-- SPRITE WALK -->
+<div id="walk-sprite"></div>
 
 <!-- SPRITE APGAR -->
 <div id="apgar-sprite-overlay">
@@ -1228,6 +1254,7 @@ document.addEventListener('keydown', e => {
     setTimeout(() => {
       stopSprite();
       ov.style.display = 'none';
+      ov.style.visibility = 'hidden';
       ov.classList.remove('slide-left-out');
       _frame = 0; _loop = 0;
     }, 580);
@@ -1244,6 +1271,7 @@ document.addEventListener('keydown', e => {
     const ov = getOverlay();
     if(!ov) return;
     ov.style.display = 'block';
+    ov.style.visibility = 'visible';
     ov.classList.remove('slide-left-out');
     _frame = 0; _loop = 0; _running = true;
 
@@ -1336,12 +1364,12 @@ setTab = function(id, btn) {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, W, H);
 
-    // Escala o frame para preencher o canvas mantendo proporção
-    const scale    = Math.min(W / SP2.FW, H / SP2.FH);
-    const drawW    = SP2.FW * scale;
-    const drawH    = SP2.FH * scale;
+    // Metade da tela, centralizado — igual ao sprite.png
+    const tileSize2 = Math.max(W, H) / 2;
+    const drawW    = tileSize2;
+    const drawH    = tileSize2;
     const offsetX  = (W - drawW) / 2;
-    const offsetY  = 0; // ancora no topo do canvas
+    const offsetY  = (H - drawH) / 2;
 
     const col = frameIdx % SP2.COLS;
     const row = Math.floor(frameIdx / SP2.COLS);
@@ -1363,6 +1391,7 @@ setTab = function(id, btn) {
     c.classList.add('slide-out');
     setTimeout(() => {
       c.classList.remove('slide-out');
+      c.style.visibility = 'hidden';
       stopSprite2();
     }, 420);
   }
@@ -1380,6 +1409,7 @@ setTab = function(id, btn) {
     // Reseta posição e desliza para dentro
     c.classList.remove('slide-out');
     c.style.left = '';            // remove inline, deixa CSS controlar
+    c.style.visibility = 'visible';
     void c.offsetWidth;           // force reflow
     c.classList.add('slide-in');
 
@@ -1426,6 +1456,125 @@ const _origForceUpdate2 = forceUpdate;
 forceUpdate = async function(event) {
   if(typeof window.triggerFugazi === 'function') window.triggerFugazi();
   return _origForceUpdate2(event);
+};
+
+// ══════════════════════════════════════════════
+// SPRITE WALK — TRACKER
+// sprite_walk.png | 8 frames | 4 cols × 2 rows
+// Entra pela direita, caminha para a esquerda ao clicar na aba Tracker
+// 15fps
+// ══════════════════════════════════════════════
+
+(function() {
+  const SW = {
+    FILE : 'sprite_walk.png',
+    COLS : 4, ROWS: 2, TOTAL: 8,
+    FPS  : 15,
+  };
+
+  // Calcula FW/FH após carregar a imagem
+  let _imgW = null;
+  let _loaded = false;
+  let _timer  = null;
+  let _animRAF= null;
+  let _running= false;
+  let _fw = 1, _fh = 1;   // calculados após load
+
+  const _img = new Image();
+  _img.onload = () => {
+    _fw = _img.naturalWidth  / SW.COLS;
+    _fh = _img.naturalHeight / SW.ROWS;
+    _loaded = true;
+  };
+  _img.onerror = () => console.warn('[Walk] sprite_walk.png não encontrado');
+  _img.src = SW.FILE;
+
+  function getEl() { return document.getElementById('walk-sprite'); }
+
+  function applyFrame(frameIdx) {
+    const el = getEl();
+    if(!el || !_loaded) return;
+
+    const displayW = el.offsetWidth  || 140;
+    const displayH = el.offsetHeight || 140;
+    const scaleX   = displayW / _fw;
+    const scaleY   = displayH / _fh;
+    const col      = frameIdx % SW.COLS;
+    const row      = Math.floor(frameIdx / SW.COLS);
+    const bsW      = SW.COLS * _fw * scaleX;
+    const bsH      = SW.ROWS * _fh * scaleY;
+    const bpX      = -(col * _fw * scaleX);
+    const bpY      = -(row * _fh * scaleY);
+
+    el.style.backgroundSize     = `${bsW}px ${bsH}px`;
+    el.style.backgroundPosition = `${bpX}px ${bpY}px`;
+  }
+
+  function stopWalk() {
+    if(_timer)   { clearInterval(_timer);         _timer   = null; }
+    if(_animRAF) { cancelAnimationFrame(_animRAF); _animRAF = null; }
+    _running = false;
+  }
+
+  function playWalk() {
+    if(_running) return;
+    if(!_loaded) { setTimeout(playWalk, 300); return; }
+
+    const el      = getEl();
+    if(!el) return;
+
+    const totalW  = window.innerWidth + 200;   // distância a percorrer
+    let   posX    = window.innerWidth + 10;    // começa fora à direita
+    const speed   = Math.round(totalW / 80);   // ~80 frames para atravessar
+    let   frame   = 0;
+    const delay   = Math.round(1000 / SW.FPS);
+
+    // Posiciona fora à direita e torna visível
+    el.style.right      = 'auto';
+    el.style.left       = posX + 'px';
+    el.style.visibility = 'visible';
+    _running = true;
+
+    applyFrame(0);
+
+    // Timer de frames do sprite (independente do movimento)
+    _timer = setInterval(() => {
+      frame = (frame + 1) % SW.TOTAL;
+      applyFrame(frame);
+    }, delay);
+
+    // RAF para movimento horizontal suave da direita para a esquerda
+    function andar() {
+      posX -= speed;
+      el.style.left = posX + 'px';
+      if(posX > -200) {
+        _animRAF = requestAnimationFrame(andar);
+      } else {
+        stopWalk();
+        el.style.visibility = 'hidden';
+        el.style.left = (window.innerWidth + 10) + 'px';
+      }
+    }
+    _animRAF = requestAnimationFrame(andar);
+  }
+
+  window.triggerWalkSprite = playWalk;
+
+  window.addEventListener('resize', () => {
+    if(!_running) {
+      const el = getEl();
+      if(el) el.style.left = (window.innerWidth + 10) + 'px';
+    }
+  });
+})();
+
+// Hook no setTab — ativa walk ao ir para TRACKER
+const _origSetTab4 = setTab;
+setTab = function(id, btn) {
+  _origSetTab4(id, btn);
+  if(id === 'tracker' && typeof window.triggerWalkSprite === 'function') {
+    window.triggerWalkSprite();
+  }
 };
 
 atualizarDados();
