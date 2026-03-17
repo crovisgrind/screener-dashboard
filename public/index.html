@@ -2,233 +2,263 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>IBOV · Asset Management</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
 <style>
-/* ── PALETA ── */
 :root {
-  --floor:    #6B7FA3;
-  --floor2:   #7B8FB5;
-  --wall:     #D4845A;
-  --wall-dk:  #B86A3C;
-  --desk:     #C97B3E;
-  --desk-dk:  #A55E28;
-  --win-bg:   #A8D4E6;
-  --win-fr:   #6A9AB4;
-  --mon:      #2A2A3A;
-  --screen:   #C8ECD8;
-  --paper:    #F8F4EC;
-  --shadow:   rgba(0,0,0,.18);
-  --tile:     #7B8FB5;
-  --red-ch:   #E05A4A;
-  --grn-ch:   #5AB85A;
-  --blu-ch:   #4AB8D4;
-  --shelf:    #B87040;
-
-  --ui-bg:    #F5EFE6;
-  --ui-surf:  #EDE6DA;
-  --ui-brd:   #C8B89A;
-  --ui-text:  #2A1F14;
-  --ui-muted: #7A6A58;
-  --ui-green: #2D7A4A;
-  --ui-yellow:#8A6A10;
-  --ui-red:   #8A2A1A;
-  --ui-blue:  #1A5A8A;
-  --ui-purple:#5A3A8A;
-  --mono: 'Space Mono', monospace;
-  --pixel: 'Press Start 2P', monospace;
+  --wall:   #E8D5B0;
+  --wall2:  #D4BF94;
+  --floor:  #8B7355;
+  --floor2: #7A6448;
+  --baseboard: #5C4A32;
+  --ceiling: #F5ECD8;
+  --ui-bg:  #FAF6EE;
+  --ui-surf:#EDE6D8;
+  --ui-brd: #C8B090;
+  --ui-text:#2A1F10;
+  --ui-mut: #7A6A50;
+  --g:      #2A6A3A;
+  --y:      #7A5A08;
+  --r:      #7A2A18;
+  --b:      #1A4A7A;
+  --mono:   'Space Mono',monospace;
+  --pixel:  'Press Start 2P',monospace;
 }
-
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:#3A3028;font-family:var(--mono);font-size:12px}
+html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono);font-size:12px}
 
 /* ── TOPBAR ── */
 #topbar{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  height:48px;background:var(--ui-bg);border-bottom:2px solid var(--ui-brd);
-  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:46px;background:var(--ui-bg);border-bottom:2px solid var(--ui-brd);
+  display:flex;align-items:center;justify-content:space-between;padding:0 16px;
 }
-.logo{font-family:var(--pixel);font-size:7px;color:var(--ui-text);display:flex;align-items:center;gap:8px}
-.logo-dot{width:7px;height:7px;border-radius:50%}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.update-info{font-size:9px;color:var(--ui-muted);text-align:right}
-.update-info b{color:var(--ui-text);font-size:10px}
-.btn-top{background:var(--ui-surf);border:2px solid var(--ui-brd);color:var(--ui-text);
-  padding:4px 12px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer;
-  transition:.15s;letter-spacing:.5px}
-.btn-top:hover{background:var(--ui-brd);border-color:var(--ui-text)}
-.btn-top.snd-on{border-color:var(--ui-green);color:var(--ui-green)}
+.logo{font-family:var(--pixel);font-size:7px;color:var(--ui-text);display:flex;align-items:center;gap:6px}
+.ldot{width:6px;height:6px;border-radius:50%}
+.topbar-r{display:flex;align-items:center;gap:8px}
+.upd{font-size:9px;color:var(--ui-mut)}
+.upd b{color:var(--ui-text);font-size:10px}
+.tbtn{background:var(--ui-surf);border:2px solid var(--ui-brd);color:var(--ui-text);
+  padding:4px 10px;border-radius:4px;font-family:var(--pixel);font-size:6px;
+  cursor:pointer;transition:.15s;letter-spacing:.3px}
+.tbtn:hover{background:var(--ui-brd)}
+.tbtn.son{border-color:var(--g);color:var(--g)}
 
 /* ── BOTTOM NAV ── */
 #nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:200;
-  height:50px;background:var(--ui-bg);border-top:2px solid var(--ui-brd);
-  display:flex;align-items:stretch;
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  height:46px;background:var(--ui-bg);border-top:2px solid var(--ui-brd);
+  display:flex;
 }
-.room-btn{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
-  font-family:var(--pixel);font-size:6px;letter-spacing:.5px;
-  background:transparent;border:none;border-top:3px solid transparent;
-  color:var(--ui-muted);cursor:pointer;transition:.15s;
+.rbtn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-family:var(--pixel);font-size:6px;background:transparent;border:none;
+  border-top:3px solid transparent;color:var(--ui-mut);cursor:pointer;transition:.15s;
 }
-.room-btn:hover{background:var(--ui-surf);color:var(--ui-text)}
-.room-btn.active{color:var(--ui-text);background:var(--ui-surf)}
-.room-btn.active.r-mrs{border-top-color:#2D7A4A}
-.room-btn.active.r-apgar{border-top-color:#5A3A8A}
-.room-btn.active.r-tracker{border-top-color:#8A6A10}
-.room-icon{font-size:14px}
+.rbtn:hover{background:var(--ui-surf);color:var(--ui-text)}
+.rbtn.active{color:var(--ui-text);background:var(--ui-surf)}
+.rbtn.active.rm{border-top-color:var(--g)}
+.rbtn.active.ra{border-top-color:#7A3A9A}
+.rbtn.active.rt{border-top-color:var(--y)}
 
 /* ── STAGE ── */
 #stage{
-  position:fixed;top:48px;left:0;right:0;bottom:50px;
-  overflow:hidden;background:#3A3028;
+  position:fixed;top:46px;left:0;right:0;bottom:46px;
+  overflow:hidden;
 }
 #world{
-  height:100%;display:flex;
-  transition:transform .65s cubic-bezier(0.22,1,0.36,1);
-  transform:translateX(0);
-  image-rendering:pixelated;
+  display:flex;height:100%;
+  transition:transform .6s cubic-bezier(0.22,1,0.36,1);
 }
-
-/* ── ROOMS ── */
 .room{
   flex-shrink:0;width:100vw;height:100%;
   position:relative;overflow:hidden;
-  image-rendering:pixelated;
 }
-.room-svg{width:100%;height:100%;display:block;image-rendering:pixelated}
+
+/* ── ROOM LAYERS (2D platform view) ── */
+.r-ceiling{position:absolute;top:0;left:0;right:0;height:12%;background:var(--ceiling)}
+.r-wall{position:absolute;top:12%;left:0;right:0;bottom:15%;background:var(--wall)}
+.r-baseboard{position:absolute;bottom:15%;left:0;right:0;height:2%;background:var(--baseboard)}
+.r-floor{position:absolute;bottom:0;left:0;right:0;height:15%;background:var(--floor)}
+.r-floor-stripe{position:absolute;bottom:0;left:0;right:0;height:4%;background:var(--floor2)}
+
+/* Molding top */
+.r-molding{position:absolute;top:12%;left:0;right:0;height:1.5%;background:var(--wall2)}
+/* Wainscoting bottom panel */
+.r-wainscot{position:absolute;bottom:15%;left:0;right:0;height:22%;background:var(--wall2);border-top:3px solid var(--baseboard)}
+
+/* ── SCREENS ON WALL ── */
+.screen-wrap{position:absolute;display:flex;flex-direction:column}
+.screen-frame{background:#1A1414;border-radius:6px;padding:5px;
+  box-shadow:0 2px 0 #0A0808, 4px 4px 0 rgba(0,0,0,.3);
+  image-rendering:pixelated}
+.screen-bezel{background:#0A0A14;border-radius:3px;overflow:hidden;position:relative}
+.screen-content{width:100%;height:100%;padding:8px;overflow:hidden}
+.screen-title{font-family:var(--pixel);font-size:6px;letter-spacing:.5px;margin-bottom:6px;
+  white-space:nowrap;overflow:hidden}
+.screen-row{display:flex;justify-content:space-between;align-items:center;
+  padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:8px;white-space:nowrap;overflow:hidden}
+.screen-row:last-child{border-bottom:none}
+.screen-stand{display:none}
+.screen-base{display:none}
+/* Screen color themes */
+.sc-green .screen-bezel{background:#061410}
+.sc-green .screen-title{color:#00E880}
+.sc-green .screen-row{color:#A0D8B8}
+.sc-purple .screen-bezel{background:#100A1A}
+.sc-purple .screen-title{color:#C878F8}
+.sc-purple .screen-row{color:#C0A8D8}
+.sc-yellow .screen-bezel{background:#140E04}
+.sc-yellow .screen-title{color:#F5C842}
+.sc-yellow .screen-row{color:#D8C090}
+.sc-blue .screen-bezel{background:#040C18}
+.sc-blue .screen-title{color:#60C8F8}
+.sc-blue .screen-row{color:#90B8D8}
+
+/* LED strip on top of screens */
+.led-strip{height:3px;border-radius:2px;margin-bottom:3px}
+.led-g{background:#00E880;animation:ledpulse 2s ease-in-out infinite}
+.led-p{background:#C878F8;animation:ledpulse 2.3s ease-in-out infinite}
+.led-y{background:#F5C842;animation:ledpulse 1.8s ease-in-out infinite}
+.led-b{background:#60C8F8;animation:ledpulse 2.5s ease-in-out infinite}
+@keyframes ledpulse{0%,100%{opacity:.8}50%{opacity:.3}}
+
+/* ── WINDOW / DOOR ELEMENTS ── */
+.room-window{position:absolute;background:#B8D8EC;border:4px solid #6A8AAA;border-radius:3px;overflow:hidden}
+.room-window::before{content:'';position:absolute;top:0;left:50%;bottom:0;width:3px;background:#6A8AAA;transform:translateX(-50%)}
+.room-window::after{content:'';position:absolute;left:0;right:0;top:50%;height:3px;background:#6A8AAA;transform:translateY(-50%)}
+.window-glare{position:absolute;top:5px;left:5px;width:30%;height:35%;background:rgba(255,255,255,.4);border-radius:2px}
+
 
 /* ── SPRITE CANVAS ── */
-#sprite-canvas{
-  position:fixed;z-index:190;
-  pointer-events:none;
-  image-rendering:pixelated;
+#sprite-cv{
+  position:fixed;z-index:250;pointer-events:none;image-rendering:pixelated;
+  bottom:46px;
 }
+
+/* ── SPEECH BALLOON ── */
+#balloon-wrap{
+  position:fixed;z-index:260;pointer-events:none;
+  display:none;flex-direction:column;align-items:center;
+}
+.balloon{
+  background:#fff;border:3px solid #222;border-radius:18px;
+  padding:8px 14px;max-width:220px;min-width:100px;
+  box-shadow:3px 3px 0 #222;position:relative;
+}
+.balloon::after{
+  content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
+  border:8px solid transparent;border-top:10px solid #222;
+}
+.balloon::before{
+  content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-top:9px solid #fff;z-index:1;
+}
+.balloon-text{
+  font-family:'Bangers',cursive;font-size:clamp(13px,2.5vw,20px);color:#222;
+  letter-spacing:1px;text-align:center;line-height:1.2;
+}
+/* tail pointing down, coming from sprite head */
+.balloon-tail{height:16px;width:2px;background:transparent}
 
 /* ── DATA PANEL ── */
 #panel{
-  position:fixed;right:0;top:48px;bottom:50px;width:320px;z-index:150;
+  position:fixed;right:0;top:46px;bottom:46px;width:300px;z-index:280;
   background:var(--ui-bg);border-left:2px solid var(--ui-brd);
   display:flex;flex-direction:column;
   transform:translateX(100%);
   transition:transform .4s cubic-bezier(0.22,1,0.36,1);
 }
 #panel.open{transform:translateX(0)}
-#ph{padding:12px 16px;border-bottom:2px solid var(--ui-brd);display:flex;align-items:center;justify-content:space-between;background:var(--ui-surf)}
+#ph{padding:11px 14px;border-bottom:2px solid var(--ui-brd);background:var(--ui-surf);
+  display:flex;align-items:center;justify-content:space-between}
 #ph-title{font-family:var(--pixel);font-size:7px;color:var(--ui-text)}
-#ph-close{background:transparent;border:none;color:var(--ui-muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:3px}
-#ph-close:hover{background:var(--ui-brd);color:var(--ui-text)}
-#pb{flex:1;overflow-y:auto;padding:14px 16px}
-#pb::-webkit-scrollbar{width:4px}
+#phx{background:transparent;border:none;color:var(--ui-mut);cursor:pointer;font-size:16px;
+  padding:2px 6px;border-radius:3px}
+#phx:hover{background:var(--ui-brd);color:var(--ui-text)}
+#pb{flex:1;overflow-y:auto;padding:12px 14px}
+#pb::-webkit-scrollbar{width:3px}
 #pb::-webkit-scrollbar-track{background:var(--ui-surf)}
 #pb::-webkit-scrollbar-thumb{background:var(--ui-brd);border-radius:2px}
 
-/* ── PANEL CONTENT ── */
-.ps{margin-bottom:16px}
-.ps-title{font-size:8px;color:var(--ui-muted);letter-spacing:1.5px;text-transform:uppercase;
-  margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--ui-brd)}
-.pstats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
-.pstat{background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:5px;padding:8px 10px}
-.pstat-lbl{font-size:7px;color:var(--ui-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
-.pstat-val{font-size:16px;font-weight:700;line-height:1;color:var(--ui-text)}
-.pstat-val.g{color:var(--ui-green)}.pstat-val.y{color:var(--ui-yellow)}.pstat-val.r{color:var(--ui-red)}
-.prow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(90,70,50,.1)}
-.prow:last-child{border-bottom:none}
-.pticker{font-size:11px;font-weight:700;color:var(--ui-text)}
-.pval{font-size:10px}.pval.g{color:var(--ui-green)}.pval.r{color:var(--ui-red)}.pval.y{color:var(--ui-yellow)}
-.ppill{font-size:7px;padding:2px 7px;border-radius:3px;font-weight:700}
-.ppill.buy{background:#D4EDE0;color:var(--ui-green);border:1px solid #A8D4B8}
-.ppill.sell{background:#EDD4D4;color:var(--ui-red);border:1px solid #D4A8A8}
-.pscore{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(90,70,50,.1)}
-.pscore:last-child{border-bottom:none}
-.sbadge{width:34px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-.s-forte{background:#D4EDE0;color:var(--ui-green);border:1px solid #A8D4B8}
-.s-pos{background:#EDE4C8;color:var(--ui-yellow);border:1px solid #D4C890}
-.s-neu{background:var(--ui-surf);color:var(--ui-text);border:1px solid var(--ui-brd)}
-.s-frac{background:#EDD4D4;color:var(--ui-red);border:1px solid #D4A8A8}
-.pdots{display:flex;gap:3px;margin-top:3px}
-.pdot{width:7px;height:7px;border-radius:2px}
-.pd2{background:#2D7A4A}.pd1{background:#8A6A10}.pd0{background:#C8B89A}
-.pfilter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-.pfbtn{font-size:7px;padding:3px 9px;border-radius:12px;border:1px solid var(--ui-brd);
-  background:transparent;color:var(--ui-muted);cursor:pointer;transition:.15s;font-family:var(--mono)}
+/* Panel content */
+.ps{margin-bottom:14px}
+.pst{font-size:7px;color:var(--ui-mut);letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid var(--ui-brd)}
+.psg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+.psc{background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:4px;padding:7px 9px}
+.psc-l{font-size:7px;color:var(--ui-mut);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
+.psc-v{font-size:15px;font-weight:700;line-height:1;color:var(--ui-text)}
+.psc-v.g{color:var(--g)}.psc-v.y{color:var(--y)}.psc-v.r{color:var(--r)}
+.pr{display:flex;align-items:center;justify-content:space-between;
+  padding:5px 0;border-bottom:1px solid rgba(90,70,40,.08)}
+.pr:last-child{border-bottom:none}
+.ptk{font-size:11px;font-weight:700;color:var(--ui-text)}
+.pv{font-size:10px}.pv.g{color:var(--g)}.pv.y{color:var(--y)}.pv.r{color:var(--r)}
+.ppl{font-size:7px;padding:2px 6px;border-radius:3px;font-weight:700}
+.ppl.buy{background:#D0EAD8;color:var(--g);border:1px solid #A0C8A8}
+.ppl.sel{background:#EAD0D0;color:var(--r);border:1px solid #C8A0A0}
+.pscr{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:7px;
+  padding:5px 0;border-bottom:1px solid rgba(90,70,40,.08)}
+.pscr:last-child{border-bottom:none}
+.sbg{width:30px;height:30px;border-radius:4px;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.sf{background:#D0EAD8;color:var(--g);border:1px solid #A0C8A8}
+.sp{background:#EAE0B0;color:var(--y);border:1px solid #C8B070}
+.sn{background:var(--ui-surf);color:var(--ui-text);border:1px solid var(--ui-brd)}
+.sw{background:#EAD0D0;color:var(--r);border:1px solid #C8A0A0}
+.pdts{display:flex;gap:3px;margin-top:2px}
+.pdt{width:7px;height:7px;border-radius:2px}
+.pd2{background:var(--g)}.pd1{background:var(--y)}.pd0{background:#C8B090}
+.pfb{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.pfbtn{font-size:7px;padding:3px 8px;border-radius:10px;border:1px solid var(--ui-brd);
+  background:transparent;color:var(--ui-mut);cursor:pointer;transition:.12s;font-family:var(--mono)}
 .pfbtn:hover,.pfbtn.active{background:var(--ui-surf);border-color:var(--ui-text);color:var(--ui-text)}
-.psearch{width:100%;background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:4px;
-  padding:5px 9px;font-family:var(--mono);font-size:10px;color:var(--ui-text);outline:none;margin-bottom:10px}
-.psearch:focus{border-color:var(--ui-blue)}
-.btn-add-pos{width:100%;background:var(--ui-surf);border:2px solid var(--ui-green);color:var(--ui-green);
-  padding:7px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer;margin-bottom:10px;
-  letter-spacing:.5px;transition:.15s}
-.btn-add-pos:hover{background:#D4EDE0}
-.ptrk{display:grid;grid-template-columns:70px 1fr 58px;align-items:center;gap:6px;
-  padding:6px 0;border-bottom:1px solid rgba(90,70,50,.1)}
+.psrch{width:100%;background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:4px;
+  padding:5px 8px;font-family:var(--mono);font-size:10px;color:var(--ui-text);
+  outline:none;margin-bottom:9px}
+.psrch:focus{border-color:var(--b)}
+.badd{width:100%;background:var(--ui-surf);border:2px solid var(--g);color:var(--g);
+  padding:6px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer;
+  margin-bottom:9px;letter-spacing:.3px;transition:.12s}
+.badd:hover{background:#D0EAD8}
+.ptrk{display:grid;grid-template-columns:65px 1fr 54px;align-items:center;gap:5px;
+  padding:5px 0;border-bottom:1px solid rgba(90,70,40,.08)}
 .ptrk:last-child{border-bottom:none}
-.tpill{font-size:7px;padding:2px 5px;border-radius:3px;font-weight:700;text-align:center}
-.tp-open{background:#D4EDE0;color:var(--ui-green)}
-.tp-tp{background:#D4E0ED;color:var(--ui-blue)}
-.tp-ts{background:var(--ui-surf);color:var(--ui-muted)}
-.pempty{color:var(--ui-muted);font-size:9px;text-align:center;padding:20px 0}
+.tpl{font-size:7px;padding:2px 4px;border-radius:3px;font-weight:700;text-align:center}
+.to{background:#D0EAD8;color:var(--g)}.tt{background:#D0D8EA;color:var(--b)}.ts{background:var(--ui-surf);color:var(--ui-mut)}
+.pmt{color:var(--ui-mut);font-size:9px;text-align:center;padding:16px 0}
 
 /* ── MODAL ── */
-.modal-ov{display:none;position:fixed;inset:0;background:rgba(50,40,30,.6);z-index:300;align-items:center;justify-content:center}
-.modal-ov.open{display:flex}
-.modal{background:var(--ui-bg);border:2px solid var(--ui-brd);border-radius:8px;padding:20px;width:300px}
-.modal-title{font-family:var(--pixel);font-size:7px;color:var(--ui-green);margin-bottom:14px}
-.fl{font-size:8px;color:var(--ui-muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.mov{display:none;position:fixed;inset:0;background:rgba(40,30,20,.6);z-index:400;align-items:center;justify-content:center}
+.mov.open{display:flex}
+.modal{background:var(--ui-bg);border:2px solid var(--ui-brd);border-radius:8px;padding:18px;width:290px}
+.mt{font-family:var(--pixel);font-size:7px;color:var(--g);margin-bottom:12px}
+.fl{font-size:7px;color:var(--ui-mut);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
 .fi{width:100%;background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:4px;
-  padding:6px 9px;font-family:var(--mono);font-size:10px;color:var(--ui-text);outline:none;margin-bottom:9px}
-.fi:focus{border-color:var(--ui-green)}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mactions{display:flex;gap:8px;margin-top:10px}
-.btn-ok{flex:1;background:var(--ui-green);color:white;border:none;padding:8px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer}
-.btn-cn{flex:1;background:transparent;border:1px solid var(--ui-brd);color:var(--ui-muted);padding:8px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer}
+  padding:5px 8px;font-family:var(--mono);font-size:10px;color:var(--ui-text);outline:none;margin-bottom:8px}
+.fi:focus{border-color:var(--g)}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ma{display:flex;gap:7px;margin-top:8px}
+.bok{flex:1;background:var(--g);color:#fff;border:none;padding:7px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer}
+.bcn{flex:1;background:transparent;border:1px solid var(--ui-brd);color:var(--ui-mut);padding:7px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer}
 
 /* ── LOADING ── */
-#loading{
-  position:fixed;inset:0;z-index:500;
-  background:var(--ui-bg);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:14px;transition:opacity .5s;
-}
-#loading.hide{opacity:0;pointer-events:none}
-#load-title{font-family:var(--pixel);font-size:9px;color:var(--ui-green);letter-spacing:2px}
-#load-bar{width:200px;height:6px;background:var(--ui-brd);border-radius:3px;overflow:hidden}
-#load-fill{height:100%;background:var(--ui-green);width:0;transition:width .3s;border-radius:3px}
-#load-msg{font-size:8px;color:var(--ui-muted);letter-spacing:1px}
-
-/* ── FUGAZI ── */
-#fugazi-wrap{
-  position:fixed;top:48px;left:-110vw;width:100vw;z-index:185;
-  pointer-events:none;visibility:hidden;
-  display:flex;flex-direction:column;align-items:center;
-  transition:left .45s cubic-bezier(.22,1,.36,1);
-}
-#fugazi-wrap.fi{left:0;visibility:visible}
-#fugazi-wrap.fo{left:110vw;visibility:visible;transition:left .4s cubic-bezier(.55,0,1,.45)}
-#fugazi-balloon{
-  position:relative;background:#fff;border:4px solid #333;border-radius:24px;
-  padding:10px 20px;margin:8px 20px 0;max-width:min(88vw,500px);
-  box-shadow:4px 4px 0 #333;
-}
-#fugazi-balloon::after{content:'';position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);
-  border:12px solid transparent;border-top-color:#333}
-#fugazi-balloon::before{content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
-  border:10px solid transparent;border-top-color:#fff;z-index:1}
-#fugazi-text{font-family:'Bangers',cursive;font-size:clamp(20px,5vw,36px);color:#333;
-  letter-spacing:2px;text-align:center;text-shadow:2px 2px 0 #ddd}
-#fugazi-canvas{display:block;width:100vw;image-rendering:pixelated}
-#walk-sprite{position:fixed;bottom:58px;width:140px;height:140px;z-index:188;
-  pointer-events:none;visibility:hidden;
-  image-rendering:pixelated;background-image:url('sprite_walk.png');background-repeat:no-repeat}
-#apgar-ov{display:none;position:fixed;inset:0;z-index:400;pointer-events:none;visibility:hidden}
-#apgar-ov.visible{visibility:visible}
-#apgar-canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-#apgar-ov.slo{animation:slo .55s cubic-bezier(.55,0,1,.45) forwards}
-@keyframes slo{from{transform:translateX(0);opacity:1}to{transform:translateX(-110vw);opacity:0}}
+#ld{position:fixed;inset:0;z-index:500;background:var(--ui-bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .5s}
+#ld.hide{opacity:0;pointer-events:none}
+#ldt{font-family:var(--pixel);font-size:8px;color:var(--g);letter-spacing:2px}
+#ldb{width:180px;height:5px;background:var(--ui-brd);border-radius:3px;overflow:hidden}
+#ldf{height:100%;background:var(--g);width:0;transition:width .3s;border-radius:3px}
+#ldm{font-size:8px;color:var(--ui-mut);letter-spacing:1px}
 
 @media(max-width:600px){
   #panel{width:100%;border-left:none;border-top:2px solid var(--ui-brd)}
-  .room-btn span{display:none}
+  .rbtn span{display:none}
+  .screen-content{padding:5px}
+  .screen-title{font-size:5px}
+  .screen-row{font-size:7px}
 }
 </style>
 </head>
@@ -237,1203 +267,992 @@ html,body{height:100%;overflow:hidden;background:#3A3028;font-family:var(--mono)
 <!-- TOPBAR -->
 <div id="topbar">
   <div class="logo">
-    <div class="logo-dot" style="background:#2D7A4A"></div>
-    <div class="logo-dot" style="background:#8A6A10"></div>
-    <div class="logo-dot" style="background:#8A2A1A"></div>
+    <div class="ldot" style="background:var(--g)"></div>
+    <div class="ldot" style="background:var(--y)"></div>
+    <div class="ldot" style="background:var(--r)"></div>
     IBOV ASSET MGMT
   </div>
-  <div class="topbar-right">
-    <div class="update-info">ÚLTIMA ATT: <b id="updateTime">—</b></div>
-    <button class="btn-top" id="snd-btn" onclick="toggleSound()">♪ SOM</button>
-    <button class="btn-top" onclick="forceUpdate(event)">↻ UPDATE</button>
+  <div class="topbar-r">
+    <div class="upd">ATT: <b id="updT">—</b></div>
+    <button class="tbtn" id="snd-btn" onclick="toggleSnd()">♪ SOM</button>
+    <button class="tbtn" onclick="forceUpdate(event)">↻ UPDATE</button>
   </div>
 </div>
 
-<!-- STAGE + WORLD + ROOMS -->
+<!-- STAGE -->
 <div id="stage">
 <div id="world">
 
-  <!-- SALA 1: TRADING FLOOR -->
-  <div class="room" id="room-mrs">
-    <svg class="room-svg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid slice">
-      <!-- FUNDO/PISO -->
-      <rect width="800" height="580" fill="#6B7FA3"/>
-      <!-- Sombras de tile no piso -->
-      <g opacity="0.18" fill="none" stroke="#3A4A68" stroke-width="0.8">
-        <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
-        <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
-        <line x1="0" y1="500" x2="800" y2="500"/>
-        <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
-        <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
-        <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
-        <line x1="700" y1="0" x2="700" y2="580"/>
-      </g>
-      <!-- Tile pattern text -->
-      <g font-family="Space Mono" font-size="8" fill="#7B8FB5" opacity="0.5">
-        <text x="50" y="175">CCr</text><text x="250" y="275">CCr</text>
-        <text x="450" y="175">CCr</text><text x="650" y="275">CCr</text>
-        <text x="150" y="375">CCr</text><text x="350" y="475">CCr</text>
-        <text x="550" y="375">CCr</text><text x="750" y="475">CCr</text>
-      </g>
+  <!-- ══ SALA 1: TRADING FLOOR ══ -->
+  <div class="room" id="room-mrs" onclick="openPanel('mrs')">
+    <div class="r-ceiling"></div>
+    <div class="r-molding"></div>
+    <div class="r-wall" id="wall-mrs">
 
-      <!-- PAREDE NORTE -->
-      <rect x="0" y="0" width="800" height="110" fill="#D4845A"/>
-      <rect x="0" y="105" width="800" height="8" fill="#B86A3C"/>
+      <!-- Janela esquerda -->
+      <div class="room-window" style="left:3%;top:8%;width:12%;height:48%">
+        <div class="window-glare"></div>
+      </div>
 
-      <!-- JANELA (esquerda) -->
-      <rect x="40" y="15" width="240" height="75" rx="3" fill="#B86A3C"/>
-      <rect x="44" y="19" width="232" height="67" rx="2" fill="#A8D4E6"/>
-      <!-- Reflexo janela -->
-      <rect x="50" y="22" width="70" height="58" fill="rgba(255,255,255,0.25)" rx="1"/>
-      <rect x="128" y="22" width="70" height="58" fill="rgba(255,255,255,0.2)" rx="1"/>
-      <rect x="206" y="22" width="66" height="58" fill="rgba(255,255,255,0.22)" rx="1"/>
-      <!-- Divisões janela -->
-      <line x1="122" y1="19" x2="122" y2="86" stroke="#6A9AB4" stroke-width="3"/>
-      <line x1="200" y1="19" x2="200" y2="86" stroke="#6A9AB4" stroke-width="3"/>
-      <!-- Parapeito -->
-      <rect x="38" y="86" width="244" height="12" fill="#B86A3C"/>
-      <rect x="30" y="96" width="260" height="8" fill="#C97B3E"/>
+      <!-- 3 TELAS: COMPRA | PRÓXIMOS | TOP MRS -->
+      <!-- Tela 1: COMPRA -->
+      <div class="screen-wrap sc-green" style="left:18%;top:5%;width:22%">
+        <div class="led-strip led-g"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">▸ COMPRAS HOJE</div>
+              <div id="sc1-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- CAIXAS (esquerda parede) -->
-      <rect x="30" y="108" width="55" height="45" rx="2" fill="#C97B3E" stroke="#A55E28" stroke-width="1.5"/>
-      <rect x="30" y="148" width="55" height="25" rx="2" fill="#A55E28" stroke="#8A4A1C" stroke-width="1.5"/>
-      <rect x="38" y="115" width="40" height="5" fill="#A55E28" opacity="0.5"/>
+      <!-- Tela 2: PRÓXIMOS -->
+      <div class="screen-wrap sc-yellow" style="left:42%;top:5%;width:22%">
+        <div class="led-strip led-y"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">◈ PRÓX. CRUZAR</div>
+              <div id="sc2-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- ESTANTE/GABINETE (direita) -->
-      <rect x="540" y="108" width="240" height="90" rx="3" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
-      <!-- Gavetas -->
-      <rect x="545" y="113" width="110" height="37" rx="2" fill="#B87040" stroke="#A55E28" stroke-width="1"/>
-      <rect x="545" y="154" width="110" height="37" rx="2" fill="#B87040" stroke="#A55E28" stroke-width="1"/>
-      <!-- Puxadores -->
-      <rect x="593" y="129" width="14" height="6" rx="3" fill="#A55E28"/>
-      <rect x="593" y="170" width="14" height="6" rx="3" fill="#A55E28"/>
-      <!-- Pastas coloridas dir -->
-      <g transform="translate(660,115)">
-        <rect x="0"  y="0" width="13" height="32" rx="1" fill="#E05A4A"/><rect x="14" y="0" width="13" height="32" rx="1" fill="#E8A030"/>
-        <rect x="28" y="0" width="13" height="32" rx="1" fill="#E8D030"/><rect x="42" y="0" width="13" height="32" rx="1" fill="#58B848"/>
-        <rect x="56" y="0" width="13" height="32" rx="1" fill="#4AB8D4"/><rect x="70" y="0" width="13" height="32" rx="1" fill="#8848C8"/>
-        <rect x="84" y="0" width="13" height="32" rx="1" fill="#E848A0"/>
-        <!-- Passas coloridas row 2 -->
-        <rect x="0"  y="35" width="13" height="30" rx="1" fill="#4AB8D4"/><rect x="14" y="35" width="13" height="30" rx="1" fill="#E05A4A"/>
-        <rect x="28" y="35" width="13" height="30" rx="1" fill="#58B848"/><rect x="42" y="35" width="13" height="30" rx="1" fill="#E8A030"/>
-        <rect x="56" y="35" width="13" height="30" rx="1" fill="#8848C8"/><rect x="70" y="35" width="13" height="30" rx="1" fill="#E8D030"/>
-        <rect x="84" y="35" width="13" height="30" rx="1" fill="#E848A0"/>
-      </g>
+      <!-- Tela 3: TOP MRS -->
+      <div class="screen-wrap sc-blue" style="left:66%;top:5%;width:22%">
+        <div class="led-strip led-b"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">★ TOP MRS</div>
+              <div id="sc3-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- PAPÉIS na parede (centro) -->
-      <g transform="translate(450,8)">
-        <rect x="0" y="0" width="52" height="64" rx="2" fill="#F8F4EC" stroke="#DDD8CC" stroke-width="1" transform="rotate(-5,26,32)"/>
-        <line x1="6" y1="16" x2="42" y2="16" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
-        <line x1="6" y1="24" x2="38" y2="24" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
-        <line x1="6" y1="32" x2="40" y2="32" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
-        <line x1="6" y1="40" x2="35" y2="40" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
-      </g>
-
-      <!-- TICKER MURAL (parede centro) — dados MRS -->
-      <rect x="300" y="10" width="200" height="90" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="303" y="13" width="194" height="84" rx="2" fill="#141428"/>
-      <text id="mrs-tb1" x="400" y="38" text-anchor="middle" fill="#00E880" font-family="Space Mono" font-size="10" font-weight="700">COMPRA: —</text>
-      <text id="mrs-tb2" x="400" y="56" text-anchor="middle" fill="#F5C842" font-family="Space Mono" font-size="8">MRS — RSV —</text>
-      <text id="mrs-tb3" x="400" y="72" text-anchor="middle" fill="#4A7A9A" font-family="Space Mono" font-size="7">PRÓX: — sinais</text>
-      <text id="mrs-tb4" x="400" y="88" text-anchor="middle" fill="#3A5A7A" font-family="Space Mono" font-size="7" id="mrs-tb4">AÇÕES: —</text>
-
-      <!-- MESA 1 (esquerda) -->
-      <rect x="90" y="270" width="200" height="140" rx="4" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
-      <!-- Sombra mesa -->
-      <rect x="96" y="406" width="200" height="12" rx="2" fill="rgba(0,0,0,0.2)"/>
-      <!-- Pernas mesa -->
-      <rect x="96"  y="400" width="14" height="28" rx="2" fill="#A55E28"/>
-      <rect x="270" y="400" width="14" height="28" rx="2" fill="#A55E28"/>
-      <!-- MONITOR 1 -->
-      <rect x="108" y="235" width="110" height="76" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="112" y="239" width="102" height="64" rx="2" fill="#C8ECD8"/>
-      <!-- Gráfico no monitor -->
-      <polyline id="mon1-chart" points="116,290 128,278 140,283 152,268 164,272 176,262 188,258 200,265" fill="none" stroke="#2D7A4A" stroke-width="2" stroke-linecap="round"/>
-      <!-- Suporte monitor -->
-      <rect x="155" y="311" width="14" height="20" fill="#1A1A28"/>
-      <rect x="148" y="329" width="28" height="5" rx="2" fill="#2A2A3A"/>
-      <!-- Teclado -->
-      <rect x="110" y="318" width="80" height="30" rx="3" fill="#3A3A4A" stroke="#2A2A38" stroke-width="1"/>
-      <!-- Mouse -->
-      <rect x="200" y="322" width="22" height="16" rx="8" fill="#3A3A4A" stroke="#2A2A38" stroke-width="1"/>
-      <!-- Cabo mouse -->
-      <path d="M211 322 Q220 310 230 308" fill="none" stroke="#2A2A38" stroke-width="1.5"/>
-      <!-- CADEIRA VERMELHA -->
-      <rect x="60" y="338" width="52" height="42" rx="24" fill="#E05A4A"/>
-      <circle cx="86" cy="406" r="8" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="74" y="408" width="4" height="14" rx="2" transform="rotate(-35,76,408)"/>
-        <rect x="80" y="408" width="4" height="14" rx="2" transform="rotate(-12,82,408)"/>
-        <rect x="86" y="408" width="4" height="14" rx="2"/>
-        <rect x="92" y="408" width="4" height="14" rx="2" transform="rotate(12,94,408)"/>
-        <rect x="98" y="408" width="4" height="14" rx="2" transform="rotate(35,100,408)"/>
-      </g>
-
-      <!-- MESA 2 (centro) -->
-      <rect x="310" y="250" width="200" height="140" rx="4" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
-      <rect x="316" y="386" width="200" height="12" rx="2" fill="rgba(0,0,0,0.2)"/>
-      <rect x="316" y="382" width="14" height="28" rx="2" fill="#A55E28"/>
-      <rect x="490" y="382" width="14" height="28" rx="2" fill="#A55E28"/>
-      <!-- MONITOR 2 -->
-      <rect x="328" y="215" width="110" height="76" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="332" y="219" width="102" height="64" rx="2" fill="#C8ECD8"/>
-      <!-- Gráfico 2 -->
-      <polyline id="mon2-chart" points="336,265 348,258 360,262 372,252 384,255 396,245 408,248 420,240" fill="none" stroke="#8A2A8A" stroke-width="2" stroke-linecap="round"/>
-      <rect x="375" y="291" width="14" height="20" fill="#1A1A28"/>
-      <rect x="368" y="309" width="28" height="5" rx="2" fill="#2A2A3A"/>
-      <!-- Fone de ouvido na mesa -->
-      <path d="M330 270 Q360 250 380 270" fill="none" stroke="#2A2A3A" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="330" cy="270" r="8" fill="#3A3A4A"/>
-      <circle cx="380" cy="270" r="8" fill="#3A3A4A"/>
-      <!-- Cabo fone saindo -->
-      <path d="M355 270 Q360 290 365 300 L365 330" fill="none" stroke="#1A1A28" stroke-width="2"/>
-      <!-- CADEIRA VERDE -->
-      <rect x="280" y="320" width="52" height="42" rx="24" fill="#5AB85A"/>
-      <circle cx="306" cy="390" r="8" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="294" y="392" width="4" height="14" rx="2" transform="rotate(-35,296,392)"/>
-        <rect x="300" y="392" width="4" height="14" rx="2" transform="rotate(-12,302,392)"/>
-        <rect x="306" y="392" width="4" height="14" rx="2"/>
-        <rect x="312" y="392" width="4" height="14" rx="2" transform="rotate(12,314,392)"/>
-        <rect x="318" y="392" width="4" height="14" rx="2" transform="rotate(35,320,392)"/>
-      </g>
-
-      <!-- MESA 3 (direita) -->
-      <rect x="530" y="270" width="180" height="130" rx="4" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
-      <rect x="536" y="396" width="180" height="12" rx="2" fill="rgba(0,0,0,0.2)"/>
-      <rect x="536" y="392" width="14" height="25" rx="2" fill="#A55E28"/>
-      <rect x="690" y="392" width="14" height="25" rx="2" fill="#A55E28"/>
-      <!-- Monitor 3 (tela com stats) -->
-      <rect x="548" y="235" width="100" height="70" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="552" y="239" width="92" height="58" rx="2" fill="#EAF4F8"/>
-      <!-- Stats no monitor -->
-      <text x="598" y="258" text-anchor="middle" fill="#1A5A8A" font-family="Space Mono" font-size="8" font-weight="700">TOP MRS</text>
-      <text id="mon3-l1" x="556" y="272" fill="#2D7A4A" font-family="Space Mono" font-size="7">1. ——  +0.0%</text>
-      <text id="mon3-l2" x="556" y="284" fill="#2D7A4A" font-family="Space Mono" font-size="7">2. ——  +0.0%</text>
-      <text id="mon3-l3" x="556" y="296" fill="#4A7A4A" font-family="Space Mono" font-size="7">3. ——  +0.0%</text>
-      <rect x="598" y="305" width="12" height="18" fill="#1A1A28"/>
-      <rect x="592" y="321" width="24" height="4" rx="2" fill="#2A2A3A"/>
-      <!-- CADEIRA AZUL (canto) -->
-      <rect x="710" y="380" width="52" height="42" rx="24" fill="#4AB8D4"/>
-      <circle cx="736" cy="450" r="8" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="724" y="452" width="4" height="14" rx="2" transform="rotate(-35,726,452)"/>
-        <rect x="730" y="452" width="4" height="14" rx="2" transform="rotate(-12,732,452)"/>
-        <rect x="736" y="452" width="4" height="14" rx="2"/>
-        <rect x="742" y="452" width="4" height="14" rx="2" transform="rotate(12,744,452)"/>
-        <rect x="748" y="452" width="4" height="14" rx="2" transform="rotate(35,750,452)"/>
-      </g>
-
-      <!-- LIXEIRA -->
-      <ellipse cx="90" cy="518" rx="22" ry="10" fill="#4A5A70"/>
-      <rect x="68" y="490" width="44" height="30" rx="4" fill="#5A6A80" stroke="#4A5A70" stroke-width="1"/>
-      <ellipse cx="90" cy="490" rx="22" ry="8" fill="#6A7A90"/>
-      <!-- Placa sala -->
-      <rect x="310" y="545" width="180" height="26" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="1.5"/>
-      <text x="400" y="562" text-anchor="middle" fill="#00E880" font-family="Space Mono" font-size="8" font-weight="700">TRADING FLOOR</text>
-    </svg>
+      <!-- Placa -->
+      <div style="position:absolute;bottom:1%;left:50%;transform:translateX(-50%);
+        background:#2A2418;border-radius:4px;padding:4px 14px;font-family:var(--pixel);
+        font-size:6px;color:#F5C842;letter-spacing:1px">TRADING FLOOR</div>
+    </div>
+    <div class="r-wainscot"></div>
+    <div class="r-baseboard"></div>
+    <div class="r-floor"></div>
+    <div class="r-floor-stripe"></div>
   </div>
 
-  <!-- SALA 2: RESEARCH ROOM -->
-  <div class="room" id="room-apgar">
-    <svg class="room-svg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid slice">
-      <!-- PISO cor diferente -->
-      <rect width="800" height="580" fill="#7A6A9A"/>
-      <g opacity="0.18" fill="none" stroke="#4A3A6A" stroke-width="0.8">
-        <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
-        <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
-        <line x1="0" y1="500" x2="800" y2="500"/>
-        <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
-        <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
-        <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
-        <line x1="700" y1="0" x2="700" y2="580"/>
-      </g>
-      <g font-family="Space Mono" font-size="8" fill="#8A7AAA" opacity="0.5">
-        <text x="50" y="175">CCr</text><text x="250" y="275">CCr</text>
-        <text x="450" y="175">CCr</text><text x="650" y="275">CCr</text>
-        <text x="150" y="375">CCr</text><text x="350" y="475">CCr</text>
-      </g>
-      <!-- PAREDE NORTE -->
-      <rect x="0" y="0" width="800" height="110" fill="#C87A9A"/>
-      <rect x="0" y="105" width="800" height="8" fill="#A86080"/>
+  <!-- ══ SALA 2: RESEARCH ROOM ══ -->
+  <div class="room" id="room-apgar" onclick="openPanel('apgar')">
+    <div class="r-ceiling" style="background:#EEE0F0"></div>
+    <div class="r-molding" style="background:#D8C8E8"></div>
+    <div class="r-wall" style="background:#ECD8F0" id="wall-apgar">
 
-      <!-- Janela pesquisa -->
-      <rect x="30" y="15" width="200" height="75" rx="3" fill="#A86080"/>
-      <rect x="34" y="19" width="192" height="67" rx="2" fill="#D4E8F4"/>
-      <rect x="40" y="22" width="58" height="58" fill="rgba(255,255,255,0.28)" rx="1"/>
-      <rect x="108" y="22" width="58" height="58" fill="rgba(255,255,255,0.22)" rx="1"/>
-      <rect x="176" y="22" width="46" height="58" fill="rgba(255,255,255,0.25)" rx="1"/>
-      <line x1="102" y1="19" x2="102" y2="86" stroke="#8A9AB4" stroke-width="3"/>
-      <line x1="170" y1="19" x2="170" y2="86" stroke="#8A9AB4" stroke-width="3"/>
-      <rect x="28" y="86" width="204" height="12" fill="#A86080"/>
-      <rect x="22" y="96" width="216" height="8" fill="#C87A9A"/>
+      <!-- Janela esquerda -->
+      <div class="room-window" style="left:2%;top:8%;width:10%;height:55%;border-color:#9A7AB8">
+        <div class="window-glare"></div>
+      </div>
 
-      <!-- QUADRO BRANCO APGAR (grande, parede centro) -->
-      <rect x="290" y="5" width="300" height="100" rx="4" fill="#F0F0F0" stroke="#C8C0D8" stroke-width="2.5"/>
-      <rect x="294" y="9" width="292" height="92" rx="2" fill="#FAFAFA"/>
-      <text x="440" y="28" text-anchor="middle" fill="#5A3A8A" font-family="Space Mono" font-size="9" font-weight="700">APGAR SCORE</text>
-      <!-- Barras APGAR no quadro -->
-      <g id="apgar-wall-board">
-        <text x="302" y="44" fill="#8A8A9A" font-family="Space Mono" font-size="7">T</text>
-        <rect x="314" y="35" width="60" height="10" rx="2" fill="#E0E0E8" id="ab-t-bg"/>
-        <rect x="314" y="35" width="60" height="10" rx="2" fill="#2D7A4A" id="ab-t"/>
-        <text x="302" y="58" fill="#8A8A9A" font-family="Space Mono" font-size="7">E</text>
-        <rect x="314" y="49" width="60" height="10" rx="2" fill="#E0E0E8"/>
-        <rect x="314" y="49" width="60" height="10" rx="2" fill="#2D7A4A" id="ab-e"/>
-        <text x="302" y="72" fill="#8A8A9A" font-family="Space Mono" font-size="7">R</text>
-        <rect x="314" y="63" width="60" height="10" rx="2" fill="#E0E0E8"/>
-        <rect x="314" y="63" width="60" height="10" rx="2" fill="#8A6A10" id="ab-r"/>
-        <text x="302" y="86" fill="#8A8A9A" font-family="Space Mono" font-size="7">C</text>
-        <rect x="314" y="77" width="60" height="10" rx="2" fill="#E0E0E8"/>
-        <rect x="314" y="77" width="60" height="10" rx="2" fill="#8A2A1A" id="ab-c"/>
-        <text x="302" y="100" fill="#8A8A9A" font-family="Space Mono" font-size="7">B</text>
-        <rect x="314" y="91" width="60" height="10" rx="2" fill="#E0E0E8"/>
-        <rect x="314" y="91" width="60" height="10" rx="2" fill="#2D7A4A" id="ab-b"/>
-        <!-- Score total -->
-        <text id="ab-score" x="420" y="72" fill="#5A3A8A" font-family="Space Mono" font-size="28" font-weight="700">—</text>
-        <text x="460" y="65" fill="#8A8A9A" font-family="Space Mono" font-size="7">/10</text>
-        <!-- Ação destaque -->
-        <text id="ab-ticker" x="420" y="88" fill="#5A3A8A" font-family="Space Mono" font-size="9" font-weight="700">——</text>
-        <!-- Contadores -->
-        <text id="ab-forte" x="540" y="38" fill="#2D7A4A" font-family="Space Mono" font-size="8" font-weight="700">— FORTE</text>
-        <text id="ab-pos" x="540" y="54" fill="#8A6A10" font-family="Space Mono" font-size="8">— POSITIVO</text>
-        <text id="ab-frac" x="540" y="70" fill="#8A2A1A" font-family="Space Mono" font-size="8">— FRACO</text>
-      </g>
-      <!-- Moldura quadro -->
-      <rect x="288" y="102" width="304" height="8" rx="2" fill="#C8C0D8"/>
+      <!-- Tela SIGNAL VCP (grande, centro-esquerda) -->
+      <div class="screen-wrap sc-purple" style="left:16%;top:5%;width:30%">
+        <div class="led-strip led-p"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">◉ VCP SIGNAL</div>
+              <div id="sc4-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- ESTANTE DE LIVROS (direita) -->
-      <rect x="610" y="108" width="170" height="90" rx="3" fill="#C87A5A" stroke="#A85A3A" stroke-width="2"/>
-      <rect x="614" y="112" width="162" height="38" rx="2" fill="#B86A4A"/>
-      <rect x="614" y="155" width="162" height="38" rx="2" fill="#B86A4A"/>
-      <!-- Livros row 1 -->
-      <g transform="translate(617,114)">
-        <rect x="0"  y="0" width="14" height="34" rx="1" fill="#4A3A8A"/><rect x="16" y="2" width="12" height="32" rx="1" fill="#8A3A2A"/>
-        <rect x="30" y="1" width="15" height="33" rx="1" fill="#2A6A3A"/><rect x="47" y="3" width="11" height="31" rx="1" fill="#6A4A1A"/>
-        <rect x="60" y="0" width="14" height="34" rx="1" fill="#1A5A7A"/><rect x="76" y="2" width="12" height="32" rx="1" fill="#8A2A5A"/>
-        <rect x="90" y="1" width="13" height="33" rx="1" fill="#3A7A2A"/><rect x="105" y="3" width="12" height="31" rx="1" fill="#7A5A1A"/>
-        <rect x="119" y="0" width="14" height="34" rx="1" fill="#5A2A8A"/><rect x="135" y="2" width="14" height="32" rx="1" fill="#2A5A3A"/>
-      </g>
-      <!-- Livros row 2 -->
-      <g transform="translate(617,157)">
-        <rect x="0"  y="0" width="14" height="34" rx="1" fill="#1A5A7A"/><rect x="16" y="2" width="12" height="32" rx="1" fill="#3A7A2A"/>
-        <rect x="30" y="1" width="15" height="33" rx="1" fill="#8A2A5A"/><rect x="47" y="3" width="11" height="31" rx="1" fill="#4A3A8A"/>
-        <rect x="60" y="0" width="14" height="34" rx="1" fill="#8A3A2A"/><rect x="76" y="2" width="12" height="32" rx="1" fill="#6A4A1A"/>
-        <rect x="90" y="1" width="13" height="33" rx="1" fill="#7A5A1A"/><rect x="105" y="3" width="12" height="31" rx="1" fill="#5A2A8A"/>
-        <rect x="119" y="0" width="14" height="34" rx="1" fill="#2A6A3A"/><rect x="135" y="2" width="14" height="32" rx="1" fill="#1A5A7A"/>
-      </g>
+      <!-- Tela TOP APGAR 1 -->
+      <div class="screen-wrap sc-green" style="left:50%;top:5%;width:16%">
+        <div class="led-strip led-g"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">★ FORTE</div>
+              <div id="sc5-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- MESA PESQUISA (centro) -->
-      <rect x="180" y="250" width="440" height="150" rx="5" fill="#C87A5A" stroke="#A85A3A" stroke-width="2"/>
-      <rect x="186" y="396" width="440" height="12" rx="2" fill="rgba(0,0,0,0.18)"/>
-      <rect x="186" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
-      <rect x="610" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
-      <rect x="340" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
-      <rect x="462" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
+      <!-- Tela TOP APGAR 2 -->
+      <div class="screen-wrap sc-yellow" style="left:68%;top:5%;width:16%">
+        <div class="led-strip led-y"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">◈ POSITIVO</div>
+              <div id="sc6-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- LAPTOP APGAR -->
-      <rect x="280" y="210" width="130" height="84" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="284" y="214" width="122" height="72" rx="2" fill="#E8E4F8"/>
-      <!-- Score no laptop -->
-      <text id="laptop-score" x="345" y="260" text-anchor="middle" fill="#5A3A8A" font-family="Space Mono" font-size="26" font-weight="700">—</text>
-      <text x="345" y="276" text-anchor="middle" fill="#8A7AAA" font-family="Space Mono" font-size="7">TOP SCORE</text>
-      <rect x="338" y="294" width="14" height="16" fill="#1A1A28"/>
-      <rect x="320" y="308" width="50" height="5" rx="2" fill="#2A2A3A"/>
-      <!-- Tampa laptop parcial aberta -->
-      <rect x="280" y="294" width="130" height="30" rx="2" fill="#1E1E2E" stroke="#1A1A28" stroke-width="1"/>
+      <!-- Tela TOP APGAR 3 -->
+      <div class="screen-wrap sc-blue" style="left:86%;top:5%;width:12%">
+        <div class="led-strip led-b"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">▸ NEUTRO</div>
+              <div id="sc7-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- SEGUNDO LAPTOP (top stocks) -->
-      <rect x="440" y="215" width="120" height="80" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="444" y="219" width="112" height="66" rx="2" fill="#F4F0E8"/>
-      <text x="500" y="234" text-anchor="middle" fill="#8A6A10" font-family="Space Mono" font-size="7" font-weight="700">VCP SIGNALS</text>
-      <text id="apg-top1" x="448" y="248" fill="#2D7A4A" font-family="Space Mono" font-size="7">——  7/10</text>
-      <text id="apg-top2" x="448" y="261" fill="#2D7A4A" font-family="Space Mono" font-size="7">——  7/10</text>
-      <text id="apg-top3" x="448" y="274" fill="#8A6A10" font-family="Space Mono" font-size="7">——  6/10</text>
-      <text id="apg-top4" x="448" y="287" fill="#8A6A10" font-family="Space Mono" font-size="7">——  6/10</text>
-      <rect x="494" y="295" width="12" height="14" fill="#1A1A28"/>
-      <rect x="480" y="307" width="40" height="4" rx="2" fill="#2A2A3A"/>
-
-      <!-- CADEIRAS mesa pesquisa -->
-      <rect x="148" y="315" width="48" height="38" rx="22" fill="#E05A4A"/>
-      <circle cx="172" cy="376" r="7" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="162" y="378" width="3" height="13" rx="2" transform="rotate(-30,164,378)"/>
-        <rect x="167" y="378" width="3" height="13" rx="2" transform="rotate(-10,169,378)"/>
-        <rect x="172" y="378" width="3" height="13" rx="2"/>
-        <rect x="177" y="378" width="3" height="13" rx="2" transform="rotate(10,179,378)"/>
-        <rect x="182" y="378" width="3" height="13" rx="2" transform="rotate(30,184,378)"/>
-      </g>
-      <rect x="604" y="315" width="48" height="38" rx="22" fill="#8848C8"/>
-      <circle cx="628" cy="376" r="7" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="618" y="378" width="3" height="13" rx="2" transform="rotate(-30,620,378)"/>
-        <rect x="623" y="378" width="3" height="13" rx="2" transform="rotate(-10,625,378)"/>
-        <rect x="628" y="378" width="3" height="13" rx="2"/>
-        <rect x="633" y="378" width="3" height="13" rx="2" transform="rotate(10,635,378)"/>
-        <rect x="638" y="378" width="3" height="13" rx="2" transform="rotate(30,640,378)"/>
-      </g>
-
-      <!-- Planta decorativa -->
-      <ellipse cx="728" cy="490" rx="28" ry="18" fill="#2A6A2A"/>
-      <ellipse cx="714" cy="478" rx="18" ry="12" fill="#3A7A3A"/>
-      <ellipse cx="740" cy="478" rx="18" ry="12" fill="#2A6A2A"/>
-      <rect x="720" y="490" width="16" height="30" rx="3" fill="#8A5A2A"/>
-      <rect x="716" y="518" width="24" height="8" rx="3" fill="#A86A3A"/>
-
-      <!-- Placa sala -->
-      <rect x="300" y="545" width="200" height="26" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="1.5"/>
-      <text x="400" y="562" text-anchor="middle" fill="#C878E8" font-family="Space Mono" font-size="8" font-weight="700">RESEARCH ROOM</text>
-    </svg>
+      <div style="position:absolute;bottom:1%;left:50%;transform:translateX(-50%);
+        background:#2A1A30;border-radius:4px;padding:4px 14px;font-family:var(--pixel);
+        font-size:6px;color:#C878F8;letter-spacing:1px">RESEARCH ROOM</div>
+    </div>
+    <div class="r-wainscot" style="background:#D8C8E8;border-top-color:#8A6A9A"></div>
+    <div class="r-baseboard" style="background:#5C3A6A"></div>
+    <div class="r-floor" style="background:#7A6880"></div>
+    <div class="r-floor-stripe" style="background:#6A5870"></div>
   </div>
 
-  <!-- SALA 3: PORTFOLIO ROOM -->
-  <div class="room" id="room-tracker">
-    <svg class="room-svg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid slice">
-      <!-- PISO amarelado quente -->
-      <rect width="800" height="580" fill="#8A7A5A"/>
-      <g opacity="0.18" fill="none" stroke="#5A4A2A" stroke-width="0.8">
-        <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
-        <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
-        <line x1="0" y1="500" x2="800" y2="500"/>
-        <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
-        <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
-        <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
-        <line x1="700" y1="0" x2="700" y2="580"/>
-      </g>
-      <g font-family="Space Mono" font-size="8" fill="#9A8A6A" opacity="0.5">
-        <text x="50" y="175">CCr</text><text x="250" y="275">CCr</text>
-        <text x="450" y="175">CCr</text><text x="650" y="275">CCr</text>
-        <text x="150" y="375">CCr</text><text x="350" y="475">CCr</text>
-      </g>
-      <!-- PAREDE NORTE -->
-      <rect x="0" y="0" width="800" height="110" fill="#D4A45A"/>
-      <rect x="0" y="105" width="800" height="8" fill="#B88038"/>
+  <!-- ══ SALA 3: PORTFOLIO ROOM ══ -->
+  <div class="room" id="room-tracker" onclick="openPanel('tracker')">
+    <div class="r-ceiling" style="background:#F8EDD8"></div>
+    <div class="r-molding" style="background:#E0C890"></div>
+    <div class="r-wall" style="background:#F0DDA8" id="wall-tracker">
 
-      <!-- Janela portfolio -->
-      <rect x="550" y="15" width="200" height="75" rx="3" fill="#B88038"/>
-      <rect x="554" y="19" width="192" height="67" rx="2" fill="#A8D4E6"/>
-      <rect x="560" y="22" width="58" height="58" fill="rgba(255,255,255,0.26)" rx="1"/>
-      <rect x="628" y="22" width="58" height="58" fill="rgba(255,255,255,0.22)" rx="1"/>
-      <rect x="696" y="22" width="46" height="58" fill="rgba(255,255,255,0.25)" rx="1"/>
-      <line x1="622" y1="19" x2="622" y2="86" stroke="#6A9AB4" stroke-width="3"/>
-      <line x1="690" y1="19" x2="690" y2="86" stroke="#6A9AB4" stroke-width="3"/>
-      <rect x="548" y="86" width="204" height="12" fill="#B88038"/>
-      <rect x="542" y="96" width="216" height="8" fill="#D4A45A"/>
+      <!-- Janela direita -->
+      <div class="room-window" style="right:3%;top:8%;width:12%;height:48%">
+        <div class="window-glare"></div>
+      </div>
 
-      <!-- PORTFOLIO BOARD (parede) — P&L display -->
-      <rect x="60" y="8" width="480" height="97" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
-      <rect x="63" y="11" width="474" height="91" rx="2" fill="#141428"/>
-      <text x="300" y="34" text-anchor="middle" fill="#F5C842" font-family="Space Mono" font-size="10" font-weight="700">PORTFOLIO TRACKER</text>
-      <!-- Stats board -->
-      <text x="80" y="56" fill="#4A7A4A" font-family="Space Mono" font-size="8">ABERTAS</text>
-      <text id="trk-ab" x="200" y="56" fill="#00E880" font-family="Space Mono" font-size="12" font-weight="700">—</text>
-      <text x="240" y="56" fill="#4A7A4A" font-family="Space Mono" font-size="8">WIN RATE</text>
-      <text id="trk-wr" x="370" y="56" fill="#F5C842" font-family="Space Mono" font-size="12" font-weight="700">—</text>
-      <text x="80" y="80" fill="#4A7A4A" font-family="Space Mono" font-size="8">P&amp;L MED</text>
-      <text id="trk-pm" x="200" y="80" fill="#00E880" font-family="Space Mono" font-size="12" font-weight="700">—</text>
-      <text x="240" y="80" fill="#4A7A4A" font-family="Space Mono" font-size="8">FECHADAS</text>
-      <text id="trk-fc" x="370" y="80" fill="#4A6A8A" font-family="Space Mono" font-size="12" font-weight="700">—</text>
-      <text x="80" y="98" fill="#3A5A3A" font-family="Space Mono" font-size="7" id="trk-sig">VCP HOJE: — sinais auto-registrados</text>
+      <!-- Tela PORTFOLIO STATS -->
+      <div class="screen-wrap sc-yellow" style="left:3%;top:5%;width:22%">
+        <div class="led-strip led-y"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">◈ PORTFOLIO</div>
+              <div id="sc8-rows">
+                <div class="screen-row"><span>ABERTAS</span><span id="trk-ab">—</span></div>
+                <div class="screen-row"><span>WIN RATE</span><span id="trk-wr">—</span></div>
+                <div class="screen-row"><span>P&L MED</span><span id="trk-pm">—</span></div>
+                <div class="screen-row"><span>FECHADAS</span><span id="trk-fc">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- MESA PRINCIPAL PORTFOLIO (grande centro) -->
-      <rect x="120" y="250" width="560" height="160" rx="5" fill="#C97B3E" stroke="#A55E28" stroke-width="2.5"/>
-      <rect x="127" y="406" width="560" height="14" rx="2" fill="rgba(0,0,0,0.2)"/>
-      <rect x="127" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
-      <rect x="664" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
-      <rect x="300" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
-      <rect x="484" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
+      <!-- Tela POSIÇÕES ABERTAS -->
+      <div class="screen-wrap sc-green" style="left:27%;top:5%;width:24%">
+        <div class="led-strip led-g"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">▸ ABERTAS</div>
+              <div id="sc9-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Posições na mesa como cards coloridos -->
-      <!-- Card 1 -->
-      <rect x="148" y="265" width="110" height="80" rx="4" fill="#D4EDE0" stroke="#A8D4B8" stroke-width="1.5"/>
-      <text x="203" y="284" text-anchor="middle" fill="#1A5A2A" font-family="Space Mono" font-size="8" font-weight="700" id="c1-tck">——</text>
-      <text x="203" y="298" text-anchor="middle" fill="#2D7A4A" font-family="Space Mono" font-size="11" font-weight="700" id="c1-pnl">+0.0%</text>
-      <text x="203" y="312" text-anchor="middle" fill="#4A8A5A" font-family="Space Mono" font-size="7" id="c1-dias">0 dias</text>
-      <!-- barra progresso -->
-      <rect x="156" y="324" width="94" height="5" rx="2" fill="#A8D4B8"/>
-      <rect x="156" y="324" width="47" height="5" rx="2" fill="#2D7A4A" id="c1-bar"/>
-      <!-- Card 2 -->
-      <rect x="278" y="265" width="110" height="80" rx="4" fill="#EDE4C8" stroke="#D4C890" stroke-width="1.5"/>
-      <text x="333" y="284" text-anchor="middle" fill="#5A3A08" font-family="Space Mono" font-size="8" font-weight="700" id="c2-tck">——</text>
-      <text x="333" y="298" text-anchor="middle" fill="#8A6A10" font-family="Space Mono" font-size="11" font-weight="700" id="c2-pnl">+0.0%</text>
-      <text x="333" y="312" text-anchor="middle" fill="#9A7A20" font-family="Space Mono" font-size="7" id="c2-dias">0 dias</text>
-      <rect x="286" y="324" width="94" height="5" rx="2" fill="#D4C890"/>
-      <rect x="286" y="324" width="47" height="5" rx="2" fill="#8A6A10" id="c2-bar"/>
-      <!-- Card 3 -->
-      <rect x="408" y="265" width="110" height="80" rx="4" fill="#EDD4D4" stroke="#D4A8A8" stroke-width="1.5"/>
-      <text x="463" y="284" text-anchor="middle" fill="#5A1A1A" font-family="Space Mono" font-size="8" font-weight="700" id="c3-tck">——</text>
-      <text x="463" y="298" text-anchor="middle" fill="#8A2A1A" font-family="Space Mono" font-size="11" font-weight="700" id="c3-pnl">-0.0%</text>
-      <text x="463" y="312" text-anchor="middle" fill="#9A3A2A" font-family="Space Mono" font-size="7" id="c3-dias">0 dias</text>
-      <rect x="416" y="324" width="94" height="5" rx="2" fill="#D4A8A8"/>
-      <rect x="416" y="324" width="47" height="5" rx="2" fill="#8A2A1A" id="c3-bar"/>
-      <!-- Card 4 (vazio placeholder) -->
-      <rect x="538" y="265" width="110" height="80" rx="4" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
-      <text x="593" y="305" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-family="Space Mono" font-size="7">+ novo</text>
+      <!-- Tela FECHADAS -->
+      <div class="screen-wrap sc-blue" style="left:53%;top:5%;width:24%">
+        <div class="led-strip led-b"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">★ FECHADAS</div>
+              <div id="sc10-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Cadeiras portfolio -->
-      <rect x="60" y="290" width="48" height="38" rx="22" fill="#E05A4A"/>
-      <circle cx="84" cy="360" r="7" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="74" y="362" width="3" height="13" rx="2" transform="rotate(-30,76,362)"/>
-        <rect x="79" y="362" width="3" height="13" rx="2" transform="rotate(-10,81,362)"/>
-        <rect x="84" y="362" width="3" height="13" rx="2"/>
-        <rect x="89" y="362" width="3" height="13" rx="2" transform="rotate(10,91,362)"/>
-        <rect x="94" y="362" width="3" height="13" rx="2" transform="rotate(30,96,362)"/>
-      </g>
-      <rect x="692" y="290" width="48" height="38" rx="22" fill="#5AB85A"/>
-      <circle cx="716" cy="360" r="7" fill="#5A5A6A"/>
-      <g fill="#4A4A5A">
-        <rect x="706" y="362" width="3" height="13" rx="2" transform="rotate(-30,708,362)"/>
-        <rect x="711" y="362" width="3" height="13" rx="2" transform="rotate(-10,713,362)"/>
-        <rect x="716" y="362" width="3" height="13" rx="2"/>
-        <rect x="721" y="362" width="3" height="13" rx="2" transform="rotate(10,723,362)"/>
-        <rect x="726" y="362" width="3" height="13" rx="2" transform="rotate(30,728,362)"/>
-      </g>
-
-      <!-- Plantas decor -->
-      <ellipse cx="52" cy="510" rx="25" ry="16" fill="#2A6A2A"/>
-      <ellipse cx="40" cy="500" rx="16" ry="10" fill="#3A7A3A"/>
-      <rect x="44" y="508" width="14" height="26" rx="3" fill="#8A5A2A"/>
-      <rect x="40" y="532" width="22" height="7" rx="3" fill="#A86A3A"/>
-
-      <ellipse cx="748" cy="510" rx="25" ry="16" fill="#2A6A2A"/>
-      <ellipse cx="762" cy="500" rx="16" ry="10" fill="#3A7A3A"/>
-      <rect x="742" y="508" width="14" height="26" rx="3" fill="#8A5A2A"/>
-      <rect x="738" y="532" width="22" height="7" rx="3" fill="#A86A3A"/>
-
-      <!-- Placa sala -->
-      <rect x="300" y="545" width="200" height="26" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="1.5"/>
-      <text x="400" y="562" text-anchor="middle" fill="#F5C842" font-family="Space Mono" font-size="8" font-weight="700">PORTFOLIO ROOM</text>
-    </svg>
+      <div style="position:absolute;bottom:1%;left:50%;transform:translateX(-50%);
+        background:#2A2010;border-radius:4px;padding:4px 14px;font-family:var(--pixel);
+        font-size:6px;color:#F5C842;letter-spacing:1px">PORTFOLIO ROOM</div>
+    </div>
+    <div class="r-wainscot" style="background:#E0C890;border-top-color:#8A7030"></div>
+    <div class="r-baseboard" style="background:#6A5020"></div>
+    <div class="r-floor" style="background:#8A7040"></div>
+    <div class="r-floor-stripe" style="background:#7A6030"></div>
   </div>
 
 </div><!-- /world -->
 </div><!-- /stage -->
 
 <!-- SPRITE CANVAS -->
-<canvas id="sprite-canvas" width="140" height="140"></canvas>
+<canvas id="sprite-cv" width="100" height="100"></canvas>
+
+<!-- SPEECH BALLOON -->
+<div id="balloon-wrap">
+  <div class="balloon"><div class="balloon-text" id="balloon-text">It's all a Fugazi !</div></div>
+  <div class="balloon-tail"></div>
+</div>
 
 <!-- DATA PANEL -->
 <div id="panel">
   <div id="ph">
     <span id="ph-title">TRADING FLOOR</span>
-    <button id="ph-close" onclick="closePanel()">✕</button>
+    <button id="phx" onclick="closePanel()">✕</button>
   </div>
-  <div id="pb"><div class="pempty">Carregando...</div></div>
+  <div id="pb"><div class="pmt">Carregando...</div></div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <div id="nav">
-  <button class="room-btn active r-mrs" id="btn-mrs" onclick="goRoom('mrs',this)">
-    <span class="room-icon">📊</span><span>TRADING FLOOR</span>
+  <button class="rbtn active rm" id="btn-mrs" onclick="goRoom('mrs',this)">
+    <span style="font-size:14px">📊</span><span>TRADING FLOOR</span>
   </button>
-  <button class="room-btn r-apgar" id="btn-apgar" onclick="goRoom('apgar',this)">
-    <span class="room-icon">🏆</span><span>RESEARCH ROOM</span>
+  <button class="rbtn ra" id="btn-apgar" onclick="goRoom('apgar',this)">
+    <span style="font-size:14px">🏆</span><span>RESEARCH ROOM</span>
   </button>
-  <button class="room-btn r-tracker" id="btn-tracker" onclick="goRoom('tracker',this)">
-    <span class="room-icon">💼</span><span>PORTFOLIO ROOM</span>
+  <button class="rbtn rt" id="btn-tracker" onclick="goRoom('tracker',this)">
+    <span style="font-size:14px">💼</span><span>PORTFOLIO ROOM</span>
   </button>
 </div>
-
-<!-- SPRITES -->
-<div id="fugazi-wrap">
-  <div id="fugazi-balloon"><span id="fugazi-text">It's all a Fugazi !</span></div>
-  <canvas id="fugazi-canvas"></canvas>
-</div>
-<div id="walk-sprite"></div>
-<div id="apgar-ov"><canvas id="apgar-canvas"></canvas></div>
 
 <!-- MODAL -->
-<div class="modal-ov" id="mOv" onclick="fecharModal(event)">
+<div class="mov" id="mOv" onclick="closeModal(event)">
   <div class="modal">
-    <div class="modal-title">+ REGISTRAR SINAL VCP</div>
+    <div class="mt">+ REGISTRAR SINAL VCP</div>
     <label class="fl">Ticker</label>
-    <input class="fi" id="mTicker" placeholder="ex: PETR4" style="text-transform:uppercase">
-    <div class="fr">
-      <div><label class="fl">Preço (R$)</label><input class="fi" id="mEntrada" type="number" step="0.01" placeholder="38.50"></div>
-      <div><label class="fl">Score</label><input class="fi" id="mScore" type="number" min="0" max="10" placeholder="7"></div>
+    <input class="fi" id="mTk" placeholder="PETR4" style="text-transform:uppercase">
+    <div class="fr2">
+      <div><label class="fl">Preço (R$)</label><input class="fi" id="mEn" type="number" step="0.01" placeholder="38.50"></div>
+      <div><label class="fl">Score</label><input class="fi" id="mSc" type="number" min="0" max="10" placeholder="7"></div>
     </div>
-    <div class="fr">
-      <div><label class="fl">Data</label><input class="fi" id="mData" type="date"></div>
-      <div><label class="fl">Notas</label><input class="fi" id="mNotas" placeholder="opcional"></div>
+    <div class="fr2">
+      <div><label class="fl">Data</label><input class="fi" id="mDt" type="date"></div>
+      <div><label class="fl">Notas</label><input class="fi" id="mNt" placeholder="opcional"></div>
     </div>
-    <div class="mactions">
-      <button class="btn-cn" onclick="fecharModal()">CANCELAR</button>
-      <button class="btn-ok" onclick="salvarSinal()">SALVAR</button>
+    <div class="ma">
+      <button class="bcn" onclick="closeModal()">CANCELAR</button>
+      <button class="bok" onclick="salvarSinal()">SALVAR</button>
     </div>
   </div>
 </div>
+
 <!-- LOADING -->
-<div id="loading">
-  <div id="load-title">IBOV · ASSET MANAGEMENT</div>
-  <div id="load-bar"><div id="load-fill"></div></div>
-  <div id="load-msg">INICIALIZANDO...</div>
+<div id="ld">
+  <div id="ldt">IBOV · ASSET MGMT</div>
+  <div id="ldb"><div id="ldf"></div></div>
+  <div id="ldm">INICIALIZANDO...</div>
 </div>
 
 <script>
 // ══════════════════════════════════════════════
+// FRASES DO BALÃO
+// ══════════════════════════════════════════════
+const FRASES = [
+  "It's all a Fugazi !",
+  "Volatility is my cardio.",
+  "Liquidity is a myth.",
+  "Alpha? I got beta.",
+  "Correlation just broke.",
+  "Hedged… emotionally.",
+  "Cash is a position.",
+  "Narrative > numbers.",
+  "Conviction or delusion?",
+  "Exit is for the weak.",
+  "Hope is not a strategy.",
+  "Another bag secured.",
+  "I love drawdowns.",
+  "Perfect timing. As always.",
+  "Pain is temporary. Losses are forever.",
+  "At least I'm consistent.",
+  "This market hates me.",
+  "Buy high, panic sell low.",
+  "This is fine. 🔥📉",
+  "Long term… sure.",
+  "Just a healthy correction.",
+  "Totally priced in.",
+  "Trust the process… again.",
+  "Diamond hands, empty wallet.",
+  "It's not a loss yet.",
+  "Fundamentals? Never heard of them.",
+  "Smart money already left.",
+  "Retail is exit liquidity.",
+  "Another 'once in a lifetime' dip.",
+  "This time is different.",
+  "Loading… regret.",
+  "Risk management? Nah.",
+  "All in. What could go wrong?",
+  "Just one more trade.",
+  "I did my own research.",
+  "Stonks only go up… right?",
+];
+let _lastFrase = -1;
+function pickFrase() {
+  let i;
+  do { i = Math.floor(Math.random() * FRASES.length); } while (i === _lastFrase);
+  _lastFrase = i;
+  return FRASES[i];
+}
+
+// ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
-let _dados=null, _filtro='todos', _search='', _room='mrs', _soundOn=false, _ctx=null;
-const LS='ibov_tracker_v1', TP=0.05;
+let _dados = null, _filtro = 'todos', _search = '', _room = 'mrs';
+let _snd = false, _sndCtx = null;
+const LS = 'ibov_tracker_v1', TP = 0.05;
 
 // ══════════════════════════════════════════════
 // LOADING
 // ══════════════════════════════════════════════
-function lprog(p,m){
-  document.getElementById('load-fill').style.width=p+'%';
-  if(m) document.getElementById('load-msg').textContent=m;
+function lprog(p, m) {
+  document.getElementById('ldf').style.width = p + '%';
+  if (m) document.getElementById('ldm').textContent = m;
 }
-function hideLoad(){
-  const el=document.getElementById('loading');
+function hideLoad() {
+  const el = document.getElementById('ld');
   el.classList.add('hide');
-  setTimeout(()=>el.style.display='none',600);
+  setTimeout(() => el.style.display = 'none', 600);
 }
 
 // ══════════════════════════════════════════════
-// ROOM NAVIGATION
+// ROOMS
 // ══════════════════════════════════════════════
-const ROOM_IDX={mrs:0,apgar:1,tracker:2};
-
-function goRoom(id,btn){
-  const wasRoom=_room;
-  _room=id;
-  document.querySelectorAll('.room-btn').forEach(b=>b.classList.remove('active'));
+const RIDX = { mrs: 0, apgar: 1, tracker: 2 };
+function goRoom(id, btn) {
+  _room = id;
+  document.querySelectorAll('.rbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const idx=ROOM_IDX[id]||0;
-  document.getElementById('world').style.transform='translateX(-'+(idx*100)+'vw)';
-  // Sprite triggers
-  if(id==='mrs'&&wasRoom!==id){ triggerFugazi(); playSound('swoosh'); }
-  else if(id==='apgar'&&wasRoom!==id){ triggerApgar(); playSound('chime'); }
-  else if(id==='tracker'&&wasRoom!==id){ triggerWalk(); playSound('tick'); }
+  document.getElementById('world').style.transform = 'translateX(-' + (RIDX[id] * 100) + 'vw)';
+  // Limit sprite to current room
+  updateSpriteRoomBounds();
+  // Sound
+  playSound(id === 'apgar' ? 'chime' : id === 'tracker' ? 'tick' : 'swoosh');
   // Panel
-  const p=document.getElementById('panel');
-  if(p.classList.contains('open')){
-    const titles={mrs:'📊 TRADING FLOOR',apgar:'🏆 RESEARCH ROOM',tracker:'💼 PORTFOLIO ROOM'};
-    document.getElementById('ph-title').textContent=titles[id];
+  if (document.getElementById('panel').classList.contains('open')) {
+    document.getElementById('ph-title').textContent = TITLES[id];
     renderPanel(id);
   }
 }
+const TITLES = { mrs: '📊 TRADING FLOOR', apgar: '🏆 RESEARCH ROOM', tracker: '💼 PORTFOLIO ROOM' };
 
-function openPanel(id){
-  _room=id;
-  const p=document.getElementById('panel');
-  p.classList.add('open');
-  const titles={mrs:'📊 TRADING FLOOR',apgar:'🏆 RESEARCH ROOM',tracker:'💼 PORTFOLIO ROOM'};
-  document.getElementById('ph-title').textContent=titles[id]||id;
+function openPanel(id) {
+  _room = id;
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('ph-title').textContent = TITLES[id];
   renderPanel(id);
+  updateSpriteRoomBounds(); // panel acts as right wall
 }
-function closePanel(){ document.getElementById('panel').classList.remove('open'); }
-
-// ══════════════════════════════════════════════
-// PANEL
-// ══════════════════════════════════════════════
-function renderPanel(r){
-  const b=document.getElementById('pb');
-  if(!_dados){ b.innerHTML='<div class="pempty">Aguardando dados...</div>'; return; }
-  if(r==='mrs') b.innerHTML=panelMRS(_dados);
-  else if(r==='apgar') b.innerHTML=panelAPGAR(_dados);
-  else b.innerHTML=panelTracker();
-}
-
-function panelMRS(d){
-  const s=d.sinaisHoje||[], p=d.proximosCruzar||[], rec=d.cruzamentosRecentes||[];
-  let h='<div class="ps"><div class="pstats">';
-  h+='<div class="pstat"><div class="pstat-lbl">Sinais</div><div class="pstat-val g">'+s.length+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Compras</div><div class="pstat-val g">'+s.filter(x=>x.tipo==='COMPRA').length+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Próximos</div><div class="pstat-val y">'+p.length+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Ações</div><div class="pstat-val">'+(d.totalAcoes||'—')+'</div></div>';
-  h+='</div></div>';
-  h+='<div class="ps"><div class="ps-title">Sinais de Hoje</div>';
-  if(!s.length) h+='<div class="pempty">Nenhum sinal hoje</div>';
-  else s.forEach(x=>{
-    h+='<div class="prow"><span class="pticker">'+x.ticker+'</span>';
-    h+='<span class="ppill '+(x.tipo==='COMPRA'?'buy':'sell')+'">'+x.tipo+'</span>';
-    h+='<span class="pval '+(x.mrs>=0?'g':'r')+'">MRS '+(x.mrs>=0?'+':'')+x.mrs.toFixed(1)+'%</span></div>';
-  });
-  h+='</div>';
-  h+='<div class="ps"><div class="ps-title">Próximos de Cruzar</div>';
-  if(!p.length) h+='<div class="pempty">Nenhum</div>';
-  else p.slice(0,8).forEach(x=>{
-    h+='<div class="prow"><span class="pticker">'+x.ticker+'</span>';
-    h+='<span class="pval y">falta '+x.distancia.toFixed(2)+'%</span>';
-    h+='<span class="pval '+(x.mrs>=0?'g':'r')+'">MRS '+(x.mrs>=0?'+':'')+x.mrs.toFixed(1)+'%</span></div>';
-  });
-  h+='</div>';
-  h+='<div class="ps"><div class="ps-title">Top MRS</div>';
-  (d.topMRS||[]).slice(0,10).forEach((x,i)=>{
-    h+='<div class="prow"><span style="font-size:9px;color:var(--ui-muted)">'+(i+1)+'.</span>';
-    h+='<span class="pticker">'+x.ticker+'</span>';
-    h+='<span class="pval g">'+(x.mrs>=0?'+':'')+x.mrs.toFixed(2)+'%</span></div>';
-  });
-  h+='</div>';
-  const recup=d.recuperacoes||[];
-  if(recup.length){
-    h+='<div class="ps"><div class="ps-title">Viradas</div>';
-    recup.slice(0,6).forEach(x=>{
-      h+='<div class="prow"><span class="pticker">'+x.ticker+'</span>';
-      h+='<span class="pval" style="color:var(--ui-purple)">▲ '+x.dias_subindo+'d</span>';
-      h+='<span class="pval" style="color:var(--ui-purple)">RSV '+x.dias_rsv_positivo+'d</span></div>';
-    });
-    h+='</div>';
-  }
-  return h;
-}
-
-function panelAPGAR(d){
-  if(!d.apgar) return '<div class="pempty">Sem dados APGAR</div>';
-  const r=d.apgar.resumo||{};
-  let h='<div class="ps"><div class="pstats">';
-  h+='<div class="pstat"><div class="pstat-lbl">Forte 9-10</div><div class="pstat-val g">'+(r.forte||0)+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Positivo 7-8</div><div class="pstat-val y">'+(r.positivo||0)+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Neutro 5-6</div><div class="pstat-val">'+(r.neutro||0)+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Fraco &lt;5</div><div class="pstat-val r">'+(r.fraco||0)+'</div></div>';
-  h+='</div></div>';
-  h+='<div class="ps"><div class="pfilter">';
-  ['todos','FORTE','POSITIVO','NEUTRO','FRACO'].forEach(f=>{
-    h+='<button class="pfbtn'+(_filtro===f?' active':'')+'" onclick="setFiltro(\''+f+'\',this)">'+f+'</button>';
-  });
-  h+='</div>';
-  h+='<input class="psearch" type="text" placeholder="buscar ticker..." value="'+_search+'" oninput="setSearch(this.value)"></div>';
-  let lista=d.apgar.acoes||[];
-  if(_filtro!=='todos') lista=lista.filter(a=>a.classe===_filtro);
-  if(_search) lista=lista.filter(a=>a.ticker.toLowerCase().includes(_search.toLowerCase()));
-  h+='<div class="ps"><div class="ps-title">Ações ('+lista.length+')</div>';
-  lista.slice(0,30).forEach(a=>{
-    const sc=a.score;
-    const cls=sc>=9?'s-forte':sc>=7?'s-pos':sc>=5?'s-neu':'s-frac';
-    const keys=['tendencia','estagio','forca_relativa','contracao','breakout'];
-    const dots=keys.map(k=>'<div class="pdot pd'+a.scores[k]+'"></div>').join('');
-    h+='<div class="pscore"><div class="sbadge '+cls+'">'+sc+'</div>';
-    h+='<div><div style="font-size:11px;font-weight:700;color:var(--ui-text)">'+a.ticker+'</div>';
-    h+='<div class="pdots">'+dots+'</div></div>';
-    h+='<div style="text-align:right"><div style="font-size:10px;color:var(--ui-text)">R$'+a.preco.toFixed(2)+'</div>';
-    h+='<div class="pval '+(a.mrs>=0?'g':'r')+'" style="font-size:9px">MRS '+(a.mrs>=0?'+':'')+a.mrs.toFixed(1)+'%</div></div></div>';
-  });
-  if(lista.length>30) h+='<div class="pempty" style="font-size:8px">+'+( lista.length-30)+' mais</div>';
-  h+='</div>';
-  return h;
-}
-
-function panelTracker(){
-  const pos=loadPos(), ab=pos.filter(p=>!p.fechada), fc=pos.filter(p=>p.fechada);
-  const wins=fc.filter(p=>(p.pnl_fechamento||0)>0).length;
-  const wr=fc.length?Math.round(wins/fc.length*100):null;
-  const pnls=fc.map(p=>p.pnl_fechamento||0);
-  const med=pnls.length?pnls.reduce((a,b)=>a+b,0)/pnls.length:null;
-  const tot=pnls.reduce((a,b)=>a+b,0);
-  let h='<div class="ps"><div class="pstats">';
-  h+='<div class="pstat"><div class="pstat-lbl">Abertas</div><div class="pstat-val g">'+ab.length+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">Win Rate</div><div class="pstat-val y">'+(wr!==null?wr+'%':'—')+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">P&L Médio</div><div class="pstat-val '+(med!==null&&med>=0?'g':'r')+'">'+(med!==null?(med>=0?'+':'')+med.toFixed(2)+'%':'—')+'</div></div>';
-  h+='<div class="pstat"><div class="pstat-lbl">P&L Total</div><div class="pstat-val '+(tot>=0?'g':'r')+'">'+(pnls.length?(tot>=0?'+':'')+tot.toFixed(2)+'%':'—')+'</div></div>';
-  h+='</div></div>';
-  h+='<button class="btn-add-pos" onclick="abrirModal()">+ REGISTRAR SINAL VCP</button>';
-  h+='<div class="ps"><div class="ps-title">Posições Abertas</div>';
-  if(!ab.length) h+='<div class="pempty">Nenhuma posição aberta</div>';
-  else ab.forEach(p=>{
-    const pa=p._preco_atual||p.entrada;
-    const pnl=(pa/p.entrada-1)*100;
-    const d=diasCorridos(p.data);
-    const pct=Math.min(100,Math.round(d/7*100));
-    const st=statusPos(p,pa);
-    const pc=st==='open'?'tp-open':st==='tp'?'tp-tp':'tp-ts';
-    const pl=st==='open'?'ABERTA':st==='tp'?'TP +5%':'T.STOP';
-    h+='<div class="ptrk"><span class="pticker" style="font-size:10px">'+p.ticker+'</span>';
-    h+='<div style="font-size:9px"><div>R$'+p.entrada.toFixed(2)+' → R$'+pa.toFixed(2)+'</div>';
-    h+='<div style="height:3px;background:var(--ui-brd);border-radius:2px;margin-top:3px"><div style="width:'+pct+'%;height:100%;background:'+(d>=7?'#8A2A1A':d>=5?'#8A6A10':'#2D7A4A')+';border-radius:2px"></div></div></div>';
-    h+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">';
-    h+='<span class="pval '+(pnl>=0?'g':'r')+'" style="font-size:10px;font-weight:700">'+(pnl>=0?'+':'')+pnl.toFixed(2)+'%</span>';
-    h+='<span class="tpill '+pc+'">'+pl+'</span></div></div>';
-  });
-  h+='</div>';
-  const ult=fc.slice(-8).reverse();
-  if(ult.length){
-    h+='<div class="ps"><div class="ps-title">Últimas Fechadas</div>';
-    ult.forEach(p=>{
-      const pnl=p.pnl_fechamento||0;
-      const mot=p.motivo_fechamento||'—';
-      const pc=mot==='tp'?'tp-tp':'tp-ts';
-      h+='<div class="ptrk"><span class="pticker" style="font-size:10px;opacity:.7">'+p.ticker+'</span>';
-      h+='<div style="font-size:9px;opacity:.7"><div>'+(p.dias_aberta||0)+'d · R$'+p.entrada.toFixed(2)+'</div></div>';
-      h+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">';
-      h+='<span class="pval '+(pnl>=0?'g':'r')+'" style="font-size:10px;font-weight:700;opacity:.8">'+(pnl>=0?'+':'')+pnl.toFixed(2)+'%</span>';
-      h+='<span class="tpill '+pc+'">'+mot.replace('_',' ')+'</span></div></div>';
-    });
-    h+='</div>';
-  }
-  return h;
-}
-
-function setFiltro(f,btn){
-  _filtro=f;
-  document.querySelectorAll('.pfbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(_dados) renderPanel('apgar');
-}
-function setSearch(v){_search=v; if(_dados) renderPanel('apgar');}
-
-// ══════════════════════════════════════════════
-// ISO SVG DATA UPDATE
-// ══════════════════════════════════════════════
-function updateRooms(d){
-  const s=d.sinaisHoje||[], p=d.proximosCruzar||[];
-  // Sala 1: MRS board
-  const top=s[0];
-  const compras=s.filter(x=>x.tipo==='COMPRA').length;
-  setText('mrs-tb1', top?'COMPRA: '+top.ticker:'SINAIS: '+compras);
-  setText('mrs-tb2', top?'MRS:'+(top.mrs>=0?'+':'')+top.mrs.toFixed(1)+'  RSV:'+(top.rsv>=0?'+':'')+top.rsv.toFixed(1):'SEM SINAL HOJE');
-  setText('mrs-tb3', 'PRÓX: '+p.length+' sinais');
-  setText('mrs-tb4', 'AÇÕES: '+(d.totalAcoes||'—'));
-  // Monitor 3 top MRS
-  const tm=d.topMRS||[];
-  setText('mon3-l1','1. '+(tm[0]?tm[0].ticker.padEnd(5)+'  '+(tm[0].mrs>=0?'+':'')+tm[0].mrs.toFixed(1)+'%':'——'));
-  setText('mon3-l2','2. '+(tm[1]?tm[1].ticker.padEnd(5)+'  '+(tm[1].mrs>=0?'+':'')+tm[1].mrs.toFixed(1)+'%':'——'));
-  setText('mon3-l3','3. '+(tm[2]?tm[2].ticker.padEnd(5)+'  '+(tm[2].mrs>=0?'+':'')+tm[2].mrs.toFixed(1)+'%':'——'));
-
-  // Sala 2: APGAR board
-  const ap=d.apgar||{}, res=ap.resumo||{}, acoes=ap.acoes||[];
-  const topAcao=acoes.find(a=>a.score>=7);
-  if(topAcao){
-    setText('ab-score', topAcao.score);
-    setText('ab-ticker', topAcao.ticker);
-    setText('laptop-score', topAcao.score);
-    // Barras
-    const sc=topAcao.scores;
-    setBar('ab-t', sc.tendencia/2);
-    setBar('ab-e', sc.estagio/2);
-    setBar('ab-r', sc.forca_relativa/2);
-    setBar('ab-c', sc.contracao/2);
-    setBar('ab-b', sc.breakout/2);
-  }
-  setText('ab-forte', (res.forte||'—')+' FORTE');
-  setText('ab-pos', (res.positivo||'—')+' POSITIVO');
-  setText('ab-frac', (res.fraco||'—')+' FRACO');
-  // Top VCP no laptop
-  const vcps=acoes.filter(a=>a.score>=5&&a.score<=8&&a.scores?.breakout===2&&a.mrs>0);
-  setText('apg-top1', (vcps[0]?vcps[0].ticker.padEnd(5)+'  '+vcps[0].score+'/10':'——    —/10'));
-  setText('apg-top2', (vcps[1]?vcps[1].ticker.padEnd(5)+'  '+vcps[1].score+'/10':'——    —/10'));
-  setText('apg-top3', (vcps[2]?vcps[2].ticker.padEnd(5)+'  '+vcps[2].score+'/10':'——    —/10'));
-  setText('apg-top4', (vcps[3]?vcps[3].ticker.padEnd(5)+'  '+vcps[3].score+'/10':'——    —/10'));
-
-  // Sala 3: Tracker board
-  updateTrackerRoom();
-}
-
-function updateTrackerRoom(){
-  const pos=loadPos(), ab=pos.filter(p=>!p.fechada), fc=pos.filter(p=>p.fechada);
-  const wins=fc.filter(p=>(p.pnl_fechamento||0)>0).length;
-  const wr=fc.length?Math.round(wins/fc.length*100):null;
-  const pnls=fc.map(p=>p.pnl_fechamento||0);
-  const med=pnls.length?pnls.reduce((a,b)=>a+b,0)/pnls.length:null;
-  setText('trk-ab', ab.length);
-  setText('trk-wr', wr!==null?wr+'%':'—');
-  setText('trk-pm', med!==null?(med>=0?'+':'')+med.toFixed(2)+'%':'—');
-  setText('trk-fc', fc.length);
-  // Posição nos cards visuais
-  ab.slice(0,3).forEach((p,i)=>{
-    const pa=p._preco_atual||p.entrada;
-    const pnl=(pa/p.entrada-1)*100;
-    const d=diasCorridos(p.data);
-    const pct=Math.min(100,Math.round(d/7*100));
-    const n=i+1;
-    setText('c'+n+'-tck', p.ticker);
-    const pe=document.getElementById('c'+n+'-pnl');
-    if(pe){ pe.textContent=(pnl>=0?'+':'')+pnl.toFixed(2)+'%'; pe.setAttribute('fill',pnl>=0?'#2D7A4A':'#8A2A1A'); }
-    setText('c'+n+'-dias', d+'d');
-    const bar=document.getElementById('c'+n+'-bar');
-    if(bar){ bar.setAttribute('width', Math.round(pct*0.94)); }
-  });
-}
-
-function setText(id,v){const el=document.getElementById(id); if(el) el.textContent=v;}
-function setBar(id,pct){
-  const el=document.getElementById(id); if(!el) return;
-  el.setAttribute('width', Math.round(pct*60));
-  const col=pct>=1?'#2D7A4A':pct>=0.5?'#8A6A10':'#8A2A1A';
-  el.setAttribute('fill', col);
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+  updateSpriteRoomBounds();
 }
 
 // ══════════════════════════════════════════════
-// SPRITE ENGINE — personagem unificado
+// SPRITE ENGINE
 // ══════════════════════════════════════════════
-const SPRITES={
-  walk:  {file:'sprite_walk.png', cols:4, rows:2, total:8,  fps:12},
-  idle1: {file:'sprite.png',      cols:5, rows:2, total:10, fps:11},
-  idle2: {file:'sprite2.png',     cols:5, rows:2, total:10, fps:11},
+const SP = {
+  walk:  { file: 'sprite_walk.png', cols: 4, rows: 2, total: 8,  fps: 12 },
+  idle1: { file: 'sprite.png',      cols: 5, rows: 2, total: 10, fps: 11 },
+  idle2: { file: 'sprite2.png',     cols: 5, rows: 2, total: 10, fps: 11 },
 };
-const _imgs={};
-let _spriteLoaded={walk:false,idle1:false,idle2:false};
-Object.entries(SPRITES).forEach(([k,s])=>{
-  _imgs[k]=new Image();
-  _imgs[k].onload=()=>{ _spriteLoaded[k]=true; if(Object.values(_spriteLoaded).every(Boolean)) onAllSpritesLoaded(); };
-  _imgs[k].onerror=()=>console.warn('[Sprite] '+s.file+' não encontrado');
-  _imgs[k].src=s.file;
+const _imgs = {};
+const _loaded = { walk: false, idle1: false, idle2: false };
+let _allLoaded = false;
+
+Object.entries(SP).forEach(([k, s]) => {
+  _imgs[k] = new Image();
+  _imgs[k].onload = () => {
+    _loaded[k] = true;
+    if (Object.values(_loaded).every(Boolean)) { _allLoaded = true; startChar(); }
+  };
+  _imgs[k].onerror = () => { _loaded[k] = true; if (Object.values(_loaded).every(Boolean)) { _allLoaded = true; startChar(); } };
+  _imgs[k].src = s.file;
 });
 
-// Personagem global
-const CHAR={
-  x:200, y:350,      // posição atual
-  vx:0,              // velocidade
-  dir:1,             // 1=direita, -1=esquerda
-  mode:'walk',       // 'walk'|'idle1'|'idle2'
-  frame:0,
-  frameTimer:0,
-  idleTimer:0,
-  size:140,          // tamanho de display
-  running:false,
+const CHAR = {
+  x: 200, vx: 1.4, dir: 1,
+  mode: 'walk', frame: 0, frameTick: 0,
+  size: 100,
+  minX: 0, maxX: 0,   // updated per room+panel state
+  idleTimer: null,
+  balloonTimer: null,
 };
-let _charLoop=null;
-let _charCanvas=null, _charCtx=null;
 
-function onAllSpritesLoaded(){
-  _charCanvas=document.getElementById('sprite-canvas');
-  _charCtx=_charCanvas.getContext('2d');
-  startCharLoop();
+let _cv, _cx;
+function startChar() {
+  _cv = document.getElementById('sprite-cv');
+  _cx = _cv.getContext('2d');
+  updateSpriteRoomBounds();
+  requestAnimationFrame(charLoop);
 }
 
-function startCharLoop(){
-  if(_charLoop) return;
-  CHAR.running=true;
-  const stageEl=document.getElementById('stage');
+function updateSpriteRoomBounds() {
+  const stW = document.getElementById('stage').offsetWidth;
+  const panelOpen = document.getElementById('panel').classList.contains('open');
+  const panelW = panelOpen ? 300 : 0;
+  CHAR.minX = 0;
+  CHAR.maxX = stW - panelW - CHAR.size;
+  if (CHAR.x > CHAR.maxX) CHAR.x = CHAR.maxX;
+}
 
-  function loop(){
-    if(!CHAR.running) return;
-    const stW=stageEl.offsetWidth, stH=stageEl.offsetHeight;
-    const sp=SPRITES[CHAR.mode];
-    const now=Date.now();
+window.addEventListener('resize', () => {
+  updateSpriteRoomBounds();
+  positionBalloon();
+});
 
-    // Avança frame
-    CHAR.frameTimer+=16;
-    if(CHAR.frameTimer>=Math.round(1000/sp.fps)){
-      CHAR.frameTimer=0;
-      CHAR.frame=(CHAR.frame+1)%sp.total;
-    }
+let _lastFrame = 0;
+function charLoop(ts) {
+  if (!_allLoaded) { requestAnimationFrame(charLoop); return; }
+  const dt = ts - _lastFrame; _lastFrame = ts;
 
-    // Movimento se walking
-    if(CHAR.mode==='walk'){
-      CHAR.x+=CHAR.vx;
-      // Rebate nas bordas
-      if(CHAR.x<-20){ CHAR.x=-20; CHAR.vx=Math.abs(CHAR.vx); CHAR.dir=1; }
-      if(CHAR.x>stW-CHAR.size+20){ CHAR.x=stW-CHAR.size+20; CHAR.vx=-Math.abs(CHAR.vx); CHAR.dir=-1; }
-    }
-
-    // Posiciona canvas
-    _charCanvas.style.left=CHAR.x+'px';
-    _charCanvas.style.top=(stH-CHAR.size-8)+'px'; // sempre no "chão"
-    _charCanvas.width=CHAR.size; _charCanvas.height=CHAR.size;
-
-    // Desenha frame
-    const ctx=_charCtx;
-    ctx.clearRect(0,0,CHAR.size,CHAR.size);
-    const img=_imgs[CHAR.mode];
-    if(!img||!_spriteLoaded[CHAR.mode]){ requestAnimationFrame(loop); return; }
-    const sp2=SPRITES[CHAR.mode];
-    const fw=img.naturalWidth/sp2.cols, fh=img.naturalHeight/sp2.rows;
-    const col=CHAR.frame%sp2.cols, row=Math.floor(CHAR.frame/sp2.cols);
-    ctx.save();
-    if(CHAR.dir===-1){
-      // Espelha horizontalmente
-      ctx.translate(CHAR.size,0); ctx.scale(-1,1);
-    }
-    ctx.drawImage(img, col*fw, row*fh, fw, fh, 0, 0, CHAR.size, CHAR.size);
-    ctx.restore();
-    requestAnimationFrame(loop);
+  const sp = SP[CHAR.mode];
+  CHAR.frameTick += dt;
+  const fpsDt = 1000 / sp.fps;
+  if (CHAR.frameTick >= fpsDt) {
+    CHAR.frameTick -= fpsDt;
+    CHAR.frame = (CHAR.frame + 1) % sp.total;
   }
-  requestAnimationFrame(loop);
-}
 
-function setCharMode(mode, durationMs){
-  CHAR.mode=mode; CHAR.frame=0; CHAR.frameTimer=0;
-  if(mode==='walk'){
-    // Velocidade aleatória leve
-    const speed=1.2+Math.random()*1.5;
-    CHAR.vx=CHAR.dir*speed;
+  if (CHAR.mode === 'walk') {
+    CHAR.x += CHAR.vx;
+    if (CHAR.x <= CHAR.minX) { CHAR.x = CHAR.minX; CHAR.vx = Math.abs(CHAR.vx); CHAR.dir = 1; }
+    if (CHAR.x >= CHAR.maxX) { CHAR.x = CHAR.maxX; CHAR.vx = -Math.abs(CHAR.vx); CHAR.dir = -1; }
   }
-  if(durationMs){
-    setTimeout(()=>{ CHAR.mode='walk'; CHAR.vx=CHAR.dir*(1.2+Math.random()*1.5); },durationMs);
+
+  // Draw — sprite fica em cima do chão (floor = bottom 15% da sala)
+  const stH = document.getElementById('stage').offsetHeight;
+  const floorH = Math.round(stH * 0.15);       // altura do chão
+  const groundY = 46 + stH - floorH - CHAR.size; // topo do sprite = topo do chão - altura sprite
+  _cv.style.left = CHAR.x + 'px';
+  _cv.style.top  = groundY + 'px';
+  _cv.style.bottom = 'auto';
+  _cv.width = CHAR.size; _cv.height = CHAR.size;
+
+  _cx.clearRect(0, 0, CHAR.size, CHAR.size);
+  const img = _imgs[CHAR.mode];
+  if (img && _loaded[CHAR.mode] && img.naturalWidth > 0) {
+    const fw = img.naturalWidth / sp.cols, fh = img.naturalHeight / sp.rows;
+    const col = CHAR.frame % sp.cols, row = Math.floor(CHAR.frame / sp.cols);
+    _cx.save();
+    if (CHAR.dir === -1) { _cx.translate(CHAR.size, 0); _cx.scale(-1, 1); }
+    _cx.drawImage(img, col * fw, row * fh, fw, fh, 0, 0, CHAR.size, CHAR.size);
+    _cx.restore();
   }
+
+  // Position balloon above sprite
+  positionBalloon();
+  requestAnimationFrame(charLoop);
 }
 
-// Inicia andando
-function initChar(){
-  const stW=document.getElementById('stage').offsetWidth;
-  CHAR.x=stW*0.4; CHAR.vx=1.5; CHAR.dir=1;
-  CHAR.mode='walk';
+function positionBalloon() {
+  const bw = document.getElementById('balloon-wrap');
+  if (bw.style.display === 'none') return;
+  const stH = document.getElementById('stage').offsetHeight;
+  const bwEl = bw;
+  const bHeight = bwEl.offsetHeight || 80;
+  const bWidth = bwEl.offsetWidth || 160;
+  const stW = document.getElementById('stage').offsetWidth;
+  let bx = CHAR.x + CHAR.size / 2 - bWidth / 2;
+  bx = Math.max(4, Math.min(bx, stW - bWidth - 4));
+  const floorH2 = Math.round(stH * 0.15);
+  const groundY2 = 46 + stH - floorH2 - CHAR.size;
+  const by = groundY2 - bHeight - 12;
+  bw.style.left = bx + 'px';
+  bw.style.top = by + 'px';
 }
 
-// Muda direção periodicamente + idle espontâneo
-function charAI(){
-  setInterval(()=>{
-    if(CHAR.mode==='walk'&&Math.random()<0.08){
-      // 8% chance de parar e fazer idle
-      setCharMode(Math.random()<0.5?'idle1':'idle2', 2800+Math.random()*1500);
+function showBalloon(frase, durationMs) {
+  const bw = document.getElementById('balloon-wrap');
+  document.getElementById('balloon-text').textContent = frase;
+  bw.style.display = 'flex';
+  positionBalloon();
+  if (CHAR.balloonTimer) clearTimeout(CHAR.balloonTimer);
+  CHAR.balloonTimer = setTimeout(() => { bw.style.display = 'none'; }, durationMs || 3500);
+}
+
+function triggerIdle(which) {
+  // which: 'idle1' | 'idle2' | random
+  const mode = which === 'random' ? (Math.random() < 0.5 ? 'idle1' : 'idle2') : which;
+  CHAR.mode = mode; CHAR.frame = 0; CHAR.frameTick = 0;
+  const dur = SP[mode].total / SP[mode].fps * 1000 * 2 + 500;
+  if (CHAR.idleTimer) clearTimeout(CHAR.idleTimer);
+  // Show balloon for idle2
+  if (mode === 'idle2') { showBalloon(pickFrase(), Math.max(dur - 200, 1500)); }
+  CHAR.idleTimer = setTimeout(() => {
+    CHAR.mode = 'walk'; CHAR.vx = CHAR.dir * (1.2 + Math.random() * 0.8);
+  }, dur);
+}
+
+// Spontaneous idle
+function charAI() {
+  setInterval(() => {
+    if (CHAR.mode === 'walk') {
+      const r = Math.random();
+      if (r < 0.04) triggerIdle('idle1');
+      else if (r < 0.07) triggerIdle('idle2');
+      else if (r < 0.10) { CHAR.vx = -CHAR.vx; CHAR.dir = CHAR.vx > 0 ? 1 : -1; }
     }
-    if(CHAR.mode==='walk'&&Math.random()<0.05){
-      CHAR.vx=-CHAR.vx; CHAR.dir=CHAR.vx>0?1:-1;
-    }
-  },800);
-}
-
-// Triggers de fora
-function triggerApgar(){
-  // Cobre tela com canvas separado (mantém canvas do sprite também)
-  const ov=document.getElementById('apgar-ov');
-  const canvas=document.getElementById('apgar-canvas');
-  ov.style.display='block'; ov.classList.add('visible');
-  const ctx2=canvas.getContext('2d');
-  const sp=SPRITES['idle1'];
-  const img=_imgs['idle1'];
-  if(!img||!_spriteLoaded['idle1']){ ov.style.display='none'; return; }
-  canvas.width=canvas.offsetWidth||window.innerWidth;
-  canvas.height=canvas.offsetHeight||window.innerHeight;
-  const sz=Math.max(canvas.width,canvas.height)/2;
-  let f=0, loop=0;
-  const iv=setInterval(()=>{
-    ctx2.clearRect(0,0,canvas.width,canvas.height);
-    const fw=img.naturalWidth/sp.cols, fh=img.naturalHeight/sp.rows;
-    const col=f%sp.cols, row=Math.floor(f/sp.cols);
-    ctx2.drawImage(img,col*fw,row*fh,fw,fh,(canvas.width-sz)/2,(canvas.height-sz)/2,sz,sz);
-    f++; if(f>=sp.total){f=0;loop++; if(loop>=3){clearInterval(iv);
-      ov.classList.add('slo');
-      setTimeout(()=>{ov.style.display='none';ov.classList.remove('slo','visible');},580);
-    }}
-  },Math.round(1000/sp.fps));
-  // Personagem faz idle1 também
-  setCharMode('idle1', sp.total/sp.fps*3*1000+200);
-}
-
-function triggerFugazi(){
-  const w=document.getElementById('fugazi-wrap');
-  if(!_spriteLoaded['idle2']){return;}
-  w.classList.remove('fo'); w.style.left=''; w.style.visibility='visible';
-  void w.offsetWidth; w.classList.add('fi');
-  const canvas=document.getElementById('fugazi-canvas');
-  const sp=SPRITES['idle2'], img=_imgs['idle2'];
-  const balloon=document.getElementById('fugazi-balloon');
-  canvas.width=window.innerWidth;
-  const bH=balloon.offsetHeight+40;
-  canvas.height=Math.max(window.innerHeight-48-bH,120);
-  const sz=Math.max(canvas.width,canvas.height)/2;
-  const ctx2=canvas.getContext('2d');
-  let f=0,loop=0,_hide=null;
-  const iv=setInterval(()=>{
-    ctx2.clearRect(0,0,canvas.width,canvas.height);
-    const fw=img.naturalWidth/sp.cols,fh=img.naturalHeight/sp.rows;
-    const col=f%sp.cols,row=Math.floor(f/sp.cols);
-    ctx2.drawImage(img,col*fw,row*fh,fw,fh,(canvas.width-sz)/2,(canvas.height-sz)/2,sz,sz);
-    f++; if(f>=sp.total){f=0;loop++;if(loop>=3){clearInterval(iv);
-      _hide=setTimeout(()=>{
-        w.classList.remove('fi'); w.classList.add('fo');
-        setTimeout(()=>{w.classList.remove('fo');w.style.visibility='hidden';},420);
-      },3000);
-    }}
-  },Math.round(1000/sp.fps));
-  setCharMode('idle2', sp.total/sp.fps*3*1000+3200);
-}
-
-function triggerWalk(){
-  // Personagem faz animação de walk especial (corrida rápida)
-  const stW=document.getElementById('stage').offsetWidth;
-  CHAR.x=-20; CHAR.vx=6; CHAR.dir=1;
-  setCharMode('walk');
-  // Volta ao normal após atravessar
-  setTimeout(()=>{ CHAR.vx=1.5+Math.random(); },2200);
+  }, 1000);
 }
 
 // ══════════════════════════════════════════════
-// TRACKER LOGIC
+// SCREEN DATA RENDERING
 // ══════════════════════════════════════════════
-function loadPos(){try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch{return[]}}
-function savePos(a){localStorage.setItem(LS,JSON.stringify(a))}
-function diasCorridos(ds){return Math.floor((new Date()-new Date(ds+'T00:00:00'))/86400000)}
-function statusPos(p,pa){
-  const pnl=(pa/p.entrada-1)*100, d=diasCorridos(p.data);
-  if(p.fechada) return p.motivo_fechamento||'fechada';
-  if(pnl>=TP*100) return 'tp';
-  if(d>=7) return 'time_stop';
+function setRows(id, rows) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!rows || !rows.length) { el.innerHTML = '<div class="screen-row"><span>—</span><span>—</span></div>'; return; }
+  el.innerHTML = rows.map(([a, b, c]) =>
+    '<div class="screen-row"><span>' + (a||'') + '</span><span>' + (b||'') + (c ? ' <span style="opacity:.6;font-size:7px">'+c+'</span>' : '') + '</span></div>'
+  ).join('');
+}
+
+function updateScreens(d) {
+  const s = d.sinaisHoje || [], p = d.proximosCruzar || [], tm = d.topMRS || [];
+  const ap = d.apgar || {}, acoes = ap.acoes || [];
+
+  // SC1: Compras
+  const compras = s.filter(x => x.tipo === 'COMPRA');
+  setRows('sc1-rows', compras.length
+    ? compras.slice(0, 7).map(x => [x.ticker, (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(1) + '%', 'MRS'])
+    : [['SEM COMPRAS', 'hoje', '']]
+  );
+
+  // SC2: Próximos
+  setRows('sc2-rows', p.length
+    ? p.slice(0, 7).map(x => [x.ticker, 'falta ' + x.distancia.toFixed(2) + '%', ''])
+    : [['NENHUM', '—', '']]
+  );
+
+  // SC3: Top MRS
+  setRows('sc3-rows', tm.slice(0, 7).map((x, i) =>
+    [(i + 1) + '. ' + x.ticker, (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(2) + '%', '']
+  ));
+
+  // SC4: VCP Signal
+  const vcps = acoes.filter(a => a.score >= 5 && a.score <= 8 && a.scores?.breakout === 2 && a.mrs > 0 && a.rsv > 0);
+  setRows('sc4-rows', vcps.length
+    ? vcps.slice(0, 6).map(x => [x.ticker, x.score + '/10', 'B=2'])
+    : [['SEM SINAL', 'VCP hoje', '']]
+  );
+
+  // SC5: Forte
+  const forte = acoes.filter(a => a.score >= 9);
+  setRows('sc5-rows', forte.length
+    ? forte.slice(0, 7).map(x => [x.ticker, x.score + '/10', (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(1) + '%'])
+    : [['NENHUM', '≥9 hoje', '']]
+  );
+
+  // SC6: Positivo
+  const pos = acoes.filter(a => a.score >= 7 && a.score < 9);
+  setRows('sc6-rows', pos.length
+    ? pos.slice(0, 7).map(x => [x.ticker, x.score + '/10', (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(1) + '%'])
+    : [['NENHUM', '7-8 hoje', '']]
+  );
+
+  // SC7: Neutro
+  const neu = acoes.filter(a => a.score >= 5 && a.score < 7);
+  setRows('sc7-rows', neu.length
+    ? neu.slice(0, 7).map(x => [x.ticker, x.score + '/10', (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(1) + '%'])
+    : [['NENHUM', '5-6 hoje', '']]
+  );
+
+  updateTrackerScreens();
+}
+
+function updateTrackerScreens() {
+  const pos = loadPos(), ab = pos.filter(p => !p.fechada), fc = pos.filter(p => p.fechada);
+  const wins = fc.filter(p => (p.pnl_fechamento || 0) > 0).length;
+  const wr = fc.length ? Math.round(wins / fc.length * 100) : null;
+  const pnls = fc.map(p => p.pnl_fechamento || 0);
+  const med = pnls.length ? pnls.reduce((a, b) => a + b, 0) / pnls.length : null;
+
+  setText('trk-ab', ab.length || '—');
+  setText('trk-wr', wr !== null ? wr + '%' : '—');
+  setText('trk-pm', med !== null ? (med >= 0 ? '+' : '') + med.toFixed(2) + '%' : '—');
+  setText('trk-fc', fc.length || '—');
+
+  // SC9: Abertas
+  setRows('sc9-rows', ab.length
+    ? ab.slice(0, 7).map(p => {
+        const pa = p._preco_atual || p.entrada;
+        const pnl = (pa / p.entrada - 1) * 100;
+        return [p.ticker, (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%', diasCorridos(p.data) + 'd'];
+      })
+    : [['SEM', 'posições', '']]
+  );
+
+  // SC10: Fechadas recentes
+  const ult = fc.slice(-7).reverse();
+  setRows('sc10-rows', ult.length
+    ? ult.map(p => {
+        const pnl = p.pnl_fechamento || 0;
+        return [p.ticker, (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%', p.motivo_fechamento === 'tp' ? 'TP' : 'TS'];
+      })
+    : [['SEM', 'histórico', '']]
+  );
+}
+function setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+
+// ══════════════════════════════════════════════
+// DATA PANEL
+// ══════════════════════════════════════════════
+function renderPanel(r) {
+  const b = document.getElementById('pb');
+  if (!_dados) { b.innerHTML = '<div class="pmt">Aguardando dados...</div>'; return; }
+  if (r === 'mrs') b.innerHTML = panelMRS(_dados);
+  else if (r === 'apgar') b.innerHTML = panelAPGAR(_dados);
+  else b.innerHTML = panelTrk();
+}
+
+function panelMRS(d) {
+  const s = d.sinaisHoje || [], p = d.proximosCruzar || [];
+  let h = '<div class="ps"><div class="psg">';
+  h += stat('Sinais', s.length, 'g') + stat('Compras', s.filter(x => x.tipo === 'COMPRA').length, 'g');
+  h += stat('Próximos', p.length, 'y') + stat('Ações', d.totalAcoes || '—', '');
+  h += '</div></div>';
+  h += sec('Sinais de Hoje');
+  if (!s.length) h += '<div class="pmt">Nenhum sinal hoje</div>';
+  else s.forEach(x => {
+    h += '<div class="pr"><span class="ptk">' + x.ticker + '</span>';
+    h += '<span class="ppl ' + (x.tipo === 'COMPRA' ? 'buy' : 'sel') + '">' + x.tipo + '</span>';
+    h += '<span class="pv ' + (x.mrs >= 0 ? 'g' : 'r') + '">MRS ' + (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(1) + '%</span></div>';
+  });
+  h += sec('Próximos de Cruzar');
+  if (!p.length) h += '<div class="pmt">Nenhum</div>';
+  else p.slice(0, 8).forEach(x => {
+    h += '<div class="pr"><span class="ptk">' + x.ticker + '</span>';
+    h += '<span class="pv y">falta ' + x.distancia.toFixed(2) + '%</span></div>';
+  });
+  h += sec('Top MRS');
+  (d.topMRS || []).slice(0, 10).forEach((x, i) => {
+    h += '<div class="pr"><span style="font-size:9px;color:var(--ui-mut)">' + (i + 1) + '.</span>';
+    h += '<span class="ptk">' + x.ticker + '</span>';
+    h += '<span class="pv g">' + (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(2) + '%</span></div>';
+  });
+  const rec = d.recuperacoes || [];
+  if (rec.length) {
+    h += sec('Viradas');
+    rec.slice(0, 6).forEach(x => {
+      h += '<div class="pr"><span class="ptk">' + x.ticker + '</span>';
+      h += '<span class="pv" style="color:#7A3A9A">▲ ' + x.dias_subindo + 'd RSV ' + x.dias_rsv_positivo + 'd</span></div>';
+    });
+  }
+  return h;
+}
+
+function panelAPGAR(d) {
+  if (!d.apgar) return '<div class="pmt">Sem dados APGAR</div>';
+  const r = d.apgar.resumo || {};
+  let h = '<div class="ps"><div class="psg">';
+  h += stat('Forte 9-10', r.forte || 0, 'g') + stat('Positivo 7-8', r.positivo || 0, 'y');
+  h += stat('Neutro 5-6', r.neutro || 0, '') + stat('Fraco <5', r.fraco || 0, 'r');
+  h += '</div></div>';
+  h += '<div class="ps"><div class="pfb">';
+  ['todos', 'FORTE', 'POSITIVO', 'NEUTRO', 'FRACO'].forEach(f => {
+    h += '<button class="pfbtn' + (_filtro === f ? ' active' : '') + '" onclick="setFiltro(\'' + f + '\',this)">' + f + '</button>';
+  });
+  h += '</div><input class="psrch" type="text" placeholder="buscar..." value="' + _search + '" oninput="setSearch(this.value)"></div>';
+  let lista = d.apgar.acoes || [];
+  if (_filtro !== 'todos') lista = lista.filter(a => a.classe === _filtro);
+  if (_search) lista = lista.filter(a => a.ticker.toLowerCase().includes(_search.toLowerCase()));
+  h += sec('Ações (' + lista.length + ')');
+  lista.slice(0, 30).forEach(a => {
+    const sc = a.score;
+    const cls = sc >= 9 ? 'sf' : sc >= 7 ? 'sp' : sc >= 5 ? 'sn' : 'sw';
+    const keys = ['tendencia', 'estagio', 'forca_relativa', 'contracao', 'breakout'];
+    const dots = keys.map(k => '<div class="pdt pd' + a.scores[k] + '"></div>').join('');
+    h += '<div class="pscr"><div class="sbg ' + cls + '">' + sc + '</div>';
+    h += '<div><div style="font-size:11px;font-weight:700;color:var(--ui-text)">' + a.ticker + '</div>';
+    h += '<div class="pdts">' + dots + '</div></div>';
+    h += '<div style="text-align:right"><div style="font-size:10px">R$' + a.preco.toFixed(2) + '</div>';
+    h += '<div class="pv ' + (a.mrs >= 0 ? 'g' : 'r') + '" style="font-size:9px">' + (a.mrs >= 0 ? '+' : '') + a.mrs.toFixed(1) + '%</div></div></div>';
+  });
+  if (lista.length > 30) h += '<div class="pmt" style="font-size:8px">+' + (lista.length - 30) + ' mais</div>';
+  return h;
+}
+
+function panelTrk() {
+  const pos = loadPos(), ab = pos.filter(p => !p.fechada), fc = pos.filter(p => p.fechada);
+  const wins = fc.filter(p => (p.pnl_fechamento || 0) > 0).length;
+  const wr = fc.length ? Math.round(wins / fc.length * 100) : null;
+  const pnls = fc.map(p => p.pnl_fechamento || 0);
+  const med = pnls.length ? pnls.reduce((a, b) => a + b, 0) / pnls.length : null;
+  const tot = pnls.reduce((a, b) => a + b, 0);
+  let h = '<div class="ps"><div class="psg">';
+  h += stat('Abertas', ab.length, 'g') + stat('Win Rate', wr !== null ? wr + '%' : '—', 'y');
+  h += stat('P&L Médio', med !== null ? (med >= 0 ? '+' : '') + med.toFixed(2) + '%' : '—', med !== null && med >= 0 ? 'g' : 'r');
+  h += stat('P&L Total', pnls.length ? (tot >= 0 ? '+' : '') + tot.toFixed(2) + '%' : '—', tot >= 0 ? 'g' : 'r');
+  h += '</div></div>';
+  h += '<button class="badd" onclick="abrirModal()">+ REGISTRAR SINAL VCP</button>';
+  h += sec('Posições Abertas');
+  if (!ab.length) h += '<div class="pmt">Nenhuma posição aberta</div>';
+  else ab.forEach(p => {
+    const pa = p._preco_atual || p.entrada, pnl = (pa / p.entrada - 1) * 100;
+    const d = diasCorridos(p.data), pct = Math.min(100, Math.round(d / 7 * 100));
+    const st = statusPos(p, pa);
+    const pc = st === 'open' ? 'to' : st === 'tp' ? 'tt' : 'ts';
+    const pl = st === 'open' ? 'ABERTA' : st === 'tp' ? 'TP +5%' : 'T.STOP';
+    h += '<div class="ptrk"><span class="ptk" style="font-size:10px">' + p.ticker + '</span>';
+    h += '<div style="font-size:9px"><div>R$' + p.entrada.toFixed(2) + ' → R$' + pa.toFixed(2) + '</div>';
+    h += '<div style="height:3px;background:var(--ui-brd);border-radius:2px;margin-top:3px">';
+    h += '<div style="width:' + pct + '%;height:100%;border-radius:2px;background:' + (d >= 7 ? 'var(--r)' : d >= 5 ? 'var(--y)' : 'var(--g)') + '"></div></div></div>';
+    h += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">';
+    h += '<span class="pv ' + (pnl >= 0 ? 'g' : 'r') + '" style="font-size:10px;font-weight:700">' + (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%</span>';
+    h += '<span class="tpl ' + pc + '">' + pl + '</span></div></div>';
+  });
+  const ult = fc.slice(-8).reverse();
+  if (ult.length) {
+    h += sec('Últimas Fechadas');
+    ult.forEach(p => {
+      const pnl = p.pnl_fechamento || 0, mot = p.motivo_fechamento || '—';
+      const pc = mot === 'tp' ? 'tt' : 'ts';
+      h += '<div class="ptrk"><span class="ptk" style="font-size:10px;opacity:.7">' + p.ticker + '</span>';
+      h += '<div style="font-size:9px;opacity:.7">' + (p.dias_aberta || 0) + 'd · R$' + p.entrada.toFixed(2) + '</div>';
+      h += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">';
+      h += '<span class="pv ' + (pnl >= 0 ? 'g' : 'r') + '" style="font-size:10px;font-weight:700;opacity:.8">' + (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%</span>';
+      h += '<span class="tpl ' + pc + '">' + mot.replace('_', ' ') + '</span></div></div>';
+    });
+  }
+  return h;
+}
+
+function stat(l, v, c) {
+  return '<div class="psc"><div class="psc-l">' + l + '</div><div class="psc-v ' + c + '">' + v + '</div></div>';
+}
+function sec(t) { return '<div class="ps"><div class="pst">' + t + '</div>'; }
+function setFiltro(f, btn) {
+  _filtro = f;
+  document.querySelectorAll('.pfbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (_dados) renderPanel('apgar');
+}
+function setSearch(v) { _search = v; if (_dados) renderPanel('apgar'); }
+
+// ══════════════════════════════════════════════
+// TRACKER
+// ══════════════════════════════════════════════
+function loadPos() { try { return JSON.parse(localStorage.getItem(LS) || '[]'); } catch { return []; } }
+function savePos(a) { localStorage.setItem(LS, JSON.stringify(a)); }
+function diasCorridos(ds) { return Math.floor((new Date() - new Date(ds + 'T00:00:00')) / 86400000); }
+function statusPos(p, pa) {
+  const pnl = (pa / p.entrada - 1) * 100, d = diasCorridos(p.data);
+  if (p.fechada) return p.motivo_fechamento || 'fechada';
+  if (pnl >= TP * 100) return 'tp';
+  if (d >= 7) return 'time_stop';
   return 'open';
 }
-function autoVCP(dados){
-  if(!dados?.apgar?.acoes) return;
-  const hoje=new Date().toISOString().split('T')[0];
-  const pos=loadPos(), ex=new Set(pos.filter(p=>p.data===hoje).map(p=>p.ticker));
-  dados.apgar.acoes.forEach(a=>{
-    if(a.score>=5&&a.score<=8&&a.scores?.breakout===2&&a.mrs>0&&a.rsv>0&&!ex.has(a.ticker)){
-      pos.push({id:Date.now()+'_'+a.ticker,ticker:a.ticker,entrada:a.preco,score:a.score,
-        data:hoje,notas:'VCP auto',fechada:false,_preco_atual:a.preco});
+function autoVCP(dados) {
+  if (!dados?.apgar?.acoes) return;
+  const hoje = new Date().toISOString().split('T')[0];
+  const pos = loadPos(), ex = new Set(pos.filter(p => p.data === hoje).map(p => p.ticker));
+  dados.apgar.acoes.forEach(a => {
+    if (a.score >= 5 && a.score <= 8 && a.scores?.breakout === 2 && a.mrs > 0 && a.rsv > 0 && !ex.has(a.ticker)) {
+      pos.push({ id: Date.now() + '_' + a.ticker, ticker: a.ticker, entrada: a.preco, score: a.score, data: hoje, notas: 'VCP auto', fechada: false, _preco_atual: a.preco });
       ex.add(a.ticker);
     }
   });
   savePos(pos);
 }
-function atualizaPrecos(dados){
-  if(!dados) return;
-  const pos=loadPos(); let upd=false;
-  pos.forEach(p=>{
-    if(p.fechada) return;
-    const a=(dados.apgar?.acoes||[]).find(x=>x.ticker===p.ticker);
-    if(a&&a.preco!==p._preco_atual){p._preco_atual=a.preco;upd=true;}
+function atualizaPrecos(dados) {
+  if (!dados) return;
+  const pos = loadPos(); let upd = false;
+  pos.forEach(p => {
+    if (p.fechada) return;
+    const a = (dados.apgar?.acoes || []).find(x => x.ticker === p.ticker);
+    if (a && a.preco !== p._preco_atual) { p._preco_atual = a.preco; upd = true; }
   });
-  if(upd) savePos(pos);
+  if (upd) savePos(pos);
 }
-function abrirModal(){
-  document.getElementById('mData').value=new Date().toISOString().split('T')[0];
-  ['mTicker','mEntrada','mScore','mNotas'].forEach(id=>document.getElementById(id).value='');
+function abrirModal() {
+  document.getElementById('mDt').value = new Date().toISOString().split('T')[0];
+  ['mTk', 'mEn', 'mSc', 'mNt'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mOv').classList.add('open');
-  setTimeout(()=>document.getElementById('mTicker').focus(),100);
+  setTimeout(() => document.getElementById('mTk').focus(), 100);
 }
-function fecharModal(e){
-  if(!e||e.target===document.getElementById('mOv'))
-    document.getElementById('mOv').classList.remove('open');
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('mOv')) document.getElementById('mOv').classList.remove('open');
 }
-function salvarSinal(){
-  const t=document.getElementById('mTicker').value.trim().toUpperCase();
-  const e=parseFloat(document.getElementById('mEntrada').value);
-  const sc=parseInt(document.getElementById('mScore').value)||null;
-  const d=document.getElementById('mData').value;
-  const n=document.getElementById('mNotas').value.trim();
-  if(!t||isNaN(e)||!d){alert('Ticker, preço e data são obrigatórios.');return;}
-  const pos=loadPos();
-  pos.push({id:Date.now()+'_'+t,ticker:t,entrada:e,score:sc,data:d,notas:n,fechada:false,_preco_atual:e});
-  savePos(pos); fecharModal();
-  updateTrackerRoom();
-  if(document.getElementById('panel').classList.contains('open')) renderPanel('tracker');
+function salvarSinal() {
+  const t = document.getElementById('mTk').value.trim().toUpperCase();
+  const e = parseFloat(document.getElementById('mEn').value);
+  const sc = parseInt(document.getElementById('mSc').value) || null;
+  const d = document.getElementById('mDt').value;
+  const n = document.getElementById('mNt').value.trim();
+  if (!t || isNaN(e) || !d) { alert('Ticker, preço e data são obrigatórios.'); return; }
+  const pos = loadPos();
+  pos.push({ id: Date.now() + '_' + t, ticker: t, entrada: e, score: sc, data: d, notas: n, fechada: false, _preco_atual: e });
+  savePos(pos); closeModal();
+  updateTrackerScreens();
+  if (document.getElementById('panel').classList.contains('open')) renderPanel('tracker');
+  triggerIdle('idle2');
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharModal();});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ══════════════════════════════════════════════
 // SOUND
 // ══════════════════════════════════════════════
-function initAudio(){if(!_ctx)_ctx=new(window.AudioContext||window.webkitAudioContext)();}
-function playSound(t){
-  if(!_soundOn||!_ctx) return;
-  const now=_ctx.currentTime;
-  if(t==='swoosh'){
-    const o=_ctx.createOscillator(),g=_ctx.createGain();o.connect(g);g.connect(_ctx.destination);
-    o.frequency.setValueAtTime(600,now);o.frequency.exponentialRampToValueAtTime(200,now+.2);
-    g.gain.setValueAtTime(.08,now);g.gain.exponentialRampToValueAtTime(.001,now+.25);
-    o.start(now);o.stop(now+.25);
-  } else if(t==='chime'){
-    [523,659,784].forEach((f,i)=>{
-      const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='sine';o.connect(g);g.connect(_ctx.destination);
-      o.frequency.value=f;
-      g.gain.setValueAtTime(0,now+i*.08);g.gain.linearRampToValueAtTime(.06,now+i*.08+.02);
-      g.gain.exponentialRampToValueAtTime(.001,now+i*.08+.45);
-      o.start(now+i*.08);o.stop(now+i*.08+.45);
+function initSnd() { if (!_sndCtx) _sndCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+function playSound(t) {
+  if (!_snd || !_sndCtx) return;
+  const now = _sndCtx.currentTime;
+  if (t === 'swoosh') {
+    const o = _sndCtx.createOscillator(), g = _sndCtx.createGain();
+    o.connect(g); g.connect(_sndCtx.destination);
+    o.frequency.setValueAtTime(500, now); o.frequency.exponentialRampToValueAtTime(180, now + .2);
+    g.gain.setValueAtTime(.07, now); g.gain.exponentialRampToValueAtTime(.001, now + .25);
+    o.start(now); o.stop(now + .25);
+  } else if (t === 'chime') {
+    [523, 659, 784].forEach((f, i) => {
+      const o = _sndCtx.createOscillator(), g = _sndCtx.createGain();
+      o.type = 'sine'; o.connect(g); g.connect(_sndCtx.destination);
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0, now + i * .08); g.gain.linearRampToValueAtTime(.05, now + i * .08 + .02);
+      g.gain.exponentialRampToValueAtTime(.001, now + i * .08 + .4);
+      o.start(now + i * .08); o.stop(now + i * .08 + .4);
     });
-  } else if(t==='tick'){
-    const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='square';o.connect(g);g.connect(_ctx.destination);
-    o.frequency.value=1000;g.gain.setValueAtTime(.04,now);g.gain.exponentialRampToValueAtTime(.001,now+.04);
-    o.start(now);o.stop(now+.04);
-  } else if(t==='ambient'){
-    for(let i=0;i<3;i++){
-      const dl=Math.random()*.6;
-      const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='square';o.connect(g);g.connect(_ctx.destination);
-      o.frequency.value=600+Math.random()*400;
-      g.gain.setValueAtTime(.015,now+dl);g.gain.exponentialRampToValueAtTime(.001,now+dl+.025);
-      o.start(now+dl);o.stop(now+dl+.025);
+  } else if (t === 'tick') {
+    const o = _sndCtx.createOscillator(), g = _sndCtx.createGain();
+    o.type = 'square'; o.connect(g); g.connect(_sndCtx.destination);
+    o.frequency.value = 900; g.gain.setValueAtTime(.04, now); g.gain.exponentialRampToValueAtTime(.001, now + .04);
+    o.start(now); o.stop(now + .04);
+  } else if (t === 'ambient') {
+    for (let i = 0; i < 3; i++) {
+      const dl = Math.random() * .5;
+      const o = _sndCtx.createOscillator(), g = _sndCtx.createGain();
+      o.type = 'square'; o.connect(g); g.connect(_sndCtx.destination);
+      o.frequency.value = 500 + Math.random() * 400;
+      g.gain.setValueAtTime(.012, now + dl); g.gain.exponentialRampToValueAtTime(.001, now + dl + .02);
+      o.start(now + dl); o.stop(now + dl + .02);
     }
   }
 }
-function toggleSound(){
-  initAudio(); _soundOn=!_soundOn;
-  const b=document.getElementById('snd-btn');
-  b.textContent=_soundOn?'♪ SOM ON':'♪ SOM';
-  b.classList.toggle('snd-on',_soundOn);
-  if(_soundOn) setInterval(()=>{if(_soundOn) playSound('ambient');},2800+Math.random()*1500);
+function toggleSnd() {
+  initSnd(); _snd = !_snd;
+  const b = document.getElementById('snd-btn');
+  b.textContent = _snd ? '♪ ON' : '♪ SOM';
+  b.classList.toggle('son', _snd);
+  if (_snd) setInterval(() => { if (_snd) playSound('ambient'); }, 2500 + Math.random() * 1500);
 }
 
 // ══════════════════════════════════════════════
 // API
 // ══════════════════════════════════════════════
-const DEMO={
-  _demo:true,lastUpdate:'DEMO',totalAcoes:100,
-  sinaisHoje:[
-    {ticker:'CURY3',tipo:'COMPRA',mrs:2.1,rsv:45.2,preco:22.1,dias_rsv_positivo:5,dias_rsv_negativo:0},
-    {ticker:'PETR4',tipo:'COMPRA',mrs:0.8,rsv:12.3,preco:38.5,dias_rsv_positivo:3,dias_rsv_negativo:0},
+const DEMO = {
+  _demo: true, lastUpdate: 'DEMO', totalAcoes: 100,
+  sinaisHoje: [
+    { ticker: 'CURY3', tipo: 'COMPRA', mrs: 2.1, rsv: 45.2, preco: 22.1, dias_rsv_positivo: 5, dias_rsv_negativo: 0 },
+    { ticker: 'PETR4', tipo: 'COMPRA', mrs: 0.8, rsv: 12.3, preco: 38.5, dias_rsv_positivo: 3, dias_rsv_negativo: 0 },
   ],
-  proximosCruzar:[{ticker:'VALE3',mrs:-0.8,rsv:8.1,preco:79.2,distancia:0.8,dias_rsv_positivo:2,dias_rsv_negativo:0}],
-  cruzamentosRecentes:[{ticker:'ITUB4',tipo:'COMPRA',mrs:1.2,rsv:22.4,preco:39.8,diasAtras:3,dias_rsv_positivo:8,dias_rsv_negativo:0}],
-  recuperacoes:[{ticker:'COGN3',mrs:-2.1,rsv:18.5,preco:6.2,dias_rsv_positivo:6,dias_subindo:8,quebras:0}],
-  topMRS:[
-    {ticker:'CURY3',mrs:8.4,rsv:45.2,preco:22.1,dias_rsv_positivo:5,dias_rsv_negativo:0},
-    {ticker:'WEGE3',mrs:5.1,rsv:12.0,preco:48.6,dias_rsv_positivo:3,dias_rsv_negativo:0},
-    {ticker:'PETR4',mrs:4.2,rsv:8.1,preco:38.5,dias_rsv_positivo:2,dias_rsv_negativo:0},
-    {ticker:'ITUB4',mrs:3.1,rsv:5.2,preco:39.8,dias_rsv_positivo:1,dias_rsv_negativo:0},
+  proximosCruzar: [
+    { ticker: 'VALE3', mrs: -0.8, rsv: 8.1, preco: 79.2, distancia: 0.8, dias_rsv_positivo: 2, dias_rsv_negativo: 0 },
+    { ticker: 'ITUB4', mrs: -0.4, rsv: 5.2, preco: 39.8, distancia: 0.4, dias_rsv_positivo: 1, dias_rsv_negativo: 0 },
   ],
-  topRSVConsistente:[{ticker:'VALE3',mrs:3.2,rsv:28.0,preco:79.2,dias_rsv_positivo:15}],
-  topRSVFraco:[{ticker:'MGLU3',mrs:-4.1,rsv:-32.0,preco:8.2,dias_rsv_negativo:12}],
-  apgar:{
-    resumo:{forte:2,positivo:5,neutro:18,fraco:55},
-    acoes:[
-      {ticker:'CURY3',preco:22.1,score:10,classe:'FORTE',mrs:8.4,vol_ratio:2.8,contracao:0.28,dist_ma200:16.9,stop:20.8,risco_pct:5.9,scores:{tendencia:2,estagio:2,forca_relativa:2,contracao:2,breakout:2}},
-      {ticker:'PETR4',preco:38.5,score:9,classe:'FORTE',mrs:6.1,vol_ratio:2.1,contracao:0.33,dist_ma200:12.9,stop:36.9,risco_pct:4.2,scores:{tendencia:2,estagio:2,forca_relativa:2,contracao:2,breakout:1}},
-      {ticker:'VALE3',preco:79.2,score:8,classe:'POSITIVO',mrs:3.2,vol_ratio:1.4,contracao:0.38,dist_ma200:8.1,stop:75.4,risco_pct:4.8,scores:{tendencia:2,estagio:2,forca_relativa:1,contracao:1,breakout:2}},
-      {ticker:'ITUB4',preco:39.8,score:7,classe:'POSITIVO',mrs:1.8,vol_ratio:1.1,contracao:0.42,dist_ma200:10.3,stop:37.8,risco_pct:5.0,scores:{tendencia:2,estagio:2,forca_relativa:1,contracao:1,breakout:1}},
-      {ticker:'WEGE3',preco:48.6,score:6,classe:'NEUTRO',mrs:0.5,vol_ratio:0.9,contracao:0.52,dist_ma200:19.2,stop:45.9,risco_pct:5.6,scores:{tendencia:2,estagio:1,forca_relativa:1,contracao:0,breakout:2}},
-      {ticker:'MGLU3',preco:8.2,score:3,classe:'FRACO',mrs:-4.1,vol_ratio:0.8,contracao:0.71,dist_ma200:-5.2,stop:7.6,risco_pct:7.3,scores:{tendencia:1,estagio:0,forca_relativa:0,contracao:0,breakout:2}},
+  cruzamentosRecentes: [{ ticker: 'BBAS3', tipo: 'COMPRA', mrs: 1.2, rsv: 22.4, preco: 58.2, diasAtras: 2, dias_rsv_positivo: 5, dias_rsv_negativo: 0 }],
+  recuperacoes: [{ ticker: 'COGN3', mrs: -2.1, rsv: 18.5, preco: 6.2, dias_rsv_positivo: 6, dias_subindo: 8, quebras: 0 }],
+  topMRS: [
+    { ticker: 'CURY3', mrs: 8.4, rsv: 45.2, preco: 22.1, dias_rsv_positivo: 5, dias_rsv_negativo: 0 },
+    { ticker: 'WEGE3', mrs: 5.1, rsv: 12.0, preco: 48.6, dias_rsv_positivo: 3, dias_rsv_negativo: 0 },
+    { ticker: 'PETR4', mrs: 4.2, rsv: 8.1, preco: 38.5, dias_rsv_positivo: 2, dias_rsv_negativo: 0 },
+    { ticker: 'ITUB4', mrs: 3.1, rsv: 5.2, preco: 39.8, dias_rsv_positivo: 1, dias_rsv_negativo: 0 },
+    { ticker: 'BBAS3', mrs: 2.8, rsv: 4.0, preco: 58.2, dias_rsv_positivo: 1, dias_rsv_negativo: 0 },
+  ],
+  topRSVConsistente: [{ ticker: 'VALE3', mrs: 3.2, rsv: 28.0, preco: 79.2, dias_rsv_positivo: 15 }],
+  topRSVFraco: [{ ticker: 'MGLU3', mrs: -4.1, rsv: -32.0, preco: 8.2, dias_rsv_negativo: 12 }],
+  apgar: {
+    resumo: { forte: 2, positivo: 5, neutro: 18, fraco: 55 },
+    acoes: [
+      { ticker: 'CURY3', preco: 22.1, score: 10, classe: 'FORTE',    mrs: 8.4,  rsv: 45.2, vol_ratio: 2.8, contracao: 0.28, dist_ma200: 16.9, stop: 20.8, risco_pct: 5.9, scores: { tendencia: 2, estagio: 2, forca_relativa: 2, contracao: 2, breakout: 2 } },
+      { ticker: 'PETR4', preco: 38.5, score: 9,  classe: 'FORTE',    mrs: 6.1,  rsv: 12.3, vol_ratio: 2.1, contracao: 0.33, dist_ma200: 12.9, stop: 36.9, risco_pct: 4.2, scores: { tendencia: 2, estagio: 2, forca_relativa: 2, contracao: 2, breakout: 1 } },
+      { ticker: 'VALE3', preco: 79.2, score: 8,  classe: 'POSITIVO', mrs: 3.2,  rsv: 8.1,  vol_ratio: 1.4, contracao: 0.38, dist_ma200: 8.1,  stop: 75.4, risco_pct: 4.8, scores: { tendencia: 2, estagio: 2, forca_relativa: 1, contracao: 1, breakout: 2 } },
+      { ticker: 'ITUB4', preco: 39.8, score: 7,  classe: 'POSITIVO', mrs: 1.8,  rsv: 5.2,  vol_ratio: 1.1, contracao: 0.42, dist_ma200: 10.3, stop: 37.8, risco_pct: 5.0, scores: { tendencia: 2, estagio: 2, forca_relativa: 1, contracao: 1, breakout: 1 } },
+      { ticker: 'WEGE3', preco: 48.6, score: 6,  classe: 'NEUTRO',   mrs: 0.5,  rsv: 2.1,  vol_ratio: 0.9, contracao: 0.52, dist_ma200: 19.2, stop: 45.9, risco_pct: 5.6, scores: { tendencia: 2, estagio: 1, forca_relativa: 1, contracao: 0, breakout: 2 } },
+      { ticker: 'MGLU3', preco: 8.2,  score: 3,  classe: 'FRACO',    mrs: -4.1, rsv: -32.0, vol_ratio: 0.8, contracao: 0.71, dist_ma200: -5.2, stop: 7.6, risco_pct: 7.3,  scores: { tendencia: 1, estagio: 0, forca_relativa: 0, contracao: 0, breakout: 2 } },
     ]
   }
 };
 
-async function atualizarDados(t=1,m=3){
-  lprog(30+t*20,'CONECTANDO...');
-  try{
-    const r=await fetch('/api/screener',{cache:'default'});
-    if(r.status===404) throw new Error('API 404');
-    if(!r.ok) throw new Error('Erro '+r.status);
-    const d=await r.json();
-    if(d.error&&d.retry){
-      document.getElementById('updateTime').innerHTML='<span style="color:orange">⏳'+d.error+'</span>';
-      if(t<m) setTimeout(()=>atualizarDados(t+1,m),10000);
+async function atualizarDados(t = 1, m = 3) {
+  lprog(30 + t * 20, 'CONECTANDO...');
+  try {
+    const r = await fetch('/api/screener', { cache: 'default' });
+    if (r.status === 404) throw new Error('API 404');
+    if (!r.ok) throw new Error('Erro ' + r.status);
+    const d = await r.json();
+    if (d.error && d.retry) {
+      document.getElementById('updT').innerHTML = '<span style="color:orange">⏳ ' + d.error + '</span>';
+      if (t < m) setTimeout(() => atualizarDados(t + 1, m), 10000);
       return;
     }
     onLoad(d);
-  }catch(e){
+  } catch (e) {
     console.error(e);
-    document.getElementById('updateTime').innerHTML='⚠ DEMO';
+    document.getElementById('updT').innerHTML = '⚠ DEMO';
     onLoad(DEMO);
   }
 }
 
-function onLoad(d){
-  _dados=d;
-  lprog(100,'SISTEMAS ONLINE');
-  document.getElementById('updateTime').textContent=d._demo?'⚠ DEMO':(d.lastUpdate||'—');
-  if(!d._demo){ autoVCP(d); atualizaPrecos(d); }
-  updateRooms(d);
-  updateTrackerRoom();
-  if(document.getElementById('panel').classList.contains('open')) renderPanel(_room);
+function onLoad(d) {
+  _dados = d;
+  lprog(100, 'ONLINE');
+  document.getElementById('updT').textContent = d._demo ? '⚠ DEMO' : (d.lastUpdate || '—');
+  if (!d._demo) { autoVCP(d); atualizaPrecos(d); }
+  updateScreens(d);
+  if (document.getElementById('panel').classList.contains('open')) renderPanel(_room);
   playSound('ambient');
-  setTimeout(hideLoad,500);
+  setTimeout(hideLoad, 400);
 }
 
-async function forceUpdate(ev){
-  const b=ev.currentTarget; b.disabled=true; b.textContent='⏳';
-  triggerFugazi(); playSound('swoosh');
-  try{
-    const r=await fetch('/api/screener?force='+Date.now(),{cache:'no-store'});
-    if(!r.ok) throw new Error();
-    onLoad(await r.json()); b.textContent='✅';
-  }catch(e){b.textContent='❌';}
-  finally{setTimeout(()=>{b.textContent='↻ UPDATE';b.disabled=false;},2000);}
+async function forceUpdate(ev) {
+  const b = ev.currentTarget; b.disabled = true; b.textContent = '⏳';
+  triggerIdle('idle2');
+  try {
+    const r = await fetch('/api/screener?force=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error();
+    onLoad(await r.json()); b.textContent = '✅';
+  } catch (e) { b.textContent = '❌'; }
+  finally { setTimeout(() => { b.textContent = '↻ UPDATE'; b.disabled = false; }, 2000); }
 }
 
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
-  lprog(10,'INICIALIZANDO...');
-  setTimeout(()=>lprog(40,'CARREGANDO SPRITES...'),200);
-  // Adiciona listeners nas salas para abrir panel
-  ['mrs','apgar','tracker'].forEach(r=>{
-    document.getElementById('room-'+r).addEventListener('click',()=>openPanel(r));
+document.addEventListener('DOMContentLoaded', () => {
+  lprog(10, 'CARREGANDO...');
+  setTimeout(() => lprog(40, 'SPRITES...'), 200);
+
+  // Room clicks open panel
+  document.querySelectorAll('.room').forEach(r => {
+    r.addEventListener('click', () => openPanel(r.id.replace('room-', '')));
   });
+
   initChar();
   charAI();
   atualizarDados();
 });
+function initChar() {
+  const stW = document.getElementById('stage').offsetWidth;
+  CHAR.x = stW * 0.35; CHAR.vx = 1.4; CHAR.dir = 1;
+}
 </script>
 </body>
 </html>
