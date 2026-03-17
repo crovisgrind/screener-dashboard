@@ -6,211 +6,229 @@
 <title>IBOV · Asset Management</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet">
 <style>
+/* ── PALETA ── */
 :root {
-  --bg:#080a0f; --surface:#0f1218; --surf2:#151b24; --border:#1e2738;
-  --text:#dce6f5; --muted:#4a5568; --dim:#2a3548;
-  --green:#00f0a0; --yellow:#f5c842; --red:#ff3d5a; --blue:#4d9eff; --purple:#a78bfa;
-  --mono:'Space Mono',monospace; --pixel:'Press Start 2P',monospace;
+  --floor:    #6B7FA3;
+  --floor2:   #7B8FB5;
+  --wall:     #D4845A;
+  --wall-dk:  #B86A3C;
+  --desk:     #C97B3E;
+  --desk-dk:  #A55E28;
+  --win-bg:   #A8D4E6;
+  --win-fr:   #6A9AB4;
+  --mon:      #2A2A3A;
+  --screen:   #C8ECD8;
+  --paper:    #F8F4EC;
+  --shadow:   rgba(0,0,0,.18);
+  --tile:     #7B8FB5;
+  --red-ch:   #E05A4A;
+  --grn-ch:   #5AB85A;
+  --blu-ch:   #4AB8D4;
+  --shelf:    #B87040;
+
+  --ui-bg:    #F5EFE6;
+  --ui-surf:  #EDE6DA;
+  --ui-brd:   #C8B89A;
+  --ui-text:  #2A1F14;
+  --ui-muted: #7A6A58;
+  --ui-green: #2D7A4A;
+  --ui-yellow:#8A6A10;
+  --ui-red:   #8A2A1A;
+  --ui-blue:  #1A5A8A;
+  --ui-purple:#5A3A8A;
+  --mono: 'Space Mono', monospace;
+  --pixel: 'Press Start 2P', monospace;
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px}
+html,body{height:100%;overflow:hidden;background:#3A3028;font-family:var(--mono);font-size:12px}
 
 /* ── TOPBAR ── */
 #topbar{
   position:fixed;top:0;left:0;right:0;z-index:200;
-  height:52px;background:rgba(8,10,15,.97);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
-  backdrop-filter:blur(12px);
+  height:48px;background:var(--ui-bg);border-bottom:2px solid var(--ui-brd);
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
 }
-#topbar .logo{font-family:var(--pixel);font-size:9px;color:var(--green);letter-spacing:1px;display:flex;align-items:center;gap:10px}
-.logo-led{width:6px;height:6px;border-radius:50%;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-#topbar .right{display:flex;align-items:center;gap:12px}
-.update-info{text-align:right;font-size:9px;color:var(--muted)}
-.update-info span{color:var(--text);font-size:10px}
-.btn-refresh{background:transparent;border:1px solid var(--border);color:var(--muted);
-  padding:5px 12px;border-radius:4px;font-family:var(--pixel);font-size:7px;cursor:pointer;
-  transition:.2s;letter-spacing:.5px}
-.btn-refresh:hover{border-color:var(--green);color:var(--green)}
+.logo{font-family:var(--pixel);font-size:7px;color:var(--ui-text);display:flex;align-items:center;gap:8px}
+.logo-dot{width:7px;height:7px;border-radius:50%}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.update-info{font-size:9px;color:var(--ui-muted);text-align:right}
+.update-info b{color:var(--ui-text);font-size:10px}
+.btn-top{background:var(--ui-surf);border:2px solid var(--ui-brd);color:var(--ui-text);
+  padding:4px 12px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer;
+  transition:.15s;letter-spacing:.5px}
+.btn-top:hover{background:var(--ui-brd);border-color:var(--ui-text)}
+.btn-top.snd-on{border-color:var(--ui-green);color:var(--ui-green)}
 
-/* ── NAV ROOMS ── */
-#nav-rooms{
+/* ── BOTTOM NAV ── */
+#nav{
   position:fixed;bottom:0;left:0;right:0;z-index:200;
-  height:54px;background:rgba(8,10,15,.97);border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;gap:0;
+  height:50px;background:var(--ui-bg);border-top:2px solid var(--ui-brd);
+  display:flex;align-items:stretch;
 }
 .room-btn{
-  font-family:var(--pixel);font-size:7px;padding:0 28px;height:100%;border:none;
-  background:transparent;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;
-  transition:.2s;letter-spacing:.5px;position:relative;top:1px;
-  display:flex;align-items:center;gap:8px;
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--pixel);font-size:6px;letter-spacing:.5px;
+  background:transparent;border:none;border-top:3px solid transparent;
+  color:var(--ui-muted);cursor:pointer;transition:.15s;
 }
-.room-btn:hover{color:var(--text)}
-.room-btn.active{color:var(--text);border-bottom-color:var(--green)}
-.room-btn.active.room-apgar{border-bottom-color:var(--purple)}
-.room-btn.active.room-tracker{border-bottom-color:var(--yellow)}
-.room-dot{width:8px;height:8px;border-radius:2px;background:var(--muted);transition:.2s}
-.room-btn.active .room-dot{background:var(--green)}
-.room-btn.active.room-apgar .room-dot{background:var(--purple)}
-.room-btn.active.room-tracker .room-dot{background:var(--yellow)}
+.room-btn:hover{background:var(--ui-surf);color:var(--ui-text)}
+.room-btn.active{color:var(--ui-text);background:var(--ui-surf)}
+.room-btn.active.r-mrs{border-top-color:#2D7A4A}
+.room-btn.active.r-apgar{border-top-color:#5A3A8A}
+.room-btn.active.r-tracker{border-top-color:#8A6A10}
+.room-icon{font-size:14px}
 
-/* ── ISO STAGE ── */
+/* ── STAGE ── */
 #stage{
-  position:fixed;top:52px;left:0;right:0;bottom:54px;
-  overflow:hidden;
+  position:fixed;top:48px;left:0;right:0;bottom:50px;
+  overflow:hidden;background:#3A3028;
 }
-#iso-world{
-  width:100%;height:100%;
-  cursor:grab;
-  transition:transform .7s cubic-bezier(0.22,1,0.36,1);
+#world{
+  height:100%;display:flex;
+  transition:transform .65s cubic-bezier(0.22,1,0.36,1);
+  transform:translateX(0);
+  image-rendering:pixelated;
 }
-#iso-world:active{cursor:grabbing}
 
-/* ── SVG ISO ── */
-#iso-svg{display:block;width:100%;height:100%}
+/* ── ROOMS ── */
+.room{
+  flex-shrink:0;width:100vw;height:100%;
+  position:relative;overflow:hidden;
+  image-rendering:pixelated;
+}
+.room-svg{width:100%;height:100%;display:block;image-rendering:pixelated}
 
-/* ── OVERLAY PANEL ── */
-#data-panel{
-  position:fixed;right:0;top:52px;bottom:54px;
-  width:360px;z-index:150;
-  background:rgba(8,10,15,.95);border-left:1px solid var(--border);
+/* ── SPRITE CANVAS ── */
+#sprite-canvas{
+  position:fixed;z-index:190;
+  pointer-events:none;
+  image-rendering:pixelated;
+}
+
+/* ── DATA PANEL ── */
+#panel{
+  position:fixed;right:0;top:48px;bottom:50px;width:320px;z-index:150;
+  background:var(--ui-bg);border-left:2px solid var(--ui-brd);
   display:flex;flex-direction:column;
   transform:translateX(100%);
   transition:transform .4s cubic-bezier(0.22,1,0.36,1);
-  backdrop-filter:blur(12px);
 }
-#data-panel.open{transform:translateX(0)}
-#panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-#panel-title{font-family:var(--pixel);font-size:9px;letter-spacing:1px}
-#panel-close{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;line-height:1}
-#panel-close:hover{color:var(--text)}
-#panel-body{flex:1;overflow-y:auto;padding:16px 20px}
-#panel-body::-webkit-scrollbar{width:4px}
-#panel-body::-webkit-scrollbar-track{background:transparent}
-#panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#panel.open{transform:translateX(0)}
+#ph{padding:12px 16px;border-bottom:2px solid var(--ui-brd);display:flex;align-items:center;justify-content:space-between;background:var(--ui-surf)}
+#ph-title{font-family:var(--pixel);font-size:7px;color:var(--ui-text)}
+#ph-close{background:transparent;border:none;color:var(--ui-muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:3px}
+#ph-close:hover{background:var(--ui-brd);color:var(--ui-text)}
+#pb{flex:1;overflow-y:auto;padding:14px 16px}
+#pb::-webkit-scrollbar{width:4px}
+#pb::-webkit-scrollbar-track{background:var(--ui-surf)}
+#pb::-webkit-scrollbar-thumb{background:var(--ui-brd);border-radius:2px}
 
-/* ── PANEL CONTENT STYLES ── */
-.p-section{margin-bottom:20px}
-.p-section-title{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.p-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.p-stat{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
-.p-stat-label{font-size:7px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
-.p-stat-value{font-size:18px;font-weight:700;line-height:1}
-.p-stat-value.g{color:var(--green)}.p-stat-value.y{color:var(--yellow)}.p-stat-value.r{color:var(--red)}
-.p-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(30,39,56,.4)}
-.p-row:last-child{border-bottom:none}
-.p-ticker{font-size:11px;font-weight:700}
-.p-val{font-size:10px}.p-val.g{color:var(--green)}.p-val.r{color:var(--red)}.p-val.y{color:var(--yellow)}
-.p-pill{font-size:8px;padding:2px 7px;border-radius:3px;font-weight:700}
-.p-pill.buy{background:rgba(0,240,160,.12);color:var(--green);border:1px solid rgba(0,240,160,.25)}
-.p-pill.sell{background:rgba(255,61,90,.1);color:var(--red);border:1px solid rgba(255,61,90,.2)}
-.p-score-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,39,56,.4)}
-.p-score-badge{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
-.score-forte{background:rgba(0,240,160,.1);color:var(--green);border:1px solid rgba(0,240,160,.25)}
-.score-pos{background:rgba(245,200,66,.1);color:var(--yellow);border:1px solid rgba(245,200,66,.2)}
-.score-neu{background:rgba(220,230,245,.05);color:var(--text);border:1px solid var(--border)}
-.score-frac{background:rgba(255,61,90,.07);color:var(--red);border:1px solid rgba(255,61,90,.15)}
-.p-dots{display:flex;gap:3px}
-.p-dot{width:7px;height:7px;border-radius:2px}
-.pd2{background:var(--green)}.pd1{background:var(--yellow)}.pd0{background:var(--dim)}
-.p-trk-row{display:grid;grid-template-columns:70px 1fr 60px 56px;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(30,39,56,.4)}
-.p-trk-pill{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:700;text-align:center}
-.pill-open{background:rgba(0,240,160,.1);color:var(--green)}
-.pill-tp{background:rgba(77,158,255,.1);color:var(--blue)}
-.pill-ts{background:rgba(90,100,120,.1);color:var(--muted)}
-.p-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.p-f-btn{font-size:7px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:.2s;font-family:var(--mono)}
-.p-f-btn:hover,.p-f-btn.active{border-color:var(--text);color:var(--text);background:var(--surf2)}
-.p-search{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:10px;color:var(--text);outline:none;margin-bottom:12px}
-.p-search:focus{border-color:var(--blue)}
-.btn-add{background:rgba(0,240,160,.08);border:1px solid rgba(0,240,160,.2);color:var(--green);
-  padding:6px 12px;border-radius:4px;font-family:var(--pixel);font-size:7px;cursor:pointer;width:100%;margin-bottom:8px}
-.p-empty{color:var(--muted);font-size:9px;text-align:center;padding:24px 0}
+/* ── PANEL CONTENT ── */
+.ps{margin-bottom:16px}
+.ps-title{font-size:8px;color:var(--ui-muted);letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--ui-brd)}
+.pstats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.pstat{background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:5px;padding:8px 10px}
+.pstat-lbl{font-size:7px;color:var(--ui-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.pstat-val{font-size:16px;font-weight:700;line-height:1;color:var(--ui-text)}
+.pstat-val.g{color:var(--ui-green)}.pstat-val.y{color:var(--ui-yellow)}.pstat-val.r{color:var(--ui-red)}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(90,70,50,.1)}
+.prow:last-child{border-bottom:none}
+.pticker{font-size:11px;font-weight:700;color:var(--ui-text)}
+.pval{font-size:10px}.pval.g{color:var(--ui-green)}.pval.r{color:var(--ui-red)}.pval.y{color:var(--ui-yellow)}
+.ppill{font-size:7px;padding:2px 7px;border-radius:3px;font-weight:700}
+.ppill.buy{background:#D4EDE0;color:var(--ui-green);border:1px solid #A8D4B8}
+.ppill.sell{background:#EDD4D4;color:var(--ui-red);border:1px solid #D4A8A8}
+.pscore{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(90,70,50,.1)}
+.pscore:last-child{border-bottom:none}
+.sbadge{width:34px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.s-forte{background:#D4EDE0;color:var(--ui-green);border:1px solid #A8D4B8}
+.s-pos{background:#EDE4C8;color:var(--ui-yellow);border:1px solid #D4C890}
+.s-neu{background:var(--ui-surf);color:var(--ui-text);border:1px solid var(--ui-brd)}
+.s-frac{background:#EDD4D4;color:var(--ui-red);border:1px solid #D4A8A8}
+.pdots{display:flex;gap:3px;margin-top:3px}
+.pdot{width:7px;height:7px;border-radius:2px}
+.pd2{background:#2D7A4A}.pd1{background:#8A6A10}.pd0{background:#C8B89A}
+.pfilter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.pfbtn{font-size:7px;padding:3px 9px;border-radius:12px;border:1px solid var(--ui-brd);
+  background:transparent;color:var(--ui-muted);cursor:pointer;transition:.15s;font-family:var(--mono)}
+.pfbtn:hover,.pfbtn.active{background:var(--ui-surf);border-color:var(--ui-text);color:var(--ui-text)}
+.psearch{width:100%;background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:4px;
+  padding:5px 9px;font-family:var(--mono);font-size:10px;color:var(--ui-text);outline:none;margin-bottom:10px}
+.psearch:focus{border-color:var(--ui-blue)}
+.btn-add-pos{width:100%;background:var(--ui-surf);border:2px solid var(--ui-green);color:var(--ui-green);
+  padding:7px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer;margin-bottom:10px;
+  letter-spacing:.5px;transition:.15s}
+.btn-add-pos:hover{background:#D4EDE0}
+.ptrk{display:grid;grid-template-columns:70px 1fr 58px;align-items:center;gap:6px;
+  padding:6px 0;border-bottom:1px solid rgba(90,70,50,.1)}
+.ptrk:last-child{border-bottom:none}
+.tpill{font-size:7px;padding:2px 5px;border-radius:3px;font-weight:700;text-align:center}
+.tp-open{background:#D4EDE0;color:var(--ui-green)}
+.tp-tp{background:#D4E0ED;color:var(--ui-blue)}
+.tp-ts{background:var(--ui-surf);color:var(--ui-muted)}
+.pempty{color:var(--ui-muted);font-size:9px;text-align:center;padding:20px 0}
 
 /* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:320px}
-.modal-title{font-family:var(--pixel);font-size:8px;letter-spacing:1px;margin-bottom:16px;color:var(--green)}
-.f-label{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
-.f-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-family:var(--mono);font-size:10px;color:var(--text);outline:none;margin-bottom:10px}
-.f-input:focus{border-color:var(--green)}
-.f-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.modal-actions{display:flex;gap:8px;margin-top:12px}
-.btn-ok{flex:1;background:var(--green);color:#080a0f;border:none;padding:9px;border-radius:6px;font-family:var(--pixel);font-size:7px;cursor:pointer}
-.btn-cancel{flex:1;background:transparent;border:1px solid var(--border);color:var(--muted);padding:9px;border-radius:6px;font-family:var(--pixel);font-size:7px;cursor:pointer}
-
-/* ── ISO TILES CSS (glow effects) ── */
-.monitor-glow{filter:drop-shadow(0 0 6px rgba(0,240,160,.5))}
-.monitor-glow-y{filter:drop-shadow(0 0 6px rgba(245,200,66,.4))}
-.monitor-glow-p{filter:drop-shadow(0 0 6px rgba(167,139,250,.5))}
-.lamp-flicker{animation:lamp 3s ease-in-out infinite}
-@keyframes lamp{0%,95%,100%{opacity:.9}96%{opacity:.5}97%{opacity:.9}98%{opacity:.6}99%{opacity:.9}}
-
-/* ── SPRITES ── */
-.sprite-wrap{position:absolute;pointer-events:none}
-
-/* ── TOOLTIP ── */
-#tooltip{
-  position:fixed;z-index:250;
-  background:var(--surface);border:1px solid var(--border);border-radius:6px;
-  padding:8px 12px;font-size:9px;color:var(--text);
-  pointer-events:none;display:none;max-width:180px;
-  box-shadow:0 4px 16px rgba(0,0,0,.5);
-}
-
-/* ── SOUND TOGGLE ── */
-#snd-btn{background:transparent;border:1px solid var(--border);color:var(--muted);
-  padding:5px 10px;border-radius:4px;font-size:9px;cursor:pointer;transition:.2s}
-#snd-btn:hover{border-color:var(--blue);color:var(--blue)}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(50,40,30,.6);z-index:300;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--ui-bg);border:2px solid var(--ui-brd);border-radius:8px;padding:20px;width:300px}
+.modal-title{font-family:var(--pixel);font-size:7px;color:var(--ui-green);margin-bottom:14px}
+.fl{font-size:8px;color:var(--ui-muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.fi{width:100%;background:var(--ui-surf);border:1px solid var(--ui-brd);border-radius:4px;
+  padding:6px 9px;font-family:var(--mono);font-size:10px;color:var(--ui-text);outline:none;margin-bottom:9px}
+.fi:focus{border-color:var(--ui-green)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mactions{display:flex;gap:8px;margin-top:10px}
+.btn-ok{flex:1;background:var(--ui-green);color:white;border:none;padding:8px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer}
+.btn-cn{flex:1;background:transparent;border:1px solid var(--ui-brd);color:var(--ui-muted);padding:8px;border-radius:4px;font-family:var(--pixel);font-size:6px;cursor:pointer}
 
 /* ── LOADING ── */
-#loading-screen{
-  position:fixed;inset:0;z-index:500;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-  transition:opacity .5s;
+#loading{
+  position:fixed;inset:0;z-index:500;
+  background:var(--ui-bg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;transition:opacity .5s;
 }
-#loading-screen.hide{opacity:0;pointer-events:none}
-#loading-title{font-family:var(--pixel);font-size:10px;color:var(--green);letter-spacing:2px}
-#loading-bar-bg{width:200px;height:4px;background:var(--border);border-radius:2px}
-#loading-bar-fill{height:100%;border-radius:2px;background:var(--green);width:0;transition:width .3s}
-#loading-msg{font-size:8px;color:var(--muted);letter-spacing:1px}
+#loading.hide{opacity:0;pointer-events:none}
+#load-title{font-family:var(--pixel);font-size:9px;color:var(--ui-green);letter-spacing:2px}
+#load-bar{width:200px;height:6px;background:var(--ui-brd);border-radius:3px;overflow:hidden}
+#load-fill{height:100%;background:var(--ui-green);width:0;transition:width .3s;border-radius:3px}
+#load-msg{font-size:8px;color:var(--ui-muted);letter-spacing:1px}
 
-/* ── SPRITE ANIMATIONS ── */
-#apgar-sprite-overlay{display:none;position:fixed;inset:0;z-index:400;pointer-events:none;background:transparent;visibility:hidden}
-#apgar-sprite-overlay[style*="block"]{visibility:visible}
-#apgar-sprite-canvas{position:absolute;inset:0;width:100%;height:100%}
-#apgar-sprite-overlay.slide-left-out{animation:slideLeftOut .55s cubic-bezier(.55,0,1,.45) forwards}
-@keyframes slideLeftOut{0%{transform:translateX(0);opacity:1}100%{transform:translateX(-110vw);opacity:0}}
-
-#fugazi-container{
-  position:fixed;top:52px;left:-110vw;width:100vw;z-index:390;
+/* ── FUGAZI ── */
+#fugazi-wrap{
+  position:fixed;top:48px;left:-110vw;width:100vw;z-index:185;
   pointer-events:none;visibility:hidden;
   display:flex;flex-direction:column;align-items:center;
   transition:left .45s cubic-bezier(.22,1,.36,1);
 }
-#fugazi-container.slide-in{left:0;visibility:visible}
-#fugazi-container.slide-out{left:110vw;visibility:visible;transition:left .4s cubic-bezier(.55,0,1,.45)}
+#fugazi-wrap.fi{left:0;visibility:visible}
+#fugazi-wrap.fo{left:110vw;visibility:visible;transition:left .4s cubic-bezier(.55,0,1,.45)}
 #fugazi-balloon{
-  position:relative;background:#fff;border:4px solid #111;border-radius:28px;
-  padding:12px 22px;margin:10px 20px 0;max-width:min(88vw,520px);
-  box-shadow:5px 5px 0 #111;
+  position:relative;background:#fff;border:4px solid #333;border-radius:24px;
+  padding:10px 20px;margin:8px 20px 0;max-width:min(88vw,500px);
+  box-shadow:4px 4px 0 #333;
 }
-#fugazi-balloon::after{content:'';position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
-  border-left:14px solid transparent;border-right:14px solid transparent;border-top:22px solid #111}
-#fugazi-balloon::before{content:'';position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
-  border-left:11px solid transparent;border-right:11px solid transparent;border-top:18px solid #fff;z-index:1}
-#fugazi-text{font-family:'Bangers','Impact',cursive;font-size:clamp(22px,5vw,38px);color:#111;
-  letter-spacing:2px;text-align:center;text-shadow:2px 2px 0 #ddd;white-space:nowrap}
-#fugazi-canvas{display:block;width:100vw}
-
-#walk-sprite{position:fixed;bottom:70px;left:-160px;width:140px;height:140px;z-index:395;
+#fugazi-balloon::after{content:'';position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);
+  border:12px solid transparent;border-top-color:#333}
+#fugazi-balloon::before{content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
+  border:10px solid transparent;border-top-color:#fff;z-index:1}
+#fugazi-text{font-family:'Bangers',cursive;font-size:clamp(20px,5vw,36px);color:#333;
+  letter-spacing:2px;text-align:center;text-shadow:2px 2px 0 #ddd}
+#fugazi-canvas{display:block;width:100vw;image-rendering:pixelated}
+#walk-sprite{position:fixed;bottom:58px;width:140px;height:140px;z-index:188;
   pointer-events:none;visibility:hidden;
   image-rendering:pixelated;background-image:url('sprite_walk.png');background-repeat:no-repeat}
+#apgar-ov{display:none;position:fixed;inset:0;z-index:400;pointer-events:none;visibility:hidden}
+#apgar-ov.visible{visibility:visible}
+#apgar-canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#apgar-ov.slo{animation:slo .55s cubic-bezier(.55,0,1,.45) forwards}
+@keyframes slo{from{transform:translateX(0);opacity:1}to{transform:translateX(-110vw);opacity:0}}
 
 @media(max-width:600px){
-  #data-panel{width:100%;border-left:none;border-top:1px solid var(--border)}
-  .room-btn{padding:0 16px;font-size:6px}
+  #panel{width:100%;border-left:none;border-top:2px solid var(--ui-brd)}
+  .room-btn span{display:none}
 }
 </style>
 </head>
@@ -219,1009 +237,1118 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <!-- TOPBAR -->
 <div id="topbar">
   <div class="logo">
-    <span class="logo-led" style="background:var(--green)"></span>
-    <span class="logo-led" style="background:var(--yellow);animation-delay:.4s"></span>
-    <span class="logo-led" style="background:var(--red);animation-delay:.8s"></span>
-    IBOV·ASSET·MGMT
+    <div class="logo-dot" style="background:#2D7A4A"></div>
+    <div class="logo-dot" style="background:#8A6A10"></div>
+    <div class="logo-dot" style="background:#8A2A1A"></div>
+    IBOV ASSET MGMT
   </div>
-  <div class="right">
-    <div class="update-info">
-      <div style="font-size:8px;letter-spacing:1px">ÚLTIMA ATUALIZAÇÃO</div>
-      <span id="updateTime">—</span>
-    </div>
-    <button id="snd-btn" onclick="toggleSound()">♪ SOM</button>
-    <button class="btn-refresh" onclick="forceUpdate(event)">↻ UPDATE</button>
+  <div class="topbar-right">
+    <div class="update-info">ÚLTIMA ATT: <b id="updateTime">—</b></div>
+    <button class="btn-top" id="snd-btn" onclick="toggleSound()">♪ SOM</button>
+    <button class="btn-top" onclick="forceUpdate(event)">↻ UPDATE</button>
   </div>
 </div>
 
-<!-- ISO STAGE -->
+<!-- STAGE + WORLD + ROOMS -->
 <div id="stage">
-  <div id="iso-world">
-    <svg id="iso-svg" viewBox="0 0 2400 900" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <!-- Pixel font via SVG filter for crisp rendering -->
-        <filter id="pixel" color-interpolation-filters="sRGB">
-          <feComponentTransfer><feFuncA type="discrete" tableValues="0 1"/></feComponentTransfer>
-        </filter>
-        <!-- Monitor screen glow -->
-        <filter id="glow-g" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glow-p" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glow-y" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <!-- Lamp light -->
-        <radialGradient id="lamp1" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#00f0a0" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#00f0a0" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="lamp2" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="lamp3" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#f5c842" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#f5c842" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
+<div id="world">
 
-      <!-- ═══════════════════════════════════════════════ -->
-      <!-- SALA 1 — TRADING FLOOR (MRS·RSV) x=0           -->
-      <!-- ═══════════════════════════════════════════════ -->
-      <g id="room-mrs" transform="translate(0,0)">
-        <!-- Luz ambiente -->
-        <ellipse cx="400" cy="300" rx="380" ry="260" fill="url(#lamp1)" class="lamp-flicker"/>
-
-        <!-- Piso isométrico 8x6 tiles -->
-        <!-- Tile base: parallelogram iso -->
-        <!-- Row 0 -->
-        <polygon points="100,500 300,400 500,500 300,600" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="300,400 500,300 700,400 500,500" fill="#0b1a11" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="500,300 700,200 900,300 700,400" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="700,200 900,100 1100,200 900,300" fill="#0b1a11" stroke="#0d2015" stroke-width="1"/>
-        <!-- Row 1 -->
-        <polygon points="100,600 300,500 500,600 300,700" fill="#0b1a11" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="300,500 500,400 700,500 500,600" fill="#0c1c12" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="500,400 700,300 900,400 700,500" fill="#0b1a11" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="700,300 900,200 1100,300 900,400" fill="#0c1c12" stroke="#0d2015" stroke-width="1"/>
-        <!-- Row 2 -->
-        <polygon points="100,700 300,600 500,700 300,800" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="300,600 500,500 700,600 500,700" fill="#0b1a11" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="500,500 700,400 900,500 700,600" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="700,400 900,300 1100,400 900,500" fill="#0b1a11" stroke="#0d2015" stroke-width="1"/>
-
-        <!-- Parede esquerda (norte) -->
-        <polygon points="100,500 900,100 900,0 100,400" fill="#060e08" stroke="#0d2015" stroke-width="1"/>
-        <!-- Parede direita (leste) -->
-        <polygon points="900,100 1100,200 1100,400 900,300" fill="#050d07" stroke="#0d2015" stroke-width="1"/>
-        <!-- Teto parcial -->
-        <polygon points="100,400 900,0 1100,100 300,500" fill="#080f09" stroke="#0d2015" stroke-width="0.5" opacity="0.6"/>
-
-        <!-- LUMINÁRIA 1 -->
-        <g class="lamp-flicker">
-          <line x1="500" y1="0" x2="500" y2="80" stroke="#1e3828" stroke-width="2"/>
-          <rect x="460" y="80" width="80" height="12" rx="3" fill="#1a3020" stroke="#00f0a040" stroke-width="1"/>
-          <rect x="462" y="82" width="76" height="8" rx="2" fill="#00f0a0" opacity="0.7" filter="url(#glow-g)"/>
-        </g>
-
-        <!-- MESA TRADING 1 (esquerda) -->
-        <!-- Tampa da mesa -->
-        <polygon points="160,460 360,360 460,410 260,510" fill="#0f2218" stroke="#1e3828" stroke-width="1.5"/>
-        <!-- Lateral esquerda -->
-        <polygon points="160,460 260,510 260,560 160,510" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-        <!-- Lateral direita -->
-        <polygon points="460,410 260,510 260,560 460,460" fill="#09160e" stroke="#0d2015" stroke-width="1"/>
-
-        <!-- Monitor 1A -->
-        <g filter="url(#glow-g)" id="mon-mrs-1">
-          <!-- Base monitor -->
-          <polygon points="190,430 290,380 330,400 230,450" fill="#0a1a10" stroke="#00f0a060" stroke-width="1.5"/>
-          <!-- Tela -->
-          <polygon points="195,427 290,378 325,396 230,445" fill="#001a0e"/>
-          <!-- Gráfico MRS animado -->
-          <polyline id="mrs-chart-1" points="200,440 218,430 230,435 248,420 265,425 280,415" fill="none" stroke="#00f0a0" stroke-width="1.5" stroke-linecap="round"/>
-          <!-- Label -->
-          <text x="255" y="413" fill="#00f0a0" font-family="Space Mono" font-size="6" font-weight="700">MRS</text>
-        </g>
-
-        <!-- Monitor 1B -->
-        <g filter="url(#glow-g)" id="mon-mrs-2">
-          <polygon points="250,400 350,350 390,370 290,420" fill="#0a1a10" stroke="#00f0a060" stroke-width="1.5"/>
-          <polygon points="255,397 350,348 385,366 290,415" fill="#001a0e"/>
-          <polyline id="mrs-chart-2" points="260,410 275,402 288,406 302,396 318,400 330,390" fill="none" stroke="#f5c842" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="315" y="384" fill="#f5c842" font-family="Space Mono" font-size="6" font-weight="700">RSV</text>
-        </g>
-
-        <!-- Cadeira -->
-        <polygon points="230,530 310,490 350,510 270,550" fill="#0d1f15" stroke="#1e3828" stroke-width="1"/>
-        <polygon points="230,530 270,550 270,580 230,560" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-
-        <!-- MESA TRADING 2 (direita) -->
-        <polygon points="540,390 740,290 840,340 640,440" fill="#0f2218" stroke="#1e3828" stroke-width="1.5"/>
-        <polygon points="540,390 640,440 640,490 540,440" fill="#0a1810" stroke="#0d2015" stroke-width="1"/>
-        <polygon points="840,340 640,440 640,490 840,390" fill="#09160e" stroke="#0d2015" stroke-width="1"/>
-
-        <!-- Monitor 2A -->
-        <g filter="url(#glow-g)" id="mon-mrs-3">
-          <polygon points="570,360 670,310 710,330 610,380" fill="#0a1a10" stroke="#00f0a060" stroke-width="1.5"/>
-          <polygon points="575,357 670,308 705,326 610,375" fill="#001a0e"/>
-          <polyline id="mrs-chart-3" points="580,368 595,360 608,364 622,354 638,358 650,348" fill="none" stroke="#00f0a0" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="635" y="344" fill="#00f0a0" font-family="Space Mono" font-size="6" font-weight="700">SIG</text>
-        </g>
-
-        <!-- Ticker board na parede -->
-        <g id="ticker-board">
-          <rect x="300" y="50" width="380" height="120" rx="4" fill="#060e08" stroke="#1e3828" stroke-width="1.5"/>
-          <rect x="304" y="54" width="372" height="112" rx="2" fill="#001a0e" filter="url(#glow-g)"/>
-          <!-- Tickers dinâmicos -->
-          <text id="tb-line1" x="318" y="88" fill="#00f0a0" font-family="Space Mono" font-size="11" font-weight="700">COMPRA: —</text>
-          <text id="tb-line2" x="318" y="108" fill="#f5c842" font-family="Space Mono" font-size="9">MRS: — | RSV: —</text>
-          <text id="tb-line3" x="318" y="126" fill="#4a5568" font-family="Space Mono" font-size="8">PRÓX: — sinais</text>
-          <text id="tb-line4" x="318" y="146" fill="#2a3548" font-family="Space Mono" font-size="8">ANALISADAS: — ações</text>
-        </g>
-
-        <!-- Sprite analista sala 1 (sprite2.png) -->
-        <g id="sprite-mrs-analyst" transform="translate(420,480)">
-          <rect width="1" height="1" fill="none"/><!-- placeholder para sprite canvas -->
-        </g>
-
-        <!-- Placa da sala -->
-        <g transform="translate(800,180)">
-          <rect x="0" y="0" width="140" height="30" rx="4" fill="#0a1810" stroke="#00f0a040" stroke-width="1"/>
-          <text x="70" y="20" text-anchor="middle" fill="#00f0a080" font-family="Space Mono" font-size="8" font-weight="700">TRADING FLOOR</text>
-        </g>
-
-        <!-- Clickable zone -->
-        <rect x="100" y="0" width="1000" height="900" fill="transparent" id="zone-mrs" cursor="pointer"
-          onclick="openPanel('mrs')"/>
+  <!-- SALA 1: TRADING FLOOR -->
+  <div class="room" id="room-mrs">
+    <svg class="room-svg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid slice">
+      <!-- FUNDO/PISO -->
+      <rect width="800" height="580" fill="#6B7FA3"/>
+      <!-- Sombras de tile no piso -->
+      <g opacity="0.18" fill="none" stroke="#3A4A68" stroke-width="0.8">
+        <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
+        <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
+        <line x1="0" y1="500" x2="800" y2="500"/>
+        <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
+        <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
+        <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
+        <line x1="700" y1="0" x2="700" y2="580"/>
+      </g>
+      <!-- Tile pattern text -->
+      <g font-family="Space Mono" font-size="8" fill="#7B8FB5" opacity="0.5">
+        <text x="50" y="175">CCr</text><text x="250" y="275">CCr</text>
+        <text x="450" y="175">CCr</text><text x="650" y="275">CCr</text>
+        <text x="150" y="375">CCr</text><text x="350" y="475">CCr</text>
+        <text x="550" y="375">CCr</text><text x="750" y="475">CCr</text>
       </g>
 
-      <!-- ═══════════════════════════════════════════════ -->
-      <!-- SALA 2 — RESEARCH ROOM (APGAR) x=800           -->
-      <!-- ═══════════════════════════════════════════════ -->
-      <g id="room-apgar" transform="translate(800,0)">
-        <!-- Luz ambiente roxa -->
-        <ellipse cx="400" cy="300" rx="380" ry="260" fill="url(#lamp2)" class="lamp-flicker" style="animation-delay:1.2s"/>
+      <!-- PAREDE NORTE -->
+      <rect x="0" y="0" width="800" height="110" fill="#D4845A"/>
+      <rect x="0" y="105" width="800" height="8" fill="#B86A3C"/>
 
-        <!-- Piso roxo -->
-        <polygon points="100,500 300,400 500,500 300,600" fill="#0e0a1a" stroke="#18142a" stroke-width="1"/>
-        <polygon points="300,400 500,300 700,400 500,500" fill="#100c1c" stroke="#18142a" stroke-width="1"/>
-        <polygon points="500,300 700,200 900,300 700,400" fill="#0e0a1a" stroke="#18142a" stroke-width="1"/>
-        <polygon points="700,200 900,100 1100,200 900,300" fill="#100c1c" stroke="#18142a" stroke-width="1"/>
-        <polygon points="100,600 300,500 500,600 300,700" fill="#100c1c" stroke="#18142a" stroke-width="1"/>
-        <polygon points="300,500 500,400 700,500 500,600" fill="#0c0818" stroke="#18142a" stroke-width="1"/>
-        <polygon points="500,400 700,300 900,400 700,500" fill="#100c1c" stroke="#18142a" stroke-width="1"/>
-        <polygon points="700,300 900,200 1100,300 900,400" fill="#0c0818" stroke="#18142a" stroke-width="1"/>
-        <polygon points="100,700 300,600 500,700 300,800" fill="#0e0a1a" stroke="#18142a" stroke-width="1"/>
-        <polygon points="300,600 500,500 700,600 500,700" fill="#100c1c" stroke="#18142a" stroke-width="1"/>
-        <polygon points="500,500 700,400 900,500 700,600" fill="#0e0a1a" stroke="#18142a" stroke-width="1"/>
-        <polygon points="700,400 900,300 1100,400 900,500" fill="#100c1c" stroke="#18142a" stroke-width="1"/>
+      <!-- JANELA (esquerda) -->
+      <rect x="40" y="15" width="240" height="75" rx="3" fill="#B86A3C"/>
+      <rect x="44" y="19" width="232" height="67" rx="2" fill="#A8D4E6"/>
+      <!-- Reflexo janela -->
+      <rect x="50" y="22" width="70" height="58" fill="rgba(255,255,255,0.25)" rx="1"/>
+      <rect x="128" y="22" width="70" height="58" fill="rgba(255,255,255,0.2)" rx="1"/>
+      <rect x="206" y="22" width="66" height="58" fill="rgba(255,255,255,0.22)" rx="1"/>
+      <!-- Divisões janela -->
+      <line x1="122" y1="19" x2="122" y2="86" stroke="#6A9AB4" stroke-width="3"/>
+      <line x1="200" y1="19" x2="200" y2="86" stroke="#6A9AB4" stroke-width="3"/>
+      <!-- Parapeito -->
+      <rect x="38" y="86" width="244" height="12" fill="#B86A3C"/>
+      <rect x="30" y="96" width="260" height="8" fill="#C97B3E"/>
 
-        <!-- Paredes -->
-        <polygon points="100,500 900,100 900,0 100,400" fill="#080510" stroke="#18142a" stroke-width="1"/>
-        <polygon points="900,100 1100,200 1100,400 900,300" fill="#06040e" stroke="#18142a" stroke-width="1"/>
+      <!-- CAIXAS (esquerda parede) -->
+      <rect x="30" y="108" width="55" height="45" rx="2" fill="#C97B3E" stroke="#A55E28" stroke-width="1.5"/>
+      <rect x="30" y="148" width="55" height="25" rx="2" fill="#A55E28" stroke="#8A4A1C" stroke-width="1.5"/>
+      <rect x="38" y="115" width="40" height="5" fill="#A55E28" opacity="0.5"/>
 
-        <!-- LUMINÁRIA roxa -->
-        <g class="lamp-flicker" style="animation-delay:.8s">
-          <line x1="500" y1="0" x2="500" y2="80" stroke="#28203a" stroke-width="2"/>
-          <rect x="460" y="80" width="80" height="12" rx="3" fill="#2a1a40" stroke="#a78bfa40" stroke-width="1"/>
-          <rect x="462" y="82" width="76" height="8" rx="2" fill="#a78bfa" opacity="0.6" filter="url(#glow-p)"/>
-        </g>
-
-        <!-- QUADRO BRANCO APGAR -->
-        <g id="apgar-board">
-          <!-- Frame do quadro -->
-          <polygon points="150,350 450,200 520,235 220,385" fill="#f0f0f0" stroke="#c8c0e0" stroke-width="2"/>
-          <polygon points="152,348 448,200 516,234 220,382" fill="#fafaf8"/>
-          <!-- Título no quadro -->
-          <text transform="rotate(-27,300,290)" x="200" y="230" fill="#2a1a40" font-family="Space Mono" font-size="9" font-weight="700">APGAR SCORE</text>
-          <!-- Barras de score (serão atualizadas) -->
-          <g id="apgar-board-content" transform="rotate(-27,300,290)">
-            <text x="180" y="250" fill="#4a3a80" font-family="Space Mono" font-size="7">T ██░░</text>
-            <text x="180" y="262" fill="#4a3a80" font-family="Space Mono" font-size="7">E ████</text>
-            <text x="180" y="274" fill="#4a3a80" font-family="Space Mono" font-size="7">R ██░░</text>
-            <text x="180" y="286" fill="#4a3a80" font-family="Space Mono" font-size="7">C ░░░░</text>
-            <text x="180" y="298" fill="#4a3a80" font-family="Space Mono" font-size="7">B ████</text>
-          </g>
-          <!-- Suporte quadro -->
-          <polygon points="150,350 220,385 220,400 150,365" fill="#d0c8e8" stroke="#c8c0e0" stroke-width="1"/>
-        </g>
-
-        <!-- MESA RESEARCH -->
-        <polygon points="450,430 650,330 750,380 550,480" fill="#1a1430" stroke="#28203a" stroke-width="1.5"/>
-        <polygon points="450,430 550,480 550,530 450,480" fill="#130f24" stroke="#18142a" stroke-width="1"/>
-        <polygon points="750,380 550,480 550,530 750,430" fill="#100c20" stroke="#18142a" stroke-width="1"/>
-
-        <!-- Laptop APGAR -->
-        <g filter="url(#glow-p)" id="mon-apgar">
-          <polygon points="480,400 580,350 620,370 520,420" fill="#1a1430" stroke="#a78bfa60" stroke-width="1.5"/>
-          <polygon points="485,396 578,348 614,366 521,414" fill="#0d0818"/>
-          <!-- Score display -->
-          <text x="535" y="376" text-anchor="middle" fill="#a78bfa" font-family="Space Mono" font-size="14" font-weight="700" id="apgar-score-display">7</text>
-          <text x="535" y="390" text-anchor="middle" fill="#a78bfa80" font-family="Space Mono" font-size="6">SCORE</text>
-          <!-- Tampa laptop parcial -->
-          <polygon points="480,400 580,350 580,390 480,440" fill="#120d20" stroke="#28203a" stroke-width="1"/>
-        </g>
-
-        <!-- Livros na estante (parede) -->
-        <g transform="translate(600,60)">
-          <rect x="0" y="0" width="12" height="60" rx="1" fill="#4a3a80" stroke="#28203a" stroke-width="0.5"/>
-          <rect x="14" y="5" width="10" height="55" rx="1" fill="#2a5a40" stroke="#28203a" stroke-width="0.5"/>
-          <rect x="26" y="2" width="13" height="58" rx="1" fill="#5a3020" stroke="#28203a" stroke-width="0.5"/>
-          <rect x="41" y="8" width="10" height="52" rx="1" fill="#4a2050" stroke="#28203a" stroke-width="0.5"/>
-          <rect x="53" y="0" width="12" height="60" rx="1" fill="#1a4060" stroke="#28203a" stroke-width="0.5"/>
-        </g>
-
-        <!-- Placa APGAR -->
-        <g transform="translate(800,180)">
-          <rect x="0" y="0" width="140" height="30" rx="4" fill="#0e0a1a" stroke="#a78bfa40" stroke-width="1"/>
-          <text x="70" y="20" text-anchor="middle" fill="#a78bfa80" font-family="Space Mono" font-size="8" font-weight="700">RESEARCH ROOM</text>
-        </g>
-
-        <!-- Ticker board FORTE count -->
-        <g id="apgar-stats-board">
-          <rect x="720" y="50" width="200" height="90" rx="4" fill="#0e0a1a" stroke="#28203a" stroke-width="1.5"/>
-          <rect x="722" y="52" width="196" height="86" rx="2" fill="#0a0614" filter="url(#glow-p)"/>
-          <text x="820" y="78" text-anchor="middle" fill="#a78bfa" font-family="Space Mono" font-size="10" font-weight="700" id="apgar-forte-cnt">—</text>
-          <text x="820" y="94" text-anchor="middle" fill="#a78bfa60" font-family="Space Mono" font-size="7">FORTE 9-10</text>
-          <text x="820" y="112" text-anchor="middle" fill="#f5c84280" font-family="Space Mono" font-size="7" id="apgar-pos-cnt">— POSITIVO</text>
-          <text x="820" y="128" text-anchor="middle" fill="#4a506880" font-family="Space Mono" font-size="7" id="apgar-frac-cnt">— FRACO</text>
-        </g>
-
-        <!-- Clickable zone -->
-        <rect x="100" y="0" width="1000" height="900" fill="transparent" id="zone-apgar" cursor="pointer"
-          onclick="openPanel('apgar')"/>
+      <!-- ESTANTE/GABINETE (direita) -->
+      <rect x="540" y="108" width="240" height="90" rx="3" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
+      <!-- Gavetas -->
+      <rect x="545" y="113" width="110" height="37" rx="2" fill="#B87040" stroke="#A55E28" stroke-width="1"/>
+      <rect x="545" y="154" width="110" height="37" rx="2" fill="#B87040" stroke="#A55E28" stroke-width="1"/>
+      <!-- Puxadores -->
+      <rect x="593" y="129" width="14" height="6" rx="3" fill="#A55E28"/>
+      <rect x="593" y="170" width="14" height="6" rx="3" fill="#A55E28"/>
+      <!-- Pastas coloridas dir -->
+      <g transform="translate(660,115)">
+        <rect x="0"  y="0" width="13" height="32" rx="1" fill="#E05A4A"/><rect x="14" y="0" width="13" height="32" rx="1" fill="#E8A030"/>
+        <rect x="28" y="0" width="13" height="32" rx="1" fill="#E8D030"/><rect x="42" y="0" width="13" height="32" rx="1" fill="#58B848"/>
+        <rect x="56" y="0" width="13" height="32" rx="1" fill="#4AB8D4"/><rect x="70" y="0" width="13" height="32" rx="1" fill="#8848C8"/>
+        <rect x="84" y="0" width="13" height="32" rx="1" fill="#E848A0"/>
+        <!-- Passas coloridas row 2 -->
+        <rect x="0"  y="35" width="13" height="30" rx="1" fill="#4AB8D4"/><rect x="14" y="35" width="13" height="30" rx="1" fill="#E05A4A"/>
+        <rect x="28" y="35" width="13" height="30" rx="1" fill="#58B848"/><rect x="42" y="35" width="13" height="30" rx="1" fill="#E8A030"/>
+        <rect x="56" y="35" width="13" height="30" rx="1" fill="#8848C8"/><rect x="70" y="35" width="13" height="30" rx="1" fill="#E8D030"/>
+        <rect x="84" y="35" width="13" height="30" rx="1" fill="#E848A0"/>
       </g>
 
-      <!-- ═══════════════════════════════════════════════ -->
-      <!-- SALA 3 — PORTFOLIO ROOM (TRACKER) x=1600       -->
-      <!-- ═══════════════════════════════════════════════ -->
-      <g id="room-tracker" transform="translate(1600,0)">
-        <!-- Luz ambiente amarela -->
-        <ellipse cx="400" cy="300" rx="380" ry="260" fill="url(#lamp3)" class="lamp-flicker" style="animation-delay:2s"/>
-
-        <!-- Piso amarelado -->
-        <polygon points="100,500 300,400 500,500 300,600" fill="#1a1608" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="300,400 500,300 700,400 500,500" fill="#1c180a" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="500,300 700,200 900,300 700,400" fill="#1a1608" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="700,200 900,100 1100,200 900,300" fill="#1c180a" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="100,600 300,500 500,600 300,700" fill="#1c180a" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="300,500 500,400 700,500 500,600" fill="#181408" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="500,400 700,300 900,400 700,500" fill="#1c180a" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="700,300 900,200 1100,300 900,400" fill="#181408" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="100,700 300,600 500,700 300,800" fill="#1a1608" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="300,600 500,500 700,600 500,700" fill="#1c180a" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="500,500 700,400 900,500 700,600" fill="#1a1608" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="700,400 900,300 1100,400 900,500" fill="#1c180a" stroke="#2a2210" stroke-width="1"/>
-
-        <!-- Paredes -->
-        <polygon points="100,500 900,100 900,0 100,400" fill="#0e0c04" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="900,100 1100,200 1100,400 900,300" fill="#0c0a04" stroke="#2a2210" stroke-width="1"/>
-
-        <!-- LUMINÁRIA amarela -->
-        <g class="lamp-flicker" style="animation-delay:1.6s">
-          <line x1="500" y1="0" x2="500" y2="80" stroke="#3a3010" stroke-width="2"/>
-          <rect x="460" y="80" width="80" height="12" rx="3" fill="#2a2008" stroke="#f5c84240" stroke-width="1"/>
-          <rect x="462" y="82" width="76" height="8" rx="2" fill="#f5c842" opacity="0.6" filter="url(#glow-y)"/>
-        </g>
-
-        <!-- MESA PRINCIPAL PORTFOLIO -->
-        <polygon points="200,460 500,310 650,385 350,535" fill="#1e1a08" stroke="#3a3010" stroke-width="2"/>
-        <polygon points="200,460 350,535 350,590 200,515" fill="#181408" stroke="#2a2210" stroke-width="1"/>
-        <polygon points="650,385 350,535 350,590 650,440" fill="#141206" stroke="#2a2210" stroke-width="1"/>
-
-        <!-- Cards de posição na mesa -->
-        <g id="tracker-cards">
-          <!-- Card 1 -->
-          <g filter="url(#glow-g)" id="card-1">
-            <polygon points="220,440 340,380 380,400 260,460" fill="#0a1a10" stroke="#00f0a050" stroke-width="1"/>
-            <text id="card1-ticker" transform="rotate(-27,300,415)" x="260" y="418" fill="#00f0a0" font-family="Space Mono" font-size="8" font-weight="700">——</text>
-            <text id="card1-pnl" transform="rotate(-27,300,415)" x="260" y="430" fill="#00f0a080" font-family="Space Mono" font-size="7">+0.00%</text>
-          </g>
-          <!-- Card 2 -->
-          <g filter="url(#glow-y)" id="card-2">
-            <polygon points="340,380 460,320 500,340 380,400" fill="#1a1408" stroke="#f5c84250" stroke-width="1"/>
-            <text id="card2-ticker" transform="rotate(-27,420,355)" x="375" y="358" fill="#f5c842" font-family="Space Mono" font-size="8" font-weight="700">——</text>
-            <text id="card2-pnl" transform="rotate(-27,420,355)" x="375" y="370" fill="#f5c84280" font-family="Space Mono" font-size="7">+0.00%</text>
-          </g>
-          <!-- Card 3 (negativo) -->
-          <g id="card-3">
-            <polygon points="460,325 570,268 600,282 490,340" fill="#1a0a08" stroke="#ff3d5a30" stroke-width="1"/>
-            <text id="card3-ticker" transform="rotate(-27,530,302)" x="484" y="305" fill="#ff3d5a" font-family="Space Mono" font-size="8" font-weight="700">——</text>
-            <text id="card3-pnl" transform="rotate(-27,530,302)" x="484" y="317" fill="#ff3d5a60" font-family="Space Mono" font-size="7">-0.00%</text>
-          </g>
-        </g>
-
-        <!-- P&L BOARD na parede -->
-        <g id="pnl-board">
-          <rect x="300" y="40" width="300" height="130" rx="4" fill="#0e0c04" stroke="#3a3010" stroke-width="1.5"/>
-          <rect x="302" y="42" width="296" height="126" rx="2" fill="#080600" filter="url(#glow-y)"/>
-          <text x="450" y="68" text-anchor="middle" fill="#f5c842" font-family="Space Mono" font-size="9" font-weight="700">PORTFOLIO</text>
-          <text x="340" y="90" fill="#4a5060" font-family="Space Mono" font-size="8">ABERTAS</text>
-          <text id="trk-abertas" x="550" y="90" text-anchor="end" fill="#00f0a0" font-family="Space Mono" font-size="11" font-weight="700">—</text>
-          <text x="340" y="110" fill="#4a5060" font-family="Space Mono" font-size="8">WIN RATE</text>
-          <text id="trk-winrate" x="550" y="110" text-anchor="end" fill="#f5c842" font-family="Space Mono" font-size="11" font-weight="700">—</text>
-          <text x="340" y="130" fill="#4a5060" font-family="Space Mono" font-size="8">P&amp;L MED</text>
-          <text id="trk-pnlmed" x="550" y="130" text-anchor="end" fill="#00f0a0" font-family="Space Mono" font-size="11" font-weight="700">—</text>
-          <text x="340" y="150" fill="#4a5060" font-family="Space Mono" font-size="8">FECHADAS</text>
-          <text id="trk-fechadas" x="550" y="150" text-anchor="end" fill="#4a5068" font-family="Space Mono" font-size="11" font-weight="700">—</text>
-        </g>
-
-        <!-- Placa TRACKER -->
-        <g transform="translate(800,180)">
-          <rect x="0" y="0" width="160" height="30" rx="4" fill="#1a1608" stroke="#f5c84240" stroke-width="1"/>
-          <text x="80" y="20" text-anchor="middle" fill="#f5c84280" font-family="Space Mono" font-size="8" font-weight="700">PORTFOLIO ROOM</text>
-        </g>
-
-        <!-- Clickable zone -->
-        <rect x="100" y="0" width="1000" height="900" fill="transparent" id="zone-tracker" cursor="pointer"
-          onclick="openPanel('tracker')"/>
+      <!-- PAPÉIS na parede (centro) -->
+      <g transform="translate(450,8)">
+        <rect x="0" y="0" width="52" height="64" rx="2" fill="#F8F4EC" stroke="#DDD8CC" stroke-width="1" transform="rotate(-5,26,32)"/>
+        <line x1="6" y1="16" x2="42" y2="16" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
+        <line x1="6" y1="24" x2="38" y2="24" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
+        <line x1="6" y1="32" x2="40" y2="32" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
+        <line x1="6" y1="40" x2="35" y2="40" stroke="#C8C4BC" stroke-width="1.5" transform="rotate(-5,26,32)"/>
       </g>
 
-      <!-- CORREDORES entre salas -->
-      <!-- Corredor 1-2 -->
-      <g transform="translate(900,0)">
-        <polygon points="100,500 300,400 300,600 100,700" fill="#0a0c10" stroke="#141820" stroke-width="0.5" opacity="0.7"/>
-        <!-- Porta -->
-        <polygon points="175,540 225,515 225,595 175,620" fill="#0f1218" stroke="#1e2738" stroke-width="1"/>
-        <line x1="199" y1="565" x2="203" y2="563" stroke="#2a3548" stroke-width="2" stroke-linecap="round"/>
-      </g>
-      <!-- Corredor 2-3 -->
-      <g transform="translate(1700,0)">
-        <polygon points="100,500 300,400 300,600 100,700" fill="#0a0c10" stroke="#141820" stroke-width="0.5" opacity="0.7"/>
-        <polygon points="175,540 225,515 225,595 175,620" fill="#0f1218" stroke="#1e2738" stroke-width="1"/>
-        <line x1="199" y1="565" x2="203" y2="563" stroke="#2a3548" stroke-width="2" stroke-linecap="round"/>
+      <!-- TICKER MURAL (parede centro) — dados MRS -->
+      <rect x="300" y="10" width="200" height="90" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="303" y="13" width="194" height="84" rx="2" fill="#141428"/>
+      <text id="mrs-tb1" x="400" y="38" text-anchor="middle" fill="#00E880" font-family="Space Mono" font-size="10" font-weight="700">COMPRA: —</text>
+      <text id="mrs-tb2" x="400" y="56" text-anchor="middle" fill="#F5C842" font-family="Space Mono" font-size="8">MRS — RSV —</text>
+      <text id="mrs-tb3" x="400" y="72" text-anchor="middle" fill="#4A7A9A" font-family="Space Mono" font-size="7">PRÓX: — sinais</text>
+      <text id="mrs-tb4" x="400" y="88" text-anchor="middle" fill="#3A5A7A" font-family="Space Mono" font-size="7" id="mrs-tb4">AÇÕES: —</text>
+
+      <!-- MESA 1 (esquerda) -->
+      <rect x="90" y="270" width="200" height="140" rx="4" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
+      <!-- Sombra mesa -->
+      <rect x="96" y="406" width="200" height="12" rx="2" fill="rgba(0,0,0,0.2)"/>
+      <!-- Pernas mesa -->
+      <rect x="96"  y="400" width="14" height="28" rx="2" fill="#A55E28"/>
+      <rect x="270" y="400" width="14" height="28" rx="2" fill="#A55E28"/>
+      <!-- MONITOR 1 -->
+      <rect x="108" y="235" width="110" height="76" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="112" y="239" width="102" height="64" rx="2" fill="#C8ECD8"/>
+      <!-- Gráfico no monitor -->
+      <polyline id="mon1-chart" points="116,290 128,278 140,283 152,268 164,272 176,262 188,258 200,265" fill="none" stroke="#2D7A4A" stroke-width="2" stroke-linecap="round"/>
+      <!-- Suporte monitor -->
+      <rect x="155" y="311" width="14" height="20" fill="#1A1A28"/>
+      <rect x="148" y="329" width="28" height="5" rx="2" fill="#2A2A3A"/>
+      <!-- Teclado -->
+      <rect x="110" y="318" width="80" height="30" rx="3" fill="#3A3A4A" stroke="#2A2A38" stroke-width="1"/>
+      <!-- Mouse -->
+      <rect x="200" y="322" width="22" height="16" rx="8" fill="#3A3A4A" stroke="#2A2A38" stroke-width="1"/>
+      <!-- Cabo mouse -->
+      <path d="M211 322 Q220 310 230 308" fill="none" stroke="#2A2A38" stroke-width="1.5"/>
+      <!-- CADEIRA VERMELHA -->
+      <rect x="60" y="338" width="52" height="42" rx="24" fill="#E05A4A"/>
+      <circle cx="86" cy="406" r="8" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="74" y="408" width="4" height="14" rx="2" transform="rotate(-35,76,408)"/>
+        <rect x="80" y="408" width="4" height="14" rx="2" transform="rotate(-12,82,408)"/>
+        <rect x="86" y="408" width="4" height="14" rx="2"/>
+        <rect x="92" y="408" width="4" height="14" rx="2" transform="rotate(12,94,408)"/>
+        <rect x="98" y="408" width="4" height="14" rx="2" transform="rotate(35,100,408)"/>
       </g>
 
+      <!-- MESA 2 (centro) -->
+      <rect x="310" y="250" width="200" height="140" rx="4" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
+      <rect x="316" y="386" width="200" height="12" rx="2" fill="rgba(0,0,0,0.2)"/>
+      <rect x="316" y="382" width="14" height="28" rx="2" fill="#A55E28"/>
+      <rect x="490" y="382" width="14" height="28" rx="2" fill="#A55E28"/>
+      <!-- MONITOR 2 -->
+      <rect x="328" y="215" width="110" height="76" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="332" y="219" width="102" height="64" rx="2" fill="#C8ECD8"/>
+      <!-- Gráfico 2 -->
+      <polyline id="mon2-chart" points="336,265 348,258 360,262 372,252 384,255 396,245 408,248 420,240" fill="none" stroke="#8A2A8A" stroke-width="2" stroke-linecap="round"/>
+      <rect x="375" y="291" width="14" height="20" fill="#1A1A28"/>
+      <rect x="368" y="309" width="28" height="5" rx="2" fill="#2A2A3A"/>
+      <!-- Fone de ouvido na mesa -->
+      <path d="M330 270 Q360 250 380 270" fill="none" stroke="#2A2A3A" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="330" cy="270" r="8" fill="#3A3A4A"/>
+      <circle cx="380" cy="270" r="8" fill="#3A3A4A"/>
+      <!-- Cabo fone saindo -->
+      <path d="M355 270 Q360 290 365 300 L365 330" fill="none" stroke="#1A1A28" stroke-width="2"/>
+      <!-- CADEIRA VERDE -->
+      <rect x="280" y="320" width="52" height="42" rx="24" fill="#5AB85A"/>
+      <circle cx="306" cy="390" r="8" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="294" y="392" width="4" height="14" rx="2" transform="rotate(-35,296,392)"/>
+        <rect x="300" y="392" width="4" height="14" rx="2" transform="rotate(-12,302,392)"/>
+        <rect x="306" y="392" width="4" height="14" rx="2"/>
+        <rect x="312" y="392" width="4" height="14" rx="2" transform="rotate(12,314,392)"/>
+        <rect x="318" y="392" width="4" height="14" rx="2" transform="rotate(35,320,392)"/>
+      </g>
+
+      <!-- MESA 3 (direita) -->
+      <rect x="530" y="270" width="180" height="130" rx="4" fill="#C97B3E" stroke="#A55E28" stroke-width="2"/>
+      <rect x="536" y="396" width="180" height="12" rx="2" fill="rgba(0,0,0,0.2)"/>
+      <rect x="536" y="392" width="14" height="25" rx="2" fill="#A55E28"/>
+      <rect x="690" y="392" width="14" height="25" rx="2" fill="#A55E28"/>
+      <!-- Monitor 3 (tela com stats) -->
+      <rect x="548" y="235" width="100" height="70" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="552" y="239" width="92" height="58" rx="2" fill="#EAF4F8"/>
+      <!-- Stats no monitor -->
+      <text x="598" y="258" text-anchor="middle" fill="#1A5A8A" font-family="Space Mono" font-size="8" font-weight="700">TOP MRS</text>
+      <text id="mon3-l1" x="556" y="272" fill="#2D7A4A" font-family="Space Mono" font-size="7">1. ——  +0.0%</text>
+      <text id="mon3-l2" x="556" y="284" fill="#2D7A4A" font-family="Space Mono" font-size="7">2. ——  +0.0%</text>
+      <text id="mon3-l3" x="556" y="296" fill="#4A7A4A" font-family="Space Mono" font-size="7">3. ——  +0.0%</text>
+      <rect x="598" y="305" width="12" height="18" fill="#1A1A28"/>
+      <rect x="592" y="321" width="24" height="4" rx="2" fill="#2A2A3A"/>
+      <!-- CADEIRA AZUL (canto) -->
+      <rect x="710" y="380" width="52" height="42" rx="24" fill="#4AB8D4"/>
+      <circle cx="736" cy="450" r="8" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="724" y="452" width="4" height="14" rx="2" transform="rotate(-35,726,452)"/>
+        <rect x="730" y="452" width="4" height="14" rx="2" transform="rotate(-12,732,452)"/>
+        <rect x="736" y="452" width="4" height="14" rx="2"/>
+        <rect x="742" y="452" width="4" height="14" rx="2" transform="rotate(12,744,452)"/>
+        <rect x="748" y="452" width="4" height="14" rx="2" transform="rotate(35,750,452)"/>
+      </g>
+
+      <!-- LIXEIRA -->
+      <ellipse cx="90" cy="518" rx="22" ry="10" fill="#4A5A70"/>
+      <rect x="68" y="490" width="44" height="30" rx="4" fill="#5A6A80" stroke="#4A5A70" stroke-width="1"/>
+      <ellipse cx="90" cy="490" rx="22" ry="8" fill="#6A7A90"/>
+      <!-- Placa sala -->
+      <rect x="310" y="545" width="180" height="26" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="1.5"/>
+      <text x="400" y="562" text-anchor="middle" fill="#00E880" font-family="Space Mono" font-size="8" font-weight="700">TRADING FLOOR</text>
     </svg>
   </div>
-</div>
+
+  <!-- SALA 2: RESEARCH ROOM -->
+  <div class="room" id="room-apgar">
+    <svg class="room-svg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid slice">
+      <!-- PISO cor diferente -->
+      <rect width="800" height="580" fill="#7A6A9A"/>
+      <g opacity="0.18" fill="none" stroke="#4A3A6A" stroke-width="0.8">
+        <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
+        <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
+        <line x1="0" y1="500" x2="800" y2="500"/>
+        <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
+        <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
+        <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
+        <line x1="700" y1="0" x2="700" y2="580"/>
+      </g>
+      <g font-family="Space Mono" font-size="8" fill="#8A7AAA" opacity="0.5">
+        <text x="50" y="175">CCr</text><text x="250" y="275">CCr</text>
+        <text x="450" y="175">CCr</text><text x="650" y="275">CCr</text>
+        <text x="150" y="375">CCr</text><text x="350" y="475">CCr</text>
+      </g>
+      <!-- PAREDE NORTE -->
+      <rect x="0" y="0" width="800" height="110" fill="#C87A9A"/>
+      <rect x="0" y="105" width="800" height="8" fill="#A86080"/>
+
+      <!-- Janela pesquisa -->
+      <rect x="30" y="15" width="200" height="75" rx="3" fill="#A86080"/>
+      <rect x="34" y="19" width="192" height="67" rx="2" fill="#D4E8F4"/>
+      <rect x="40" y="22" width="58" height="58" fill="rgba(255,255,255,0.28)" rx="1"/>
+      <rect x="108" y="22" width="58" height="58" fill="rgba(255,255,255,0.22)" rx="1"/>
+      <rect x="176" y="22" width="46" height="58" fill="rgba(255,255,255,0.25)" rx="1"/>
+      <line x1="102" y1="19" x2="102" y2="86" stroke="#8A9AB4" stroke-width="3"/>
+      <line x1="170" y1="19" x2="170" y2="86" stroke="#8A9AB4" stroke-width="3"/>
+      <rect x="28" y="86" width="204" height="12" fill="#A86080"/>
+      <rect x="22" y="96" width="216" height="8" fill="#C87A9A"/>
+
+      <!-- QUADRO BRANCO APGAR (grande, parede centro) -->
+      <rect x="290" y="5" width="300" height="100" rx="4" fill="#F0F0F0" stroke="#C8C0D8" stroke-width="2.5"/>
+      <rect x="294" y="9" width="292" height="92" rx="2" fill="#FAFAFA"/>
+      <text x="440" y="28" text-anchor="middle" fill="#5A3A8A" font-family="Space Mono" font-size="9" font-weight="700">APGAR SCORE</text>
+      <!-- Barras APGAR no quadro -->
+      <g id="apgar-wall-board">
+        <text x="302" y="44" fill="#8A8A9A" font-family="Space Mono" font-size="7">T</text>
+        <rect x="314" y="35" width="60" height="10" rx="2" fill="#E0E0E8" id="ab-t-bg"/>
+        <rect x="314" y="35" width="60" height="10" rx="2" fill="#2D7A4A" id="ab-t"/>
+        <text x="302" y="58" fill="#8A8A9A" font-family="Space Mono" font-size="7">E</text>
+        <rect x="314" y="49" width="60" height="10" rx="2" fill="#E0E0E8"/>
+        <rect x="314" y="49" width="60" height="10" rx="2" fill="#2D7A4A" id="ab-e"/>
+        <text x="302" y="72" fill="#8A8A9A" font-family="Space Mono" font-size="7">R</text>
+        <rect x="314" y="63" width="60" height="10" rx="2" fill="#E0E0E8"/>
+        <rect x="314" y="63" width="60" height="10" rx="2" fill="#8A6A10" id="ab-r"/>
+        <text x="302" y="86" fill="#8A8A9A" font-family="Space Mono" font-size="7">C</text>
+        <rect x="314" y="77" width="60" height="10" rx="2" fill="#E0E0E8"/>
+        <rect x="314" y="77" width="60" height="10" rx="2" fill="#8A2A1A" id="ab-c"/>
+        <text x="302" y="100" fill="#8A8A9A" font-family="Space Mono" font-size="7">B</text>
+        <rect x="314" y="91" width="60" height="10" rx="2" fill="#E0E0E8"/>
+        <rect x="314" y="91" width="60" height="10" rx="2" fill="#2D7A4A" id="ab-b"/>
+        <!-- Score total -->
+        <text id="ab-score" x="420" y="72" fill="#5A3A8A" font-family="Space Mono" font-size="28" font-weight="700">—</text>
+        <text x="460" y="65" fill="#8A8A9A" font-family="Space Mono" font-size="7">/10</text>
+        <!-- Ação destaque -->
+        <text id="ab-ticker" x="420" y="88" fill="#5A3A8A" font-family="Space Mono" font-size="9" font-weight="700">——</text>
+        <!-- Contadores -->
+        <text id="ab-forte" x="540" y="38" fill="#2D7A4A" font-family="Space Mono" font-size="8" font-weight="700">— FORTE</text>
+        <text id="ab-pos" x="540" y="54" fill="#8A6A10" font-family="Space Mono" font-size="8">— POSITIVO</text>
+        <text id="ab-frac" x="540" y="70" fill="#8A2A1A" font-family="Space Mono" font-size="8">— FRACO</text>
+      </g>
+      <!-- Moldura quadro -->
+      <rect x="288" y="102" width="304" height="8" rx="2" fill="#C8C0D8"/>
+
+      <!-- ESTANTE DE LIVROS (direita) -->
+      <rect x="610" y="108" width="170" height="90" rx="3" fill="#C87A5A" stroke="#A85A3A" stroke-width="2"/>
+      <rect x="614" y="112" width="162" height="38" rx="2" fill="#B86A4A"/>
+      <rect x="614" y="155" width="162" height="38" rx="2" fill="#B86A4A"/>
+      <!-- Livros row 1 -->
+      <g transform="translate(617,114)">
+        <rect x="0"  y="0" width="14" height="34" rx="1" fill="#4A3A8A"/><rect x="16" y="2" width="12" height="32" rx="1" fill="#8A3A2A"/>
+        <rect x="30" y="1" width="15" height="33" rx="1" fill="#2A6A3A"/><rect x="47" y="3" width="11" height="31" rx="1" fill="#6A4A1A"/>
+        <rect x="60" y="0" width="14" height="34" rx="1" fill="#1A5A7A"/><rect x="76" y="2" width="12" height="32" rx="1" fill="#8A2A5A"/>
+        <rect x="90" y="1" width="13" height="33" rx="1" fill="#3A7A2A"/><rect x="105" y="3" width="12" height="31" rx="1" fill="#7A5A1A"/>
+        <rect x="119" y="0" width="14" height="34" rx="1" fill="#5A2A8A"/><rect x="135" y="2" width="14" height="32" rx="1" fill="#2A5A3A"/>
+      </g>
+      <!-- Livros row 2 -->
+      <g transform="translate(617,157)">
+        <rect x="0"  y="0" width="14" height="34" rx="1" fill="#1A5A7A"/><rect x="16" y="2" width="12" height="32" rx="1" fill="#3A7A2A"/>
+        <rect x="30" y="1" width="15" height="33" rx="1" fill="#8A2A5A"/><rect x="47" y="3" width="11" height="31" rx="1" fill="#4A3A8A"/>
+        <rect x="60" y="0" width="14" height="34" rx="1" fill="#8A3A2A"/><rect x="76" y="2" width="12" height="32" rx="1" fill="#6A4A1A"/>
+        <rect x="90" y="1" width="13" height="33" rx="1" fill="#7A5A1A"/><rect x="105" y="3" width="12" height="31" rx="1" fill="#5A2A8A"/>
+        <rect x="119" y="0" width="14" height="34" rx="1" fill="#2A6A3A"/><rect x="135" y="2" width="14" height="32" rx="1" fill="#1A5A7A"/>
+      </g>
+
+      <!-- MESA PESQUISA (centro) -->
+      <rect x="180" y="250" width="440" height="150" rx="5" fill="#C87A5A" stroke="#A85A3A" stroke-width="2"/>
+      <rect x="186" y="396" width="440" height="12" rx="2" fill="rgba(0,0,0,0.18)"/>
+      <rect x="186" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
+      <rect x="610" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
+      <rect x="340" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
+      <rect x="462" y="392" width="14" height="28" rx="2" fill="#A85A3A"/>
+
+      <!-- LAPTOP APGAR -->
+      <rect x="280" y="210" width="130" height="84" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="284" y="214" width="122" height="72" rx="2" fill="#E8E4F8"/>
+      <!-- Score no laptop -->
+      <text id="laptop-score" x="345" y="260" text-anchor="middle" fill="#5A3A8A" font-family="Space Mono" font-size="26" font-weight="700">—</text>
+      <text x="345" y="276" text-anchor="middle" fill="#8A7AAA" font-family="Space Mono" font-size="7">TOP SCORE</text>
+      <rect x="338" y="294" width="14" height="16" fill="#1A1A28"/>
+      <rect x="320" y="308" width="50" height="5" rx="2" fill="#2A2A3A"/>
+      <!-- Tampa laptop parcial aberta -->
+      <rect x="280" y="294" width="130" height="30" rx="2" fill="#1E1E2E" stroke="#1A1A28" stroke-width="1"/>
+
+      <!-- SEGUNDO LAPTOP (top stocks) -->
+      <rect x="440" y="215" width="120" height="80" rx="3" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="444" y="219" width="112" height="66" rx="2" fill="#F4F0E8"/>
+      <text x="500" y="234" text-anchor="middle" fill="#8A6A10" font-family="Space Mono" font-size="7" font-weight="700">VCP SIGNALS</text>
+      <text id="apg-top1" x="448" y="248" fill="#2D7A4A" font-family="Space Mono" font-size="7">——  7/10</text>
+      <text id="apg-top2" x="448" y="261" fill="#2D7A4A" font-family="Space Mono" font-size="7">——  7/10</text>
+      <text id="apg-top3" x="448" y="274" fill="#8A6A10" font-family="Space Mono" font-size="7">——  6/10</text>
+      <text id="apg-top4" x="448" y="287" fill="#8A6A10" font-family="Space Mono" font-size="7">——  6/10</text>
+      <rect x="494" y="295" width="12" height="14" fill="#1A1A28"/>
+      <rect x="480" y="307" width="40" height="4" rx="2" fill="#2A2A3A"/>
+
+      <!-- CADEIRAS mesa pesquisa -->
+      <rect x="148" y="315" width="48" height="38" rx="22" fill="#E05A4A"/>
+      <circle cx="172" cy="376" r="7" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="162" y="378" width="3" height="13" rx="2" transform="rotate(-30,164,378)"/>
+        <rect x="167" y="378" width="3" height="13" rx="2" transform="rotate(-10,169,378)"/>
+        <rect x="172" y="378" width="3" height="13" rx="2"/>
+        <rect x="177" y="378" width="3" height="13" rx="2" transform="rotate(10,179,378)"/>
+        <rect x="182" y="378" width="3" height="13" rx="2" transform="rotate(30,184,378)"/>
+      </g>
+      <rect x="604" y="315" width="48" height="38" rx="22" fill="#8848C8"/>
+      <circle cx="628" cy="376" r="7" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="618" y="378" width="3" height="13" rx="2" transform="rotate(-30,620,378)"/>
+        <rect x="623" y="378" width="3" height="13" rx="2" transform="rotate(-10,625,378)"/>
+        <rect x="628" y="378" width="3" height="13" rx="2"/>
+        <rect x="633" y="378" width="3" height="13" rx="2" transform="rotate(10,635,378)"/>
+        <rect x="638" y="378" width="3" height="13" rx="2" transform="rotate(30,640,378)"/>
+      </g>
+
+      <!-- Planta decorativa -->
+      <ellipse cx="728" cy="490" rx="28" ry="18" fill="#2A6A2A"/>
+      <ellipse cx="714" cy="478" rx="18" ry="12" fill="#3A7A3A"/>
+      <ellipse cx="740" cy="478" rx="18" ry="12" fill="#2A6A2A"/>
+      <rect x="720" y="490" width="16" height="30" rx="3" fill="#8A5A2A"/>
+      <rect x="716" y="518" width="24" height="8" rx="3" fill="#A86A3A"/>
+
+      <!-- Placa sala -->
+      <rect x="300" y="545" width="200" height="26" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="1.5"/>
+      <text x="400" y="562" text-anchor="middle" fill="#C878E8" font-family="Space Mono" font-size="8" font-weight="700">RESEARCH ROOM</text>
+    </svg>
+  </div>
+
+  <!-- SALA 3: PORTFOLIO ROOM -->
+  <div class="room" id="room-tracker">
+    <svg class="room-svg" viewBox="0 0 800 580" preserveAspectRatio="xMidYMid slice">
+      <!-- PISO amarelado quente -->
+      <rect width="800" height="580" fill="#8A7A5A"/>
+      <g opacity="0.18" fill="none" stroke="#5A4A2A" stroke-width="0.8">
+        <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
+        <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
+        <line x1="0" y1="500" x2="800" y2="500"/>
+        <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
+        <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
+        <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
+        <line x1="700" y1="0" x2="700" y2="580"/>
+      </g>
+      <g font-family="Space Mono" font-size="8" fill="#9A8A6A" opacity="0.5">
+        <text x="50" y="175">CCr</text><text x="250" y="275">CCr</text>
+        <text x="450" y="175">CCr</text><text x="650" y="275">CCr</text>
+        <text x="150" y="375">CCr</text><text x="350" y="475">CCr</text>
+      </g>
+      <!-- PAREDE NORTE -->
+      <rect x="0" y="0" width="800" height="110" fill="#D4A45A"/>
+      <rect x="0" y="105" width="800" height="8" fill="#B88038"/>
+
+      <!-- Janela portfolio -->
+      <rect x="550" y="15" width="200" height="75" rx="3" fill="#B88038"/>
+      <rect x="554" y="19" width="192" height="67" rx="2" fill="#A8D4E6"/>
+      <rect x="560" y="22" width="58" height="58" fill="rgba(255,255,255,0.26)" rx="1"/>
+      <rect x="628" y="22" width="58" height="58" fill="rgba(255,255,255,0.22)" rx="1"/>
+      <rect x="696" y="22" width="46" height="58" fill="rgba(255,255,255,0.25)" rx="1"/>
+      <line x1="622" y1="19" x2="622" y2="86" stroke="#6A9AB4" stroke-width="3"/>
+      <line x1="690" y1="19" x2="690" y2="86" stroke="#6A9AB4" stroke-width="3"/>
+      <rect x="548" y="86" width="204" height="12" fill="#B88038"/>
+      <rect x="542" y="96" width="216" height="8" fill="#D4A45A"/>
+
+      <!-- PORTFOLIO BOARD (parede) — P&L display -->
+      <rect x="60" y="8" width="480" height="97" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="2"/>
+      <rect x="63" y="11" width="474" height="91" rx="2" fill="#141428"/>
+      <text x="300" y="34" text-anchor="middle" fill="#F5C842" font-family="Space Mono" font-size="10" font-weight="700">PORTFOLIO TRACKER</text>
+      <!-- Stats board -->
+      <text x="80" y="56" fill="#4A7A4A" font-family="Space Mono" font-size="8">ABERTAS</text>
+      <text id="trk-ab" x="200" y="56" fill="#00E880" font-family="Space Mono" font-size="12" font-weight="700">—</text>
+      <text x="240" y="56" fill="#4A7A4A" font-family="Space Mono" font-size="8">WIN RATE</text>
+      <text id="trk-wr" x="370" y="56" fill="#F5C842" font-family="Space Mono" font-size="12" font-weight="700">—</text>
+      <text x="80" y="80" fill="#4A7A4A" font-family="Space Mono" font-size="8">P&amp;L MED</text>
+      <text id="trk-pm" x="200" y="80" fill="#00E880" font-family="Space Mono" font-size="12" font-weight="700">—</text>
+      <text x="240" y="80" fill="#4A7A4A" font-family="Space Mono" font-size="8">FECHADAS</text>
+      <text id="trk-fc" x="370" y="80" fill="#4A6A8A" font-family="Space Mono" font-size="12" font-weight="700">—</text>
+      <text x="80" y="98" fill="#3A5A3A" font-family="Space Mono" font-size="7" id="trk-sig">VCP HOJE: — sinais auto-registrados</text>
+
+      <!-- MESA PRINCIPAL PORTFOLIO (grande centro) -->
+      <rect x="120" y="250" width="560" height="160" rx="5" fill="#C97B3E" stroke="#A55E28" stroke-width="2.5"/>
+      <rect x="127" y="406" width="560" height="14" rx="2" fill="rgba(0,0,0,0.2)"/>
+      <rect x="127" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
+      <rect x="664" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
+      <rect x="300" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
+      <rect x="484" y="402" width="16" height="32" rx="2" fill="#A55E28"/>
+
+      <!-- Posições na mesa como cards coloridos -->
+      <!-- Card 1 -->
+      <rect x="148" y="265" width="110" height="80" rx="4" fill="#D4EDE0" stroke="#A8D4B8" stroke-width="1.5"/>
+      <text x="203" y="284" text-anchor="middle" fill="#1A5A2A" font-family="Space Mono" font-size="8" font-weight="700" id="c1-tck">——</text>
+      <text x="203" y="298" text-anchor="middle" fill="#2D7A4A" font-family="Space Mono" font-size="11" font-weight="700" id="c1-pnl">+0.0%</text>
+      <text x="203" y="312" text-anchor="middle" fill="#4A8A5A" font-family="Space Mono" font-size="7" id="c1-dias">0 dias</text>
+      <!-- barra progresso -->
+      <rect x="156" y="324" width="94" height="5" rx="2" fill="#A8D4B8"/>
+      <rect x="156" y="324" width="47" height="5" rx="2" fill="#2D7A4A" id="c1-bar"/>
+      <!-- Card 2 -->
+      <rect x="278" y="265" width="110" height="80" rx="4" fill="#EDE4C8" stroke="#D4C890" stroke-width="1.5"/>
+      <text x="333" y="284" text-anchor="middle" fill="#5A3A08" font-family="Space Mono" font-size="8" font-weight="700" id="c2-tck">——</text>
+      <text x="333" y="298" text-anchor="middle" fill="#8A6A10" font-family="Space Mono" font-size="11" font-weight="700" id="c2-pnl">+0.0%</text>
+      <text x="333" y="312" text-anchor="middle" fill="#9A7A20" font-family="Space Mono" font-size="7" id="c2-dias">0 dias</text>
+      <rect x="286" y="324" width="94" height="5" rx="2" fill="#D4C890"/>
+      <rect x="286" y="324" width="47" height="5" rx="2" fill="#8A6A10" id="c2-bar"/>
+      <!-- Card 3 -->
+      <rect x="408" y="265" width="110" height="80" rx="4" fill="#EDD4D4" stroke="#D4A8A8" stroke-width="1.5"/>
+      <text x="463" y="284" text-anchor="middle" fill="#5A1A1A" font-family="Space Mono" font-size="8" font-weight="700" id="c3-tck">——</text>
+      <text x="463" y="298" text-anchor="middle" fill="#8A2A1A" font-family="Space Mono" font-size="11" font-weight="700" id="c3-pnl">-0.0%</text>
+      <text x="463" y="312" text-anchor="middle" fill="#9A3A2A" font-family="Space Mono" font-size="7" id="c3-dias">0 dias</text>
+      <rect x="416" y="324" width="94" height="5" rx="2" fill="#D4A8A8"/>
+      <rect x="416" y="324" width="47" height="5" rx="2" fill="#8A2A1A" id="c3-bar"/>
+      <!-- Card 4 (vazio placeholder) -->
+      <rect x="538" y="265" width="110" height="80" rx="4" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="593" y="305" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-family="Space Mono" font-size="7">+ novo</text>
+
+      <!-- Cadeiras portfolio -->
+      <rect x="60" y="290" width="48" height="38" rx="22" fill="#E05A4A"/>
+      <circle cx="84" cy="360" r="7" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="74" y="362" width="3" height="13" rx="2" transform="rotate(-30,76,362)"/>
+        <rect x="79" y="362" width="3" height="13" rx="2" transform="rotate(-10,81,362)"/>
+        <rect x="84" y="362" width="3" height="13" rx="2"/>
+        <rect x="89" y="362" width="3" height="13" rx="2" transform="rotate(10,91,362)"/>
+        <rect x="94" y="362" width="3" height="13" rx="2" transform="rotate(30,96,362)"/>
+      </g>
+      <rect x="692" y="290" width="48" height="38" rx="22" fill="#5AB85A"/>
+      <circle cx="716" cy="360" r="7" fill="#5A5A6A"/>
+      <g fill="#4A4A5A">
+        <rect x="706" y="362" width="3" height="13" rx="2" transform="rotate(-30,708,362)"/>
+        <rect x="711" y="362" width="3" height="13" rx="2" transform="rotate(-10,713,362)"/>
+        <rect x="716" y="362" width="3" height="13" rx="2"/>
+        <rect x="721" y="362" width="3" height="13" rx="2" transform="rotate(10,723,362)"/>
+        <rect x="726" y="362" width="3" height="13" rx="2" transform="rotate(30,728,362)"/>
+      </g>
+
+      <!-- Plantas decor -->
+      <ellipse cx="52" cy="510" rx="25" ry="16" fill="#2A6A2A"/>
+      <ellipse cx="40" cy="500" rx="16" ry="10" fill="#3A7A3A"/>
+      <rect x="44" y="508" width="14" height="26" rx="3" fill="#8A5A2A"/>
+      <rect x="40" y="532" width="22" height="7" rx="3" fill="#A86A3A"/>
+
+      <ellipse cx="748" cy="510" rx="25" ry="16" fill="#2A6A2A"/>
+      <ellipse cx="762" cy="500" rx="16" ry="10" fill="#3A7A3A"/>
+      <rect x="742" y="508" width="14" height="26" rx="3" fill="#8A5A2A"/>
+      <rect x="738" y="532" width="22" height="7" rx="3" fill="#A86A3A"/>
+
+      <!-- Placa sala -->
+      <rect x="300" y="545" width="200" height="26" rx="4" fill="#2A2A3A" stroke="#1A1A28" stroke-width="1.5"/>
+      <text x="400" y="562" text-anchor="middle" fill="#F5C842" font-family="Space Mono" font-size="8" font-weight="700">PORTFOLIO ROOM</text>
+    </svg>
+  </div>
+
+</div><!-- /world -->
+</div><!-- /stage -->
+
+<!-- SPRITE CANVAS -->
+<canvas id="sprite-canvas" width="140" height="140"></canvas>
 
 <!-- DATA PANEL -->
-<div id="data-panel">
-  <div id="panel-header">
-    <span id="panel-title">TRADING FLOOR</span>
-    <button id="panel-close" onclick="closePanel()">✕</button>
+<div id="panel">
+  <div id="ph">
+    <span id="ph-title">TRADING FLOOR</span>
+    <button id="ph-close" onclick="closePanel()">✕</button>
   </div>
-  <div id="panel-body">
-    <div class="p-empty" id="panel-loading">Carregando dados...</div>
-  </div>
+  <div id="pb"><div class="pempty">Carregando...</div></div>
 </div>
 
 <!-- BOTTOM NAV -->
-<div id="nav-rooms">
-  <button class="room-btn active" id="btn-mrs" onclick="goRoom('mrs',this)">
-    <span class="room-dot"></span>TRADING FLOOR
+<div id="nav">
+  <button class="room-btn active r-mrs" id="btn-mrs" onclick="goRoom('mrs',this)">
+    <span class="room-icon">📊</span><span>TRADING FLOOR</span>
   </button>
-  <button class="room-btn room-apgar" id="btn-apgar" onclick="goRoom('apgar',this)">
-    <span class="room-dot"></span>RESEARCH ROOM
+  <button class="room-btn r-apgar" id="btn-apgar" onclick="goRoom('apgar',this)">
+    <span class="room-icon">🏆</span><span>RESEARCH ROOM</span>
   </button>
-  <button class="room-btn room-tracker" id="btn-tracker" onclick="goRoom('tracker',this)">
-    <span class="room-dot"></span>PORTFOLIO ROOM
+  <button class="room-btn r-tracker" id="btn-tracker" onclick="goRoom('tracker',this)">
+    <span class="room-icon">💼</span><span>PORTFOLIO ROOM</span>
   </button>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
-  <div class="modal">
-    <div class="modal-title">+ REGISTRAR SINAL VCP</div>
-    <label class="f-label">Ticker</label>
-    <input class="f-input" id="mTicker" placeholder="ex: PETR4" style="text-transform:uppercase">
-    <div class="f-row">
-      <div>
-        <label class="f-label">Preço entrada (R$)</label>
-        <input class="f-input" id="mEntrada" type="number" step="0.01" placeholder="38.50">
-      </div>
-      <div>
-        <label class="f-label">Score APGAR</label>
-        <input class="f-input" id="mScore" type="number" min="0" max="10" placeholder="7">
-      </div>
-    </div>
-    <div class="f-row">
-      <div>
-        <label class="f-label">Data do sinal</label>
-        <input class="f-input" id="mData" type="date">
-      </div>
-      <div>
-        <label class="f-label">Notas</label>
-        <input class="f-input" id="mNotas" placeholder="opcional">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="fecharModal()">CANCELAR</button>
-      <button class="btn-ok" onclick="salvarSinal()">SALVAR</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOOLTIP -->
-<div id="tooltip"></div>
-
-<!-- LOADING -->
-<div id="loading-screen">
-  <div id="loading-title">IBOV · ASSET MANAGEMENT</div>
-  <div id="loading-bar-bg"><div id="loading-bar-fill"></div></div>
-  <div id="loading-msg">INICIALIZANDO SISTEMAS...</div>
 </div>
 
 <!-- SPRITES -->
-<div id="fugazi-container">
+<div id="fugazi-wrap">
   <div id="fugazi-balloon"><span id="fugazi-text">It's all a Fugazi !</span></div>
   <canvas id="fugazi-canvas"></canvas>
 </div>
 <div id="walk-sprite"></div>
-<div id="apgar-sprite-overlay"><canvas id="apgar-sprite-canvas"></canvas></div>
+<div id="apgar-ov"><canvas id="apgar-canvas"></canvas></div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="mOv" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-title">+ REGISTRAR SINAL VCP</div>
+    <label class="fl">Ticker</label>
+    <input class="fi" id="mTicker" placeholder="ex: PETR4" style="text-transform:uppercase">
+    <div class="fr">
+      <div><label class="fl">Preço (R$)</label><input class="fi" id="mEntrada" type="number" step="0.01" placeholder="38.50"></div>
+      <div><label class="fl">Score</label><input class="fi" id="mScore" type="number" min="0" max="10" placeholder="7"></div>
+    </div>
+    <div class="fr">
+      <div><label class="fl">Data</label><input class="fi" id="mData" type="date"></div>
+      <div><label class="fl">Notas</label><input class="fi" id="mNotas" placeholder="opcional"></div>
+    </div>
+    <div class="mactions">
+      <button class="btn-cn" onclick="fecharModal()">CANCELAR</button>
+      <button class="btn-ok" onclick="salvarSinal()">SALVAR</button>
+    </div>
+  </div>
+</div>
+<!-- LOADING -->
+<div id="loading">
+  <div id="load-title">IBOV · ASSET MANAGEMENT</div>
+  <div id="load-bar"><div id="load-fill"></div></div>
+  <div id="load-msg">INICIALIZANDO...</div>
+</div>
 
 <script>
-// ═══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════════
-let _dados = null;
-let _filtro = 'todos';
-let _search = '';
-let _currentRoom = 'mrs';
-let _soundOn = false;
-let _audioCtx = null;
-const LS_KEY = 'ibov_tracker_v1';
-const TP_PCT = 0.05;
+// ══════════════════════════════════════════════
+let _dados=null, _filtro='todos', _search='', _room='mrs', _soundOn=false, _ctx=null;
+const LS='ibov_tracker_v1', TP=0.05;
 
-// ═══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════
 // LOADING
-// ═══════════════════════════════════════════════════════
-function loadingProgress(pct, msg) {
-  document.getElementById('loading-bar-fill').style.width = pct + '%';
-  if (msg) document.getElementById('loading-msg').textContent = msg;
+// ══════════════════════════════════════════════
+function lprog(p,m){
+  document.getElementById('load-fill').style.width=p+'%';
+  if(m) document.getElementById('load-msg').textContent=m;
 }
-function hideLoading() {
-  const el = document.getElementById('loading-screen');
+function hideLoad(){
+  const el=document.getElementById('loading');
   el.classList.add('hide');
-  setTimeout(() => el.style.display = 'none', 600);
+  setTimeout(()=>el.style.display='none',600);
 }
 
-// ═══════════════════════════════════════════════════════
-// CAMERA / ROOM NAVIGATION
-// ═══════════════════════════════════════════════════════
-const ROOM_X = { mrs: 0, apgar: -800, tracker: -1600 };
+// ══════════════════════════════════════════════
+// ROOM NAVIGATION
+// ══════════════════════════════════════════════
+const ROOM_IDX={mrs:0,apgar:1,tracker:2};
 
-function goRoom(id, btn) {
-  if (_currentRoom === id) { togglePanel(); return; }
-  _currentRoom = id;
-
-  // Update nav
-  document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+function goRoom(id,btn){
+  const wasRoom=_room;
+  _room=id;
+  document.querySelectorAll('.room-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-
-  // Slide camera
-  const svg = document.getElementById('iso-svg');
-  const stage = document.getElementById('stage');
-  const W = stage.offsetWidth;
-  const H = stage.offsetHeight;
-  const scaleX = W / 2400;
-  const scaleY = H / 900;
-  const scale  = Math.max(scaleX, scaleY);
-  const tx = ROOM_X[id] * scale + (W - 800 * scale) / 2;
-  const ty = (H - 900 * scale) / 2;
-  document.getElementById('iso-world').style.transform =
-    'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
-
-  // Sprites & sounds
-  if (id === 'mrs') {
-    triggerFugazi();
-    playSound('swoosh');
-  } else if (id === 'apgar') {
-    triggerApgarSprite();
-    playSound('chime');
-  } else if (id === 'tracker') {
-    triggerWalkSprite();
-    playSound('tick');
-  }
-
-  // Update panel if open
-  if (document.getElementById('data-panel').classList.contains('open')) {
-    openPanel(id);
+  const idx=ROOM_IDX[id]||0;
+  document.getElementById('world').style.transform='translateX(-'+(idx*100)+'vw)';
+  // Sprite triggers
+  if(id==='mrs'&&wasRoom!==id){ triggerFugazi(); playSound('swoosh'); }
+  else if(id==='apgar'&&wasRoom!==id){ triggerApgar(); playSound('chime'); }
+  else if(id==='tracker'&&wasRoom!==id){ triggerWalk(); playSound('tick'); }
+  // Panel
+  const p=document.getElementById('panel');
+  if(p.classList.contains('open')){
+    const titles={mrs:'📊 TRADING FLOOR',apgar:'🏆 RESEARCH ROOM',tracker:'💼 PORTFOLIO ROOM'};
+    document.getElementById('ph-title').textContent=titles[id];
+    renderPanel(id);
   }
 }
 
-function initCamera() {
-  const stage = document.getElementById('stage');
-  const W = stage.offsetWidth;
-  const H = stage.offsetHeight;
-  const scaleX = W / 2400;
-  const scaleY = H / 900;
-  const scale  = Math.max(scaleX, scaleY);
-  const tx = (W - 800 * scale) / 2;
-  const ty = (H - 900 * scale) / 2;
-  const world = document.getElementById('iso-world');
-  world.style.transition = 'none';
-  world.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
-  setTimeout(() => { world.style.transition = 'transform .7s cubic-bezier(0.22,1,0.36,1)'; }, 50);
+function openPanel(id){
+  _room=id;
+  const p=document.getElementById('panel');
+  p.classList.add('open');
+  const titles={mrs:'📊 TRADING FLOOR',apgar:'🏆 RESEARCH ROOM',tracker:'💼 PORTFOLIO ROOM'};
+  document.getElementById('ph-title').textContent=titles[id]||id;
+  renderPanel(id);
 }
+function closePanel(){ document.getElementById('panel').classList.remove('open'); }
 
-window.addEventListener('resize', initCamera);
-
-// ═══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════
 // PANEL
-// ═══════════════════════════════════════════════════════
-function openPanel(room) {
-  const panel = document.getElementById('data-panel');
-  panel.classList.add('open');
-  const titles = { mrs: '📊 TRADING FLOOR', apgar: '🏆 RESEARCH ROOM', tracker: '💼 PORTFOLIO ROOM' };
-  document.getElementById('panel-title').textContent = titles[room] || room;
-  renderPanel(room);
-}
-function closePanel() {
-  document.getElementById('data-panel').classList.remove('open');
-}
-function togglePanel() {
-  document.getElementById('data-panel').classList.toggle('open');
-  if (document.getElementById('data-panel').classList.contains('open')) {
-    renderPanel(_currentRoom);
-  }
+// ══════════════════════════════════════════════
+function renderPanel(r){
+  const b=document.getElementById('pb');
+  if(!_dados){ b.innerHTML='<div class="pempty">Aguardando dados...</div>'; return; }
+  if(r==='mrs') b.innerHTML=panelMRS(_dados);
+  else if(r==='apgar') b.innerHTML=panelAPGAR(_dados);
+  else b.innerHTML=panelTracker();
 }
 
-function renderPanel(room) {
-  const body = document.getElementById('panel-body');
-  if (!_dados) { body.innerHTML = '<div class="p-empty">Aguardando dados da API...</div>'; return; }
-  if (room === 'mrs')     body.innerHTML = buildMRSPanel(_dados);
-  else if (room === 'apgar')   body.innerHTML = buildAPGARPanel(_dados);
-  else if (room === 'tracker') body.innerHTML = buildTrackerPanel();
-}
-
-function buildMRSPanel(d) {
-  const sinais = d.sinaisHoje || [];
-  const proximos = d.proximosCruzar || [];
-  const recentes = d.cruzamentosRecentes || [];
-  let html = '<div class="p-section">';
-  html += '<div class="p-stat-row">';
-  html += '<div class="p-stat"><div class="p-stat-label">Sinais Hoje</div><div class="p-stat-value g">' + sinais.length + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Próx. Cruzar</div><div class="p-stat-value y">' + proximos.length + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Compras</div><div class="p-stat-value g">' + sinais.filter(s=>s.tipo==='COMPRA').length + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Ações</div><div class="p-stat-value">' + (d.totalAcoes||'—') + '</div></div>';
-  html += '</div></div>';
-
-  html += '<div class="p-section"><div class="p-section-title">Sinais de Hoje</div>';
-  if (!sinais.length) { html += '<div class="p-empty">Nenhum sinal hoje</div>'; }
-  else sinais.forEach(s => {
-    const cls = s.tipo==='COMPRA' ? 'buy' : 'sell';
-    const pnl = s.mrs >= 0 ? 'g' : 'r';
-    html += '<div class="p-row">';
-    html += '<span class="p-ticker">' + s.ticker + '</span>';
-    html += '<span class="p-pill ' + cls + '">' + s.tipo + '</span>';
-    html += '<span class="p-val ' + pnl + '">MRS ' + (s.mrs>=0?'+':'') + s.mrs.toFixed(1) + '%</span>';
-    html += '</div>';
+function panelMRS(d){
+  const s=d.sinaisHoje||[], p=d.proximosCruzar||[], rec=d.cruzamentosRecentes||[];
+  let h='<div class="ps"><div class="pstats">';
+  h+='<div class="pstat"><div class="pstat-lbl">Sinais</div><div class="pstat-val g">'+s.length+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Compras</div><div class="pstat-val g">'+s.filter(x=>x.tipo==='COMPRA').length+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Próximos</div><div class="pstat-val y">'+p.length+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Ações</div><div class="pstat-val">'+(d.totalAcoes||'—')+'</div></div>';
+  h+='</div></div>';
+  h+='<div class="ps"><div class="ps-title">Sinais de Hoje</div>';
+  if(!s.length) h+='<div class="pempty">Nenhum sinal hoje</div>';
+  else s.forEach(x=>{
+    h+='<div class="prow"><span class="pticker">'+x.ticker+'</span>';
+    h+='<span class="ppill '+(x.tipo==='COMPRA'?'buy':'sell')+'">'+x.tipo+'</span>';
+    h+='<span class="pval '+(x.mrs>=0?'g':'r')+'">MRS '+(x.mrs>=0?'+':'')+x.mrs.toFixed(1)+'%</span></div>';
   });
-  html += '</div>';
-
-  html += '<div class="p-section"><div class="p-section-title">Próximos de Cruzar</div>';
-  if (!proximos.length) { html += '<div class="p-empty">Nenhum próximo</div>'; }
-  else proximos.slice(0,8).forEach(a => {
-    html += '<div class="p-row">';
-    html += '<span class="p-ticker">' + a.ticker + '</span>';
-    html += '<span class="p-val y">falta ' + a.distancia.toFixed(2) + '%</span>';
-    html += '<span class="p-val">MRS ' + (a.mrs>=0?'+':'') + a.mrs.toFixed(1) + '%</span>';
-    html += '</div>';
+  h+='</div>';
+  h+='<div class="ps"><div class="ps-title">Próximos de Cruzar</div>';
+  if(!p.length) h+='<div class="pempty">Nenhum</div>';
+  else p.slice(0,8).forEach(x=>{
+    h+='<div class="prow"><span class="pticker">'+x.ticker+'</span>';
+    h+='<span class="pval y">falta '+x.distancia.toFixed(2)+'%</span>';
+    h+='<span class="pval '+(x.mrs>=0?'g':'r')+'">MRS '+(x.mrs>=0?'+':'')+x.mrs.toFixed(1)+'%</span></div>';
   });
-  html += '</div>';
-
-  html += '<div class="p-section"><div class="p-section-title">Top MRS</div>';
-  (d.topMRS||[]).slice(0,8).forEach((a,i) => {
-    const pnl = a.mrs >= 0 ? 'g' : 'r';
-    html += '<div class="p-row">';
-    html += '<span style="color:var(--muted);font-size:9px">' + (i+1) + '.</span>';
-    html += '<span class="p-ticker">' + a.ticker + '</span>';
-    html += '<span class="p-val ' + pnl + '">' + (a.mrs>=0?'+':'') + a.mrs.toFixed(2) + '%</span>';
-    html += '</div>';
+  h+='</div>';
+  h+='<div class="ps"><div class="ps-title">Top MRS</div>';
+  (d.topMRS||[]).slice(0,10).forEach((x,i)=>{
+    h+='<div class="prow"><span style="font-size:9px;color:var(--ui-muted)">'+(i+1)+'.</span>';
+    h+='<span class="pticker">'+x.ticker+'</span>';
+    h+='<span class="pval g">'+(x.mrs>=0?'+':'')+x.mrs.toFixed(2)+'%</span></div>';
   });
-  html += '</div>';
-
-  const recups = d.recuperacoes || [];
-  if (recups.length) {
-    html += '<div class="p-section"><div class="p-section-title">Viradas em Andamento</div>';
-    recups.slice(0,6).forEach(a => {
-      html += '<div class="p-row">';
-      html += '<span class="p-ticker">' + a.ticker + '</span>';
-      html += '<span class="p-val" style="color:var(--purple)">▲ ' + a.dias_subindo + 'd</span>';
-      html += '<span class="p-val" style="color:var(--purple)">RSV ' + a.dias_rsv_positivo + 'd</span>';
-      html += '</div>';
+  h+='</div>';
+  const recup=d.recuperacoes||[];
+  if(recup.length){
+    h+='<div class="ps"><div class="ps-title">Viradas</div>';
+    recup.slice(0,6).forEach(x=>{
+      h+='<div class="prow"><span class="pticker">'+x.ticker+'</span>';
+      h+='<span class="pval" style="color:var(--ui-purple)">▲ '+x.dias_subindo+'d</span>';
+      h+='<span class="pval" style="color:var(--ui-purple)">RSV '+x.dias_rsv_positivo+'d</span></div>';
     });
-    html += '</div>';
+    h+='</div>';
   }
-  return html;
+  return h;
 }
 
-function buildAPGARPanel(d) {
-  if (!d.apgar) return '<div class="p-empty">Sem dados APGAR</div>';
-  const r = d.apgar.resumo || {};
-  let html = '<div class="p-section">';
-  html += '<div class="p-stat-row">';
-  html += '<div class="p-stat"><div class="p-stat-label">Forte 9-10</div><div class="p-stat-value g">' + (r.forte||0) + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Positivo 7-8</div><div class="p-stat-value y">' + (r.positivo||0) + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Neutro 5-6</div><div class="p-stat-value">' + (r.neutro||0) + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Fraco &lt;5</div><div class="p-stat-value r">' + (r.fraco||0) + '</div></div>';
-  html += '</div></div>';
-
-  html += '<div class="p-section">';
-  html += '<div class="p-filter-bar">';
-  ['todos','FORTE','POSITIVO','NEUTRO','FRACO'].forEach(f => {
-    const lbl = f === 'todos' ? 'TODOS' : f;
-    const act = _filtro === f ? ' active' : '';
-    html += '<button class="p-f-btn' + act + '" onclick="setFiltro(\'' + f + '\',this)">' + lbl + '</button>';
+function panelAPGAR(d){
+  if(!d.apgar) return '<div class="pempty">Sem dados APGAR</div>';
+  const r=d.apgar.resumo||{};
+  let h='<div class="ps"><div class="pstats">';
+  h+='<div class="pstat"><div class="pstat-lbl">Forte 9-10</div><div class="pstat-val g">'+(r.forte||0)+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Positivo 7-8</div><div class="pstat-val y">'+(r.positivo||0)+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Neutro 5-6</div><div class="pstat-val">'+(r.neutro||0)+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Fraco &lt;5</div><div class="pstat-val r">'+(r.fraco||0)+'</div></div>';
+  h+='</div></div>';
+  h+='<div class="ps"><div class="pfilter">';
+  ['todos','FORTE','POSITIVO','NEUTRO','FRACO'].forEach(f=>{
+    h+='<button class="pfbtn'+(_filtro===f?' active':'')+'" onclick="setFiltro(\''+f+'\',this)">'+f+'</button>';
   });
-  html += '</div>';
-  html += '<input class="p-search" type="text" placeholder="buscar ticker..." value="' + _search + '" oninput="setSearch(this.value)" id="panelSearch">';
-  html += '</div>';
-
-  let lista = d.apgar.acoes || [];
-  if (_filtro !== 'todos') lista = lista.filter(a => a.classe === _filtro);
-  if (_search) lista = lista.filter(a => a.ticker.toLowerCase().includes(_search.toLowerCase()));
-
-  html += '<div class="p-section"><div class="p-section-title">Ações (' + lista.length + ')</div>';
-  lista.slice(0,30).forEach(a => {
-    const sc = a.score;
-    const scClass = sc>=9?'score-forte':sc>=7?'score-pos':sc>=5?'score-neu':'score-frac';
-    const keys = ['tendencia','estagio','forca_relativa','contracao','breakout'];
-    const dots = keys.map(k => '<div class="p-dot pd' + a.scores[k] + '"></div>').join('');
-    html += '<div class="p-score-row">';
-    html += '<div class="p-score-badge ' + scClass + '">' + sc + '</div>';
-    html += '<div><div style="font-size:11px;font-weight:700">' + a.ticker + '</div>';
-    html += '<div class="p-dots" style="margin-top:4px">' + dots + '</div></div>';
-    const pnl = a.mrs >= 0 ? 'g' : 'r';
-    html += '<div style="text-align:right"><div style="font-size:10px">R$' + a.preco.toFixed(2) + '</div>';
-    html += '<div class="p-val ' + pnl + '" style="font-size:9px">MRS ' + (a.mrs>=0?'+':'') + a.mrs.toFixed(1) + '%</div></div>';
-    html += '</div>';
+  h+='</div>';
+  h+='<input class="psearch" type="text" placeholder="buscar ticker..." value="'+_search+'" oninput="setSearch(this.value)"></div>';
+  let lista=d.apgar.acoes||[];
+  if(_filtro!=='todos') lista=lista.filter(a=>a.classe===_filtro);
+  if(_search) lista=lista.filter(a=>a.ticker.toLowerCase().includes(_search.toLowerCase()));
+  h+='<div class="ps"><div class="ps-title">Ações ('+lista.length+')</div>';
+  lista.slice(0,30).forEach(a=>{
+    const sc=a.score;
+    const cls=sc>=9?'s-forte':sc>=7?'s-pos':sc>=5?'s-neu':'s-frac';
+    const keys=['tendencia','estagio','forca_relativa','contracao','breakout'];
+    const dots=keys.map(k=>'<div class="pdot pd'+a.scores[k]+'"></div>').join('');
+    h+='<div class="pscore"><div class="sbadge '+cls+'">'+sc+'</div>';
+    h+='<div><div style="font-size:11px;font-weight:700;color:var(--ui-text)">'+a.ticker+'</div>';
+    h+='<div class="pdots">'+dots+'</div></div>';
+    h+='<div style="text-align:right"><div style="font-size:10px;color:var(--ui-text)">R$'+a.preco.toFixed(2)+'</div>';
+    h+='<div class="pval '+(a.mrs>=0?'g':'r')+'" style="font-size:9px">MRS '+(a.mrs>=0?'+':'')+a.mrs.toFixed(1)+'%</div></div></div>';
   });
-  if (lista.length > 30) html += '<div class="p-empty" style="font-size:8px">+' + (lista.length-30) + ' mais...</div>';
-  html += '</div>';
-  return html;
+  if(lista.length>30) h+='<div class="pempty" style="font-size:8px">+'+( lista.length-30)+' mais</div>';
+  h+='</div>';
+  return h;
 }
 
-function buildTrackerPanel() {
-  const posicoes = carregarPosicoes();
-  const abertas = posicoes.filter(p => !p.fechada);
-  const fechadas = posicoes.filter(p => p.fechada);
-  const wins = fechadas.filter(p => (p.pnl_fechamento||0) > 0).length;
-  const winrate = fechadas.length > 0 ? Math.round(wins/fechadas.length*100) : 0;
-  const pnls = fechadas.map(p => p.pnl_fechamento||0);
-  const pnlMed = pnls.length > 0 ? pnls.reduce((a,b)=>a+b,0)/pnls.length : 0;
-  const pnlTot = pnls.reduce((a,b)=>a+b,0);
-
-  let html = '<div class="p-section">';
-  html += '<div class="p-stat-row">';
-  html += '<div class="p-stat"><div class="p-stat-label">Abertas</div><div class="p-stat-value g">' + abertas.length + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">Win Rate</div><div class="p-stat-value y">' + (fechadas.length ? winrate + '%' : '—') + '</div></div>';
-  const pmc = pnlMed >= 0 ? 'g' : 'r';
-  const ptc = pnlTot >= 0 ? 'g' : 'r';
-  html += '<div class="p-stat"><div class="p-stat-label">P&L Médio</div><div class="p-stat-value ' + pmc + '">' + (pnls.length ? (pnlMed>=0?'+':'') + pnlMed.toFixed(2) + '%' : '—') + '</div></div>';
-  html += '<div class="p-stat"><div class="p-stat-label">P&L Total</div><div class="p-stat-value ' + ptc + '">' + (pnls.length ? (pnlTot>=0?'+':'') + pnlTot.toFixed(2) + '%' : '—') + '</div></div>';
-  html += '</div></div>';
-
-  html += '<button class="btn-add" onclick="abrirModal()">+ REGISTRAR SINAL VCP</button>';
-
-  html += '<div class="p-section"><div class="p-section-title">Posições Abertas</div>';
-  if (!abertas.length) { html += '<div class="p-empty">Nenhuma posição aberta</div>'; }
-  else abertas.forEach(p => {
-    const precoAtual = p._preco_atual || p.entrada;
-    const pnl = (precoAtual / p.entrada - 1) * 100;
-    const dias = diasCorridos(p.data);
-    const pct = Math.min(100, Math.round(dias/7*100));
-    const st = statusPosicao(p, precoAtual);
-    const pillCls = st==='open'?'pill-open':st==='tp'?'pill-tp':'pill-ts';
-    const pillLbl = st==='open'?'ABERTA':st==='tp'?'TP +5%':'T.STOP';
-    const pnlCls = pnl >= 0 ? 'g' : 'r';
-    html += '<div class="p-trk-row">';
-    html += '<span class="p-ticker" style="font-size:10px">' + p.ticker + '</span>';
-    html += '<div style="font-size:9px"><div>Entrada: R$' + p.entrada.toFixed(2) + '</div>';
-    html += '<div>Atual: R$' + precoAtual.toFixed(2) + '</div>';
-    html += '<div style="height:3px;background:var(--border);border-radius:2px;margin-top:3px"><div style="width:' + pct + '%;height:100%;background:' + (dias>=7?'var(--red)':dias>=5?'var(--yellow)':'var(--green)') + ';border-radius:2px"></div></div>';
-    html += '</div>';
-    html += '<span class="p-val ' + pnlCls + '" style="font-size:10px;font-weight:700">' + (pnl>=0?'+':'') + pnl.toFixed(2) + '%</span>';
-    html += '<span class="p-trk-pill ' + pillCls + '">' + pillLbl + '</span>';
-    html += '</div>';
+function panelTracker(){
+  const pos=loadPos(), ab=pos.filter(p=>!p.fechada), fc=pos.filter(p=>p.fechada);
+  const wins=fc.filter(p=>(p.pnl_fechamento||0)>0).length;
+  const wr=fc.length?Math.round(wins/fc.length*100):null;
+  const pnls=fc.map(p=>p.pnl_fechamento||0);
+  const med=pnls.length?pnls.reduce((a,b)=>a+b,0)/pnls.length:null;
+  const tot=pnls.reduce((a,b)=>a+b,0);
+  let h='<div class="ps"><div class="pstats">';
+  h+='<div class="pstat"><div class="pstat-lbl">Abertas</div><div class="pstat-val g">'+ab.length+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">Win Rate</div><div class="pstat-val y">'+(wr!==null?wr+'%':'—')+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">P&L Médio</div><div class="pstat-val '+(med!==null&&med>=0?'g':'r')+'">'+(med!==null?(med>=0?'+':'')+med.toFixed(2)+'%':'—')+'</div></div>';
+  h+='<div class="pstat"><div class="pstat-lbl">P&L Total</div><div class="pstat-val '+(tot>=0?'g':'r')+'">'+(pnls.length?(tot>=0?'+':'')+tot.toFixed(2)+'%':'—')+'</div></div>';
+  h+='</div></div>';
+  h+='<button class="btn-add-pos" onclick="abrirModal()">+ REGISTRAR SINAL VCP</button>';
+  h+='<div class="ps"><div class="ps-title">Posições Abertas</div>';
+  if(!ab.length) h+='<div class="pempty">Nenhuma posição aberta</div>';
+  else ab.forEach(p=>{
+    const pa=p._preco_atual||p.entrada;
+    const pnl=(pa/p.entrada-1)*100;
+    const d=diasCorridos(p.data);
+    const pct=Math.min(100,Math.round(d/7*100));
+    const st=statusPos(p,pa);
+    const pc=st==='open'?'tp-open':st==='tp'?'tp-tp':'tp-ts';
+    const pl=st==='open'?'ABERTA':st==='tp'?'TP +5%':'T.STOP';
+    h+='<div class="ptrk"><span class="pticker" style="font-size:10px">'+p.ticker+'</span>';
+    h+='<div style="font-size:9px"><div>R$'+p.entrada.toFixed(2)+' → R$'+pa.toFixed(2)+'</div>';
+    h+='<div style="height:3px;background:var(--ui-brd);border-radius:2px;margin-top:3px"><div style="width:'+pct+'%;height:100%;background:'+(d>=7?'#8A2A1A':d>=5?'#8A6A10':'#2D7A4A')+';border-radius:2px"></div></div></div>';
+    h+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">';
+    h+='<span class="pval '+(pnl>=0?'g':'r')+'" style="font-size:10px;font-weight:700">'+(pnl>=0?'+':'')+pnl.toFixed(2)+'%</span>';
+    h+='<span class="tpill '+pc+'">'+pl+'</span></div></div>';
   });
-  html += '</div>';
-
-  const ult = fechadas.slice(-10).reverse();
-  if (ult.length) {
-    html += '<div class="p-section"><div class="p-section-title">Últimas Fechadas</div>';
-    ult.forEach(p => {
-      const pnl = p.pnl_fechamento || 0;
-      const pnlCls = pnl >= 0 ? 'g' : 'r';
-      const mot = p.motivo_fechamento || '—';
-      const pillCls = mot==='tp'?'pill-tp':'pill-ts';
-      const pillLbl = mot==='tp'?'TP +5%':'T.STOP';
-      html += '<div class="p-trk-row">';
-      html += '<span class="p-ticker" style="font-size:10px;opacity:.7">' + p.ticker + '</span>';
-      html += '<div style="font-size:9px;opacity:.7"><div>Entrada: R$' + p.entrada.toFixed(2) + '</div>';
-      html += '<div>' + (p.dias_aberta||0) + ' dias</div></div>';
-      html += '<span class="p-val ' + pnlCls + '" style="font-size:10px;font-weight:700;opacity:.8">' + (pnl>=0?'+':'') + pnl.toFixed(2) + '%</span>';
-      html += '<span class="p-trk-pill ' + pillCls + '">' + pillLbl + '</span>';
-      html += '</div>';
+  h+='</div>';
+  const ult=fc.slice(-8).reverse();
+  if(ult.length){
+    h+='<div class="ps"><div class="ps-title">Últimas Fechadas</div>';
+    ult.forEach(p=>{
+      const pnl=p.pnl_fechamento||0;
+      const mot=p.motivo_fechamento||'—';
+      const pc=mot==='tp'?'tp-tp':'tp-ts';
+      h+='<div class="ptrk"><span class="pticker" style="font-size:10px;opacity:.7">'+p.ticker+'</span>';
+      h+='<div style="font-size:9px;opacity:.7"><div>'+(p.dias_aberta||0)+'d · R$'+p.entrada.toFixed(2)+'</div></div>';
+      h+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">';
+      h+='<span class="pval '+(pnl>=0?'g':'r')+'" style="font-size:10px;font-weight:700;opacity:.8">'+(pnl>=0?'+':'')+pnl.toFixed(2)+'%</span>';
+      h+='<span class="tpill '+pc+'">'+mot.replace('_',' ')+'</span></div></div>';
     });
-    html += '</div>';
+    h+='</div>';
   }
-  return html;
+  return h;
 }
 
-// ═══════════════════════════════════════════════════════
-// DATA RENDERING — ISO SVG
-// ═══════════════════════════════════════════════════════
-function renderISO(d) {
-  // ── SALA 1: Trading Floor ──
-  const sinais = d.sinaisHoje || [];
-  const compras = sinais.filter(s=>s.tipo==='COMPRA').length;
-  const proximos = d.proximosCruzar || [];
+function setFiltro(f,btn){
+  _filtro=f;
+  document.querySelectorAll('.pfbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(_dados) renderPanel('apgar');
+}
+function setSearch(v){_search=v; if(_dados) renderPanel('apgar');}
 
-  // Ticker board
-  const topSinal = sinais[0];
-  document.getElementById('tb-line1').textContent =
-    topSinal ? 'COMPRA: ' + topSinal.ticker : (compras === 0 ? 'COMPRA: NENHUM' : 'COMPRA: ' + compras);
-  document.getElementById('tb-line2').textContent =
-    topSinal ? 'MRS:' + (topSinal.mrs>=0?'+':'') + topSinal.mrs.toFixed(1) + ' RSV:' + topSinal.rsv.toFixed(1) : 'MRS: — | RSV: —';
-  document.getElementById('tb-line3').textContent = 'PRÓX: ' + proximos.length + ' sinais';
-  document.getElementById('tb-line4').textContent = 'ANALISADAS: ' + (d.totalAcoes||'—') + ' ações';
+// ══════════════════════════════════════════════
+// ISO SVG DATA UPDATE
+// ══════════════════════════════════════════════
+function updateRooms(d){
+  const s=d.sinaisHoje||[], p=d.proximosCruzar||[];
+  // Sala 1: MRS board
+  const top=s[0];
+  const compras=s.filter(x=>x.tipo==='COMPRA').length;
+  setText('mrs-tb1', top?'COMPRA: '+top.ticker:'SINAIS: '+compras);
+  setText('mrs-tb2', top?'MRS:'+(top.mrs>=0?'+':'')+top.mrs.toFixed(1)+'  RSV:'+(top.rsv>=0?'+':'')+top.rsv.toFixed(1):'SEM SINAL HOJE');
+  setText('mrs-tb3', 'PRÓX: '+p.length+' sinais');
+  setText('mrs-tb4', 'AÇÕES: '+(d.totalAcoes||'—'));
+  // Monitor 3 top MRS
+  const tm=d.topMRS||[];
+  setText('mon3-l1','1. '+(tm[0]?tm[0].ticker.padEnd(5)+'  '+(tm[0].mrs>=0?'+':'')+tm[0].mrs.toFixed(1)+'%':'——'));
+  setText('mon3-l2','2. '+(tm[1]?tm[1].ticker.padEnd(5)+'  '+(tm[1].mrs>=0?'+':'')+tm[1].mrs.toFixed(1)+'%':'——'));
+  setText('mon3-l3','3. '+(tm[2]?tm[2].ticker.padEnd(5)+'  '+(tm[2].mrs>=0?'+':'')+tm[2].mrs.toFixed(1)+'%':'——'));
 
-  // Anima gráficos dos monitores com dados reais
-  const topMRS = (d.topMRS||[]).slice(0,3);
-  animateChart('mrs-chart-1', topMRS[0]);
-  animateChart('mrs-chart-2', topMRS[1]);
-  animateChart('mrs-chart-3', topMRS[2]);
-
-  // ── SALA 2: Research Room ──
-  const apgar = d.apgar || {};
-  const res = apgar.resumo || {};
-  document.getElementById('apgar-forte-cnt').textContent = res.forte || '—';
-  document.getElementById('apgar-pos-cnt').textContent = (res.positivo||'—') + ' POSITIVO';
-  document.getElementById('apgar-frac-cnt').textContent = (res.fraco||'—') + ' FRACO';
-
-  // Score display — melhor ação
-  const top = (apgar.acoes||[]).find(a => a.score >= 7);
-  if (top) {
-    document.getElementById('apgar-score-display').textContent = top.score;
-    // Atualiza quadro branco
-    const sc = top.scores;
-    const board = document.getElementById('apgar-board-content');
-    const bars = ['tendencia','estagio','forca_relativa','contracao','breakout'];
-    const labels = ['T','E','R','C','B'];
-    board.innerHTML = bars.map((k,i) => {
-      const v = sc[k] || 0;
-      const bar = v===2?'████':v===1?'██░░':'░░░░';
-      const col = v===2?'#00f0a0':v===1?'#f5c842':'#4a3a80';
-      return '<text x="180" y="' + (250+i*12) + '" fill="' + col + '" font-family="Space Mono" font-size="7">' + labels[i] + ' ' + bar + '</text>';
-    }).join('');
+  // Sala 2: APGAR board
+  const ap=d.apgar||{}, res=ap.resumo||{}, acoes=ap.acoes||[];
+  const topAcao=acoes.find(a=>a.score>=7);
+  if(topAcao){
+    setText('ab-score', topAcao.score);
+    setText('ab-ticker', topAcao.ticker);
+    setText('laptop-score', topAcao.score);
+    // Barras
+    const sc=topAcao.scores;
+    setBar('ab-t', sc.tendencia/2);
+    setBar('ab-e', sc.estagio/2);
+    setBar('ab-r', sc.forca_relativa/2);
+    setBar('ab-c', sc.contracao/2);
+    setBar('ab-b', sc.breakout/2);
   }
+  setText('ab-forte', (res.forte||'—')+' FORTE');
+  setText('ab-pos', (res.positivo||'—')+' POSITIVO');
+  setText('ab-frac', (res.fraco||'—')+' FRACO');
+  // Top VCP no laptop
+  const vcps=acoes.filter(a=>a.score>=5&&a.score<=8&&a.scores?.breakout===2&&a.mrs>0);
+  setText('apg-top1', (vcps[0]?vcps[0].ticker.padEnd(5)+'  '+vcps[0].score+'/10':'——    —/10'));
+  setText('apg-top2', (vcps[1]?vcps[1].ticker.padEnd(5)+'  '+vcps[1].score+'/10':'——    —/10'));
+  setText('apg-top3', (vcps[2]?vcps[2].ticker.padEnd(5)+'  '+vcps[2].score+'/10':'——    —/10'));
+  setText('apg-top4', (vcps[3]?vcps[3].ticker.padEnd(5)+'  '+vcps[3].score+'/10':'——    —/10'));
 
-  // ── SALA 3: Portfolio Room ──
-  updateTrackerISO();
+  // Sala 3: Tracker board
+  updateTrackerRoom();
 }
 
-function updateTrackerISO() {
-  const posicoes = carregarPosicoes();
-  const abertas = posicoes.filter(p => !p.fechada);
-  const fechadas = posicoes.filter(p => p.fechada);
-  const wins = fechadas.filter(p => (p.pnl_fechamento||0) > 0).length;
-  const winrate = fechadas.length ? Math.round(wins/fechadas.length*100) : null;
-  const pnls = fechadas.map(p => p.pnl_fechamento||0);
-  const pnlMed = pnls.length > 0 ? pnls.reduce((a,b)=>a+b,0)/pnls.length : null;
+function updateTrackerRoom(){
+  const pos=loadPos(), ab=pos.filter(p=>!p.fechada), fc=pos.filter(p=>p.fechada);
+  const wins=fc.filter(p=>(p.pnl_fechamento||0)>0).length;
+  const wr=fc.length?Math.round(wins/fc.length*100):null;
+  const pnls=fc.map(p=>p.pnl_fechamento||0);
+  const med=pnls.length?pnls.reduce((a,b)=>a+b,0)/pnls.length:null;
+  setText('trk-ab', ab.length);
+  setText('trk-wr', wr!==null?wr+'%':'—');
+  setText('trk-pm', med!==null?(med>=0?'+':'')+med.toFixed(2)+'%':'—');
+  setText('trk-fc', fc.length);
+  // Posição nos cards visuais
+  ab.slice(0,3).forEach((p,i)=>{
+    const pa=p._preco_atual||p.entrada;
+    const pnl=(pa/p.entrada-1)*100;
+    const d=diasCorridos(p.data);
+    const pct=Math.min(100,Math.round(d/7*100));
+    const n=i+1;
+    setText('c'+n+'-tck', p.ticker);
+    const pe=document.getElementById('c'+n+'-pnl');
+    if(pe){ pe.textContent=(pnl>=0?'+':'')+pnl.toFixed(2)+'%'; pe.setAttribute('fill',pnl>=0?'#2D7A4A':'#8A2A1A'); }
+    setText('c'+n+'-dias', d+'d');
+    const bar=document.getElementById('c'+n+'-bar');
+    if(bar){ bar.setAttribute('width', Math.round(pct*0.94)); }
+  });
+}
 
-  document.getElementById('trk-abertas').textContent = abertas.length;
-  document.getElementById('trk-winrate').textContent = winrate !== null ? winrate + '%' : '—';
-  document.getElementById('trk-pnlmed').textContent = pnlMed !== null ? (pnlMed>=0?'+':'') + pnlMed.toFixed(2) + '%' : '—';
-  document.getElementById('trk-fechadas').textContent = fechadas.length;
+function setText(id,v){const el=document.getElementById(id); if(el) el.textContent=v;}
+function setBar(id,pct){
+  const el=document.getElementById(id); if(!el) return;
+  el.setAttribute('width', Math.round(pct*60));
+  const col=pct>=1?'#2D7A4A':pct>=0.5?'#8A6A10':'#8A2A1A';
+  el.setAttribute('fill', col);
+}
 
-  // Cards de posição
-  abertas.slice(0,3).forEach((p,i) => {
-    const precoAtual = p._preco_atual || p.entrada;
-    const pnl = (precoAtual / p.entrada - 1) * 100;
-    const el = document.getElementById('card' + (i+1) + '-ticker');
-    const pe = document.getElementById('card' + (i+1) + '-pnl');
-    if (el) el.textContent = p.ticker;
-    if (pe) {
-      pe.textContent = (pnl>=0?'+':'') + pnl.toFixed(2) + '%';
-      pe.setAttribute('fill', pnl >= 0 ? '#00f0a080' : '#ff3d5a80');
+// ══════════════════════════════════════════════
+// SPRITE ENGINE — personagem unificado
+// ══════════════════════════════════════════════
+const SPRITES={
+  walk:  {file:'sprite_walk.png', cols:4, rows:2, total:8,  fps:12},
+  idle1: {file:'sprite.png',      cols:5, rows:2, total:10, fps:11},
+  idle2: {file:'sprite2.png',     cols:5, rows:2, total:10, fps:11},
+};
+const _imgs={};
+let _spriteLoaded={walk:false,idle1:false,idle2:false};
+Object.entries(SPRITES).forEach(([k,s])=>{
+  _imgs[k]=new Image();
+  _imgs[k].onload=()=>{ _spriteLoaded[k]=true; if(Object.values(_spriteLoaded).every(Boolean)) onAllSpritesLoaded(); };
+  _imgs[k].onerror=()=>console.warn('[Sprite] '+s.file+' não encontrado');
+  _imgs[k].src=s.file;
+});
+
+// Personagem global
+const CHAR={
+  x:200, y:350,      // posição atual
+  vx:0,              // velocidade
+  dir:1,             // 1=direita, -1=esquerda
+  mode:'walk',       // 'walk'|'idle1'|'idle2'
+  frame:0,
+  frameTimer:0,
+  idleTimer:0,
+  size:140,          // tamanho de display
+  running:false,
+};
+let _charLoop=null;
+let _charCanvas=null, _charCtx=null;
+
+function onAllSpritesLoaded(){
+  _charCanvas=document.getElementById('sprite-canvas');
+  _charCtx=_charCanvas.getContext('2d');
+  startCharLoop();
+}
+
+function startCharLoop(){
+  if(_charLoop) return;
+  CHAR.running=true;
+  const stageEl=document.getElementById('stage');
+
+  function loop(){
+    if(!CHAR.running) return;
+    const stW=stageEl.offsetWidth, stH=stageEl.offsetHeight;
+    const sp=SPRITES[CHAR.mode];
+    const now=Date.now();
+
+    // Avança frame
+    CHAR.frameTimer+=16;
+    if(CHAR.frameTimer>=Math.round(1000/sp.fps)){
+      CHAR.frameTimer=0;
+      CHAR.frame=(CHAR.frame+1)%sp.total;
     }
-  });
-}
 
-function animateChart(id, acao) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  // Gera uma curva baseada no MRS/RSV da ação
-  if (!acao) return;
-  const base = [200,218,230,248,265,280];
-  const yBase = 440;
-  const range = 25;
-  const mrs = acao.mrs || 0;
-  const points = base.map((x, i) => {
-    const frac = i / (base.length - 1);
-    const y = yBase - (frac * range) - (mrs > 0 ? Math.sin(frac * Math.PI) * 8 : 0) + (Math.random() * 4 - 2);
-    return x + ',' + y.toFixed(0);
-  }).join(' ');
-  el.setAttribute('points', points);
-}
-
-// ═══════════════════════════════════════════════════════
-// SOUND ENGINE (Web Audio API)
-// ═══════════════════════════════════════════════════════
-function initAudio() {
-  if (_audioCtx) return;
-  _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-
-function playSound(type) {
-  if (!_soundOn || !_audioCtx) return;
-  const ctx = _audioCtx;
-  const now = ctx.currentTime;
-
-  if (type === 'swoosh') {
-    // Som de transição rápido
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime(800, now);
-    osc.frequency.exponentialRampToValueAtTime(200, now + 0.2);
-    gain.gain.setValueAtTime(0.1, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-    osc.start(now); osc.stop(now + 0.25);
-
-  } else if (type === 'chime') {
-    // Som de sino para APGAR
-    [523, 659, 784].forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, now + i * 0.08);
-      gain.gain.linearRampToValueAtTime(0.08, now + i * 0.08 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.5);
-      osc.start(now + i * 0.08);
-      osc.stop(now + i * 0.08 + 0.5);
-    });
-
-  } else if (type === 'tick') {
-    // Som de tick para tracker
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = 1200;
-    gain.gain.setValueAtTime(0.05, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-    osc.start(now); osc.stop(now + 0.05);
-
-  } else if (type === 'ambient') {
-    // Teclado de escritório — série de ticks suaves
-    for (let i = 0; i < 4; i++) {
-      const delay = Math.random() * 0.8;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'square';
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = 800 + Math.random() * 400;
-      gain.gain.setValueAtTime(0.02, now + delay);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.03);
-      osc.start(now + delay); osc.stop(now + delay + 0.03);
+    // Movimento se walking
+    if(CHAR.mode==='walk'){
+      CHAR.x+=CHAR.vx;
+      // Rebate nas bordas
+      if(CHAR.x<-20){ CHAR.x=-20; CHAR.vx=Math.abs(CHAR.vx); CHAR.dir=1; }
+      if(CHAR.x>stW-CHAR.size+20){ CHAR.x=stW-CHAR.size+20; CHAR.vx=-Math.abs(CHAR.vx); CHAR.dir=-1; }
     }
+
+    // Posiciona canvas
+    _charCanvas.style.left=CHAR.x+'px';
+    _charCanvas.style.top=(stH-CHAR.size-8)+'px'; // sempre no "chão"
+    _charCanvas.width=CHAR.size; _charCanvas.height=CHAR.size;
+
+    // Desenha frame
+    const ctx=_charCtx;
+    ctx.clearRect(0,0,CHAR.size,CHAR.size);
+    const img=_imgs[CHAR.mode];
+    if(!img||!_spriteLoaded[CHAR.mode]){ requestAnimationFrame(loop); return; }
+    const sp2=SPRITES[CHAR.mode];
+    const fw=img.naturalWidth/sp2.cols, fh=img.naturalHeight/sp2.rows;
+    const col=CHAR.frame%sp2.cols, row=Math.floor(CHAR.frame/sp2.cols);
+    ctx.save();
+    if(CHAR.dir===-1){
+      // Espelha horizontalmente
+      ctx.translate(CHAR.size,0); ctx.scale(-1,1);
+    }
+    ctx.drawImage(img, col*fw, row*fh, fw, fh, 0, 0, CHAR.size, CHAR.size);
+    ctx.restore();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+function setCharMode(mode, durationMs){
+  CHAR.mode=mode; CHAR.frame=0; CHAR.frameTimer=0;
+  if(mode==='walk'){
+    // Velocidade aleatória leve
+    const speed=1.2+Math.random()*1.5;
+    CHAR.vx=CHAR.dir*speed;
+  }
+  if(durationMs){
+    setTimeout(()=>{ CHAR.mode='walk'; CHAR.vx=CHAR.dir*(1.2+Math.random()*1.5); },durationMs);
   }
 }
 
-function toggleSound() {
-  initAudio();
-  _soundOn = !_soundOn;
-  const btn = document.getElementById('snd-btn');
-  btn.textContent = _soundOn ? '♪ SOM ON' : '♪ SOM';
-  btn.style.color = _soundOn ? 'var(--green)' : '';
-  btn.style.borderColor = _soundOn ? 'var(--green)' : '';
-  if (_soundOn) {
-    // Toca som de ambiente periodicamente
-    setInterval(() => { if (_soundOn) playSound('ambient'); }, 3000 + Math.random() * 2000);
-  }
+// Inicia andando
+function initChar(){
+  const stW=document.getElementById('stage').offsetWidth;
+  CHAR.x=stW*0.4; CHAR.vx=1.5; CHAR.dir=1;
+  CHAR.mode='walk';
 }
 
-// ═══════════════════════════════════════════════════════
-// MONITOR PULSE ANIMATION
-// ═══════════════════════════════════════════════════════
-function pulseMonitors() {
-  const monitors = ['mon-mrs-1','mon-mrs-2','mon-mrs-3','mon-apgar'];
-  monitors.forEach((id, i) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    setInterval(() => {
-      el.style.opacity = '0.7';
-      setTimeout(() => el.style.opacity = '1', 200);
-    }, 2000 + i * 600);
-  });
+// Muda direção periodicamente + idle espontâneo
+function charAI(){
+  setInterval(()=>{
+    if(CHAR.mode==='walk'&&Math.random()<0.08){
+      // 8% chance de parar e fazer idle
+      setCharMode(Math.random()<0.5?'idle1':'idle2', 2800+Math.random()*1500);
+    }
+    if(CHAR.mode==='walk'&&Math.random()<0.05){
+      CHAR.vx=-CHAR.vx; CHAR.dir=CHAR.vx>0?1:-1;
+    }
+  },800);
 }
 
-// ═══════════════════════════════════════════════════════
+// Triggers de fora
+function triggerApgar(){
+  // Cobre tela com canvas separado (mantém canvas do sprite também)
+  const ov=document.getElementById('apgar-ov');
+  const canvas=document.getElementById('apgar-canvas');
+  ov.style.display='block'; ov.classList.add('visible');
+  const ctx2=canvas.getContext('2d');
+  const sp=SPRITES['idle1'];
+  const img=_imgs['idle1'];
+  if(!img||!_spriteLoaded['idle1']){ ov.style.display='none'; return; }
+  canvas.width=canvas.offsetWidth||window.innerWidth;
+  canvas.height=canvas.offsetHeight||window.innerHeight;
+  const sz=Math.max(canvas.width,canvas.height)/2;
+  let f=0, loop=0;
+  const iv=setInterval(()=>{
+    ctx2.clearRect(0,0,canvas.width,canvas.height);
+    const fw=img.naturalWidth/sp.cols, fh=img.naturalHeight/sp.rows;
+    const col=f%sp.cols, row=Math.floor(f/sp.cols);
+    ctx2.drawImage(img,col*fw,row*fh,fw,fh,(canvas.width-sz)/2,(canvas.height-sz)/2,sz,sz);
+    f++; if(f>=sp.total){f=0;loop++; if(loop>=3){clearInterval(iv);
+      ov.classList.add('slo');
+      setTimeout(()=>{ov.style.display='none';ov.classList.remove('slo','visible');},580);
+    }}
+  },Math.round(1000/sp.fps));
+  // Personagem faz idle1 também
+  setCharMode('idle1', sp.total/sp.fps*3*1000+200);
+}
+
+function triggerFugazi(){
+  const w=document.getElementById('fugazi-wrap');
+  if(!_spriteLoaded['idle2']){return;}
+  w.classList.remove('fo'); w.style.left=''; w.style.visibility='visible';
+  void w.offsetWidth; w.classList.add('fi');
+  const canvas=document.getElementById('fugazi-canvas');
+  const sp=SPRITES['idle2'], img=_imgs['idle2'];
+  const balloon=document.getElementById('fugazi-balloon');
+  canvas.width=window.innerWidth;
+  const bH=balloon.offsetHeight+40;
+  canvas.height=Math.max(window.innerHeight-48-bH,120);
+  const sz=Math.max(canvas.width,canvas.height)/2;
+  const ctx2=canvas.getContext('2d');
+  let f=0,loop=0,_hide=null;
+  const iv=setInterval(()=>{
+    ctx2.clearRect(0,0,canvas.width,canvas.height);
+    const fw=img.naturalWidth/sp.cols,fh=img.naturalHeight/sp.rows;
+    const col=f%sp.cols,row=Math.floor(f/sp.cols);
+    ctx2.drawImage(img,col*fw,row*fh,fw,fh,(canvas.width-sz)/2,(canvas.height-sz)/2,sz,sz);
+    f++; if(f>=sp.total){f=0;loop++;if(loop>=3){clearInterval(iv);
+      _hide=setTimeout(()=>{
+        w.classList.remove('fi'); w.classList.add('fo');
+        setTimeout(()=>{w.classList.remove('fo');w.style.visibility='hidden';},420);
+      },3000);
+    }}
+  },Math.round(1000/sp.fps));
+  setCharMode('idle2', sp.total/sp.fps*3*1000+3200);
+}
+
+function triggerWalk(){
+  // Personagem faz animação de walk especial (corrida rápida)
+  const stW=document.getElementById('stage').offsetWidth;
+  CHAR.x=-20; CHAR.vx=6; CHAR.dir=1;
+  setCharMode('walk');
+  // Volta ao normal após atravessar
+  setTimeout(()=>{ CHAR.vx=1.5+Math.random(); },2200);
+}
+
+// ══════════════════════════════════════════════
 // TRACKER LOGIC
-// ═══════════════════════════════════════════════════════
-function carregarPosicoes() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); } catch(e) { return []; }
-}
-function salvarPosicoes(arr) { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
-function diasCorridos(dataStr) {
-  return Math.floor((new Date() - new Date(dataStr + 'T00:00:00')) / 86400000);
-}
-function statusPosicao(pos, precoAtual) {
-  const pnl = (precoAtual / pos.entrada - 1) * 100;
-  const dias = diasCorridos(pos.data);
-  if (pos.fechada) return pos.motivo_fechamento || 'fechada';
-  if (pnl >= TP_PCT * 100) return 'tp';
-  if (dias >= 7) return 'time_stop';
+// ══════════════════════════════════════════════
+function loadPos(){try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch{return[]}}
+function savePos(a){localStorage.setItem(LS,JSON.stringify(a))}
+function diasCorridos(ds){return Math.floor((new Date()-new Date(ds+'T00:00:00'))/86400000)}
+function statusPos(p,pa){
+  const pnl=(pa/p.entrada-1)*100, d=diasCorridos(p.data);
+  if(p.fechada) return p.motivo_fechamento||'fechada';
+  if(pnl>=TP*100) return 'tp';
+  if(d>=7) return 'time_stop';
   return 'open';
 }
-function autoRegistrarSinaisVCP(dados) {
-  if (!dados?.apgar?.acoes) return;
-  const hoje = new Date().toISOString().split('T')[0];
-  const posicoes = carregarPosicoes();
-  const existentes = new Set(posicoes.filter(p=>p.data===hoje).map(p=>p.ticker));
-  dados.apgar.acoes.forEach(a => {
-    if (a.score>=5 && a.score<=8 && a.scores?.breakout===2 && a.mrs>0 && a.rsv>0 && !existentes.has(a.ticker)) {
-      posicoes.push({ id: Date.now()+'_'+a.ticker, ticker:a.ticker, entrada:a.preco,
-        score:a.score, data:hoje, ibov_entrada:null, notas:'VCP auto', fechada:false, _preco_atual:a.preco });
-      existentes.add(a.ticker);
+function autoVCP(dados){
+  if(!dados?.apgar?.acoes) return;
+  const hoje=new Date().toISOString().split('T')[0];
+  const pos=loadPos(), ex=new Set(pos.filter(p=>p.data===hoje).map(p=>p.ticker));
+  dados.apgar.acoes.forEach(a=>{
+    if(a.score>=5&&a.score<=8&&a.scores?.breakout===2&&a.mrs>0&&a.rsv>0&&!ex.has(a.ticker)){
+      pos.push({id:Date.now()+'_'+a.ticker,ticker:a.ticker,entrada:a.preco,score:a.score,
+        data:hoje,notas:'VCP auto',fechada:false,_preco_atual:a.preco});
+      ex.add(a.ticker);
     }
   });
-  salvarPosicoes(posicoes);
+  savePos(pos);
 }
-function atualizarPrecos(dados) {
-  if (!dados) return;
-  const posicoes = carregarPosicoes();
-  let updated = false;
-  posicoes.forEach(p => {
-    if (p.fechada) return;
-    const acoes = dados.apgar?.acoes || [];
-    const acao = acoes.find(a => a.ticker === p.ticker);
-    if (acao && acao.preco !== p._preco_atual) { p._preco_atual = acao.preco; updated = true; }
+function atualizaPrecos(dados){
+  if(!dados) return;
+  const pos=loadPos(); let upd=false;
+  pos.forEach(p=>{
+    if(p.fechada) return;
+    const a=(dados.apgar?.acoes||[]).find(x=>x.ticker===p.ticker);
+    if(a&&a.preco!==p._preco_atual){p._preco_atual=a.preco;upd=true;}
   });
-  if (updated) salvarPosicoes(posicoes);
+  if(upd) savePos(pos);
 }
-function abrirModal() {
-  document.getElementById('mData').value = new Date().toISOString().split('T')[0];
-  ['mTicker','mEntrada','mScore','mNotas'].forEach(id => { document.getElementById(id).value = ''; });
-  document.getElementById('modalOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('mTicker').focus(), 100);
+function abrirModal(){
+  document.getElementById('mData').value=new Date().toISOString().split('T')[0];
+  ['mTicker','mEntrada','mScore','mNotas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mOv').classList.add('open');
+  setTimeout(()=>document.getElementById('mTicker').focus(),100);
 }
-function fecharModal(e) {
-  if (!e || e.target === document.getElementById('modalOverlay'))
-    document.getElementById('modalOverlay').classList.remove('open');
+function fecharModal(e){
+  if(!e||e.target===document.getElementById('mOv'))
+    document.getElementById('mOv').classList.remove('open');
 }
-function salvarSinal() {
-  const ticker = document.getElementById('mTicker').value.trim().toUpperCase();
-  const entrada = parseFloat(document.getElementById('mEntrada').value);
-  const score = parseInt(document.getElementById('mScore').value)||null;
-  const data = document.getElementById('mData').value;
-  const notas = document.getElementById('mNotas').value.trim();
-  if (!ticker || isNaN(entrada) || !data) { alert('Preencha ticker, preço e data.'); return; }
-  const posicoes = carregarPosicoes();
-  posicoes.push({ id:Date.now()+'_'+ticker, ticker, entrada, score, data, notas, fechada:false, _preco_atual:entrada });
-  salvarPosicoes(posicoes);
-  fecharModal();
-  updateTrackerISO();
-  if (document.getElementById('data-panel').classList.contains('open')) renderPanel('tracker');
+function salvarSinal(){
+  const t=document.getElementById('mTicker').value.trim().toUpperCase();
+  const e=parseFloat(document.getElementById('mEntrada').value);
+  const sc=parseInt(document.getElementById('mScore').value)||null;
+  const d=document.getElementById('mData').value;
+  const n=document.getElementById('mNotas').value.trim();
+  if(!t||isNaN(e)||!d){alert('Ticker, preço e data são obrigatórios.');return;}
+  const pos=loadPos();
+  pos.push({id:Date.now()+'_'+t,ticker:t,entrada:e,score:sc,data:d,notas:n,fechada:false,_preco_atual:e});
+  savePos(pos); fecharModal();
+  updateTrackerRoom();
+  if(document.getElementById('panel').classList.contains('open')) renderPanel('tracker');
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharModal();});
 
-function setFiltro(f, btn) {
-  _filtro = f;
-  document.querySelectorAll('.p-f-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (_dados) renderPanel('apgar');
+// ══════════════════════════════════════════════
+// SOUND
+// ══════════════════════════════════════════════
+function initAudio(){if(!_ctx)_ctx=new(window.AudioContext||window.webkitAudioContext)();}
+function playSound(t){
+  if(!_soundOn||!_ctx) return;
+  const now=_ctx.currentTime;
+  if(t==='swoosh'){
+    const o=_ctx.createOscillator(),g=_ctx.createGain();o.connect(g);g.connect(_ctx.destination);
+    o.frequency.setValueAtTime(600,now);o.frequency.exponentialRampToValueAtTime(200,now+.2);
+    g.gain.setValueAtTime(.08,now);g.gain.exponentialRampToValueAtTime(.001,now+.25);
+    o.start(now);o.stop(now+.25);
+  } else if(t==='chime'){
+    [523,659,784].forEach((f,i)=>{
+      const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='sine';o.connect(g);g.connect(_ctx.destination);
+      o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+i*.08);g.gain.linearRampToValueAtTime(.06,now+i*.08+.02);
+      g.gain.exponentialRampToValueAtTime(.001,now+i*.08+.45);
+      o.start(now+i*.08);o.stop(now+i*.08+.45);
+    });
+  } else if(t==='tick'){
+    const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='square';o.connect(g);g.connect(_ctx.destination);
+    o.frequency.value=1000;g.gain.setValueAtTime(.04,now);g.gain.exponentialRampToValueAtTime(.001,now+.04);
+    o.start(now);o.stop(now+.04);
+  } else if(t==='ambient'){
+    for(let i=0;i<3;i++){
+      const dl=Math.random()*.6;
+      const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='square';o.connect(g);g.connect(_ctx.destination);
+      o.frequency.value=600+Math.random()*400;
+      g.gain.setValueAtTime(.015,now+dl);g.gain.exponentialRampToValueAtTime(.001,now+dl+.025);
+      o.start(now+dl);o.stop(now+dl+.025);
+    }
+  }
 }
-function setSearch(v) { _search = v; if (_dados) renderPanel('apgar'); }
+function toggleSound(){
+  initAudio(); _soundOn=!_soundOn;
+  const b=document.getElementById('snd-btn');
+  b.textContent=_soundOn?'♪ SOM ON':'♪ SOM';
+  b.classList.toggle('snd-on',_soundOn);
+  if(_soundOn) setInterval(()=>{if(_soundOn) playSound('ambient');},2800+Math.random()*1500);
+}
 
-// ═══════════════════════════════════════════════════════
-// API FETCH
-// ═══════════════════════════════════════════════════════
-const DEMO = {
-  _demo:true, lastUpdate:new Date().toLocaleString('pt-BR'), totalAcoes:100,
+// ══════════════════════════════════════════════
+// API
+// ══════════════════════════════════════════════
+const DEMO={
+  _demo:true,lastUpdate:'DEMO',totalAcoes:100,
   sinaisHoje:[
     {ticker:'CURY3',tipo:'COMPRA',mrs:2.1,rsv:45.2,preco:22.1,dias_rsv_positivo:5,dias_rsv_negativo:0},
     {ticker:'PETR4',tipo:'COMPRA',mrs:0.8,rsv:12.3,preco:38.5,dias_rsv_positivo:3,dias_rsv_negativo:0},
@@ -1233,6 +1360,7 @@ const DEMO = {
     {ticker:'CURY3',mrs:8.4,rsv:45.2,preco:22.1,dias_rsv_positivo:5,dias_rsv_negativo:0},
     {ticker:'WEGE3',mrs:5.1,rsv:12.0,preco:48.6,dias_rsv_positivo:3,dias_rsv_negativo:0},
     {ticker:'PETR4',mrs:4.2,rsv:8.1,preco:38.5,dias_rsv_positivo:2,dias_rsv_negativo:0},
+    {ticker:'ITUB4',mrs:3.1,rsv:5.2,preco:39.8,dias_rsv_positivo:1,dias_rsv_negativo:0},
   ],
   topRSVConsistente:[{ticker:'VALE3',mrs:3.2,rsv:28.0,preco:79.2,dias_rsv_positivo:15}],
   topRSVFraco:[{ticker:'MGLU3',mrs:-4.1,rsv:-32.0,preco:8.2,dias_rsv_negativo:12}],
@@ -1249,190 +1377,61 @@ const DEMO = {
   }
 };
 
-async function atualizarDados(tentativa=1, max=3) {
-  loadingProgress(20 + tentativa * 20, 'CONECTANDO À API...');
-  try {
-    const r = await fetch('/api/screener', {cache:'default'});
-    if (r.status === 404) throw new Error('API 404');
-    if (!r.ok) throw new Error('Erro ' + r.status);
-    const d = await r.json();
-    if (d.error && d.retry) {
-      document.getElementById('updateTime').innerHTML = '<span style="color:var(--yellow)">⏳ ' + d.error + '</span>';
-      if (tentativa < max) setTimeout(() => atualizarDados(tentativa+1, max), 10000);
+async function atualizarDados(t=1,m=3){
+  lprog(30+t*20,'CONECTANDO...');
+  try{
+    const r=await fetch('/api/screener',{cache:'default'});
+    if(r.status===404) throw new Error('API 404');
+    if(!r.ok) throw new Error('Erro '+r.status);
+    const d=await r.json();
+    if(d.error&&d.retry){
+      document.getElementById('updateTime').innerHTML='<span style="color:orange">⏳'+d.error+'</span>';
+      if(t<m) setTimeout(()=>atualizarDados(t+1,m),10000);
       return;
     }
-    _dados = d;
-    onDadosCarregados(d);
-  } catch(e) {
+    onLoad(d);
+  }catch(e){
     console.error(e);
-    document.getElementById('updateTime').innerHTML = '<span style="color:var(--yellow)">⚠ DEMO</span>';
-    _dados = DEMO;
-    onDadosCarregados(DEMO);
+    document.getElementById('updateTime').innerHTML='⚠ DEMO';
+    onLoad(DEMO);
   }
 }
 
-function onDadosCarregados(d) {
-  loadingProgress(100, 'SISTEMAS ONLINE');
-  document.getElementById('updateTime').textContent = d._demo ? '⚠ DEMO' : (d.lastUpdate || '—');
-  if (!d._demo) {
-    autoRegistrarSinaisVCP(d);
-    atualizarPrecos(d);
-  }
-  renderISO(d);
-  updateTrackerISO();
-  if (document.getElementById('data-panel').classList.contains('open')) {
-    renderPanel(_currentRoom);
-  }
+function onLoad(d){
+  _dados=d;
+  lprog(100,'SISTEMAS ONLINE');
+  document.getElementById('updateTime').textContent=d._demo?'⚠ DEMO':(d.lastUpdate||'—');
+  if(!d._demo){ autoVCP(d); atualizaPrecos(d); }
+  updateRooms(d);
+  updateTrackerRoom();
+  if(document.getElementById('panel').classList.contains('open')) renderPanel(_room);
   playSound('ambient');
-  setTimeout(hideLoading, 400);
+  setTimeout(hideLoad,500);
 }
 
-async function forceUpdate(event) {
-  const btn = event.currentTarget;
-  btn.disabled = true; btn.textContent = '⏳ ...';
-  triggerFugazi();
-  try {
-    const r = await fetch('/api/screener?force=' + Date.now(), {cache:'no-store'});
-    if (!r.ok) throw new Error('Erro');
-    _dados = await r.json();
-    onDadosCarregados(_dados);
-    btn.textContent = '✅ OK';
-  } catch(e) { btn.textContent = '❌ ERR'; }
-  finally { setTimeout(() => { btn.textContent = '↻ UPDATE'; btn.disabled = false; }, 2000); }
+async function forceUpdate(ev){
+  const b=ev.currentTarget; b.disabled=true; b.textContent='⏳';
+  triggerFugazi(); playSound('swoosh');
+  try{
+    const r=await fetch('/api/screener?force='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error();
+    onLoad(await r.json()); b.textContent='✅';
+  }catch(e){b.textContent='❌';}
+  finally{setTimeout(()=>{b.textContent='↻ UPDATE';b.disabled=false;},2000);}
 }
 
-// ═══════════════════════════════════════════════════════
-// SPRITE ENGINES
-// ═══════════════════════════════════════════════════════
-
-// ── SPRITE.PNG — APGAR ──
-(function() {
-  const SP = { FILE:'sprite.png', COLS:5, ROWS:2, TOTAL:10, FW:290, FH:290, FPS:11, LOOPS:3 };
-  let _img=null,_loaded=false,_timer=null,_frame=0,_loop=0,_running=false;
-  function preload() {
-    if(_img) return; _img=new Image();
-    _img.onload=()=>{_loaded=true};_img.onerror=()=>console.warn('[Sprite] não encontrado');
-    _img.src=SP.FILE;
-  }
-  preload();
-  function drawFrame(fi) {
-    const canvas=document.getElementById('apgar-sprite-canvas');
-    if(!canvas||!_loaded) return;
-    const W=canvas.width=canvas.offsetWidth||window.innerWidth;
-    const H=canvas.height=canvas.offsetHeight||window.innerHeight;
-    const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,W,H);
-    const ts=Math.max(W,H)/2;
-    const col=fi%SP.COLS,row=Math.floor(fi/SP.COLS);
-    ctx.drawImage(_img,col*SP.FW,row*SP.FH,SP.FW,SP.FH,(W-ts)/2,(H-ts)/2,ts,ts);
-  }
-  function stop() { if(_timer){clearInterval(_timer);_timer=null} _running=false; }
-  function triggerSlide() {
-    const ov=document.getElementById('apgar-sprite-overlay');
-    ov.classList.add('slide-left-out');
-    setTimeout(()=>{ stop(); ov.style.display='none'; ov.style.visibility='hidden'; ov.classList.remove('slide-left-out'); _frame=0;_loop=0; },580);
-  }
-  function play() {
-    if(_running) return;
-    if(!_loaded){setTimeout(play,300);return}
-    const ov=document.getElementById('apgar-sprite-overlay');
-    ov.style.display='block'; ov.style.visibility='visible';
-    ov.classList.remove('slide-left-out');
-    _frame=0;_loop=0;_running=true; drawFrame(0);
-    _timer=setInterval(()=>{
-      _frame++;
-      if(_frame>=SP.TOTAL){_frame=0;_loop++;if(_loop>=SP.LOOPS){stop();triggerSlide();return}}
-      drawFrame(_frame);
-    }, Math.round(1000/SP.FPS));
-  }
-  window.triggerApgarSprite=play;
-})();
-
-// ── SPRITE2.PNG — FUGAZI ──
-(function() {
-  const SP2={FILE:'sprite2.png',COLS:5,ROWS:2,TOTAL:10,FW:290,FH:290,FPS:11,LOOPS:3};
-  let _img=null,_loaded=false,_timer=null,_running=false,_hide=null;
-  function preload(){if(_img)return;_img=new Image();_img.onload=()=>{_loaded=true};_img.onerror=()=>console.warn('[Sprite2] não encontrado');_img.src=SP2.FILE}
-  preload();
-  function sizeCanvas(){
-    const canvas=document.getElementById('fugazi-canvas'),balloon=document.getElementById('fugazi-balloon');
-    if(!canvas||!balloon) return;
-    const bH=balloon.offsetHeight+40;
-    canvas.width=window.innerWidth; canvas.height=Math.max(window.innerHeight-52-bH,120);
-  }
-  function draw(fi){
-    const canvas=document.getElementById('fugazi-canvas');
-    if(!canvas||!_loaded) return; sizeCanvas();
-    const W=canvas.width,H=canvas.height,ctx=canvas.getContext('2d');
-    ctx.clearRect(0,0,W,H);
-    const ts=Math.max(W,H)/2,col=fi%SP2.COLS,row=Math.floor(fi/SP2.COLS);
-    ctx.drawImage(_img,col*SP2.FW,row*SP2.FH,SP2.FW,SP2.FH,(W-ts)/2,(H-ts)/2,ts,ts);
-  }
-  function stop(){if(_timer){clearInterval(_timer);_timer=null}_running=false}
-  function slideOut(){
-    const c=document.getElementById('fugazi-container');
-    c.classList.remove('slide-in'); c.classList.add('slide-out');
-    setTimeout(()=>{c.classList.remove('slide-out');c.style.visibility='hidden';stop()},420);
-  }
-  function play(){
-    if(_running)return; if(!_loaded){setTimeout(play,300);return}
-    if(_hide){clearTimeout(_hide);_hide=null}
-    const c=document.getElementById('fugazi-container');
-    c.classList.remove('slide-out'); c.style.left=''; c.style.visibility='visible';
-    void c.offsetWidth; c.classList.add('slide-in');
-    let frame=0,loop=0; _running=true; draw(0);
-    _timer=setInterval(()=>{
-      frame++; if(frame>=SP2.TOTAL){frame=0;loop++;if(loop>=SP2.LOOPS){stop();_hide=setTimeout(slideOut,3000);return}}
-      draw(frame);
-    },Math.round(1000/SP2.FPS));
-  }
-  window.triggerFugazi=play;
-  window.addEventListener('resize',()=>{if(_running)sizeCanvas()});
-})();
-
-// ── SPRITE_WALK.PNG — TRACKER ──
-(function() {
-  const SW={FILE:'sprite_walk.png',COLS:4,ROWS:2,TOTAL:8,FPS:15};
-  let _loaded=false,_timer=null,_raf=null,_running=false,_fw=1,_fh=1;
-  const _img=new Image();
-  _img.onload=()=>{_fw=_img.naturalWidth/SW.COLS;_fh=_img.naturalHeight/SW.ROWS;_loaded=true};
-  _img.onerror=()=>console.warn('[Walk] não encontrado');
-  _img.src=SW.FILE;
-  function getEl(){return document.getElementById('walk-sprite')}
-  function applyFrame(fi){
-    const el=getEl(); if(!el||!_loaded) return;
-    const dW=el.offsetWidth||140,dH=el.offsetHeight||140;
-    const sX=dW/_fw,sY=dH/_fh,col=fi%SW.COLS,row=Math.floor(fi/SW.COLS);
-    el.style.backgroundSize=(SW.COLS*_fw*sX)+'px '+(SW.ROWS*_fh*sY)+'px';
-    el.style.backgroundPosition=(-col*_fw*sX)+'px '+(-row*_fh*sY)+'px';
-  }
-  function stop(){if(_timer){clearInterval(_timer);_timer=null}if(_raf){cancelAnimationFrame(_raf);_raf=null}_running=false}
-  function play(){
-    if(_running)return; if(!_loaded){setTimeout(play,300);return}
-    const el=getEl(); if(!el) return;
-    const totalW=window.innerWidth+200; let posX=-160;
-    const speed=Math.ceil(totalW/240); let frame=0;
-    el.style.right='auto'; el.style.left=posX+'px'; el.style.visibility='visible';
-    _running=true; applyFrame(0);
-    _timer=setInterval(()=>{frame=(frame+1)%SW.TOTAL;applyFrame(frame)},Math.round(1000/SW.FPS));
-    function andar(){posX+=speed;el.style.left=posX+'px';if(posX<window.innerWidth+10){_raf=requestAnimationFrame(andar)}else{stop();el.style.visibility='hidden';el.style.left='-160px'}}
-    _raf=requestAnimationFrame(andar);
-  }
-  window.triggerWalkSprite=play;
-  window.addEventListener('resize',()=>{if(!_running){const el=getEl();if(el)el.style.left='-160px'}});
-})();
-
-// ═══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  loadingProgress(5, 'INICIALIZANDO...');
-  initCamera();
-  pulseMonitors();
-
-  // Loading animation
-  setTimeout(() => loadingProgress(40, 'CONECTANDO API...'), 200);
-  setTimeout(() => loadingProgress(70, 'CARREGANDO DADOS...'), 600);
-
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  lprog(10,'INICIALIZANDO...');
+  setTimeout(()=>lprog(40,'CARREGANDO SPRITES...'),200);
+  // Adiciona listeners nas salas para abrir panel
+  ['mrs','apgar','tracker'].forEach(r=>{
+    document.getElementById('room-'+r).addEventListener('click',()=>openPanel(r));
+  });
+  initChar();
+  charAI();
   atualizarDados();
 });
 </script>
