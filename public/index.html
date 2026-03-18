@@ -888,6 +888,8 @@ function setRows(id, rows) {
 
 function updateScreens(d) {
   const s = d.sinaisHoje || [], p = d.proximosCruzar || [], tm = d.topMRS || [];
+  d.reversaoMRS = d.reversaoMRS || [];
+  console.log('[updateScreens] sinaisHoje:', s.length, '| compras:', s.filter(x=>x.tipo==='COMPRA').length, '| proximos:', p.length);
   const ap = d.apgar || {}, acoes = ap.acoes || [];
 
   // SC1: Compras
@@ -1243,6 +1245,12 @@ const DEMO = {
   ],
   topRSVConsistente: [{ ticker: 'VALE3', mrs: 3.2, rsv: 28.0, preco: 79.2, dias_rsv_positivo: 15 }],
   topRSVFraco: [{ ticker: 'MGLU3', mrs: -4.1, rsv: -32.0, preco: 8.2, dias_rsv_negativo: 12 }],
+  reversaoMRS: [{ ticker: 'SBSP3', mrs: -4.2, cruzamentos: 4, preco: 88.5 }],
+  sinaisCompraHoje: [
+    { ticker: 'CURY3', tipo: 'MRS',     preco: 22.1 },
+    { ticker: 'PETR4', tipo: 'VCP',     preco: 38.5 },
+    { ticker: 'SBSP3', tipo: 'REVERSAO',preco: 88.5 },
+  ],
   apgar: {
     resumo: { forte: 2, positivo: 5, neutro: 18, fraco: 55 },
     acoes: [
@@ -1263,6 +1271,7 @@ async function atualizarDados(t = 1, m = 3) {
     if (r.status === 404) throw new Error('API 404');
     if (!r.ok) throw new Error('Erro ' + r.status);
     const d = await r.json();
+    console.log('[API] Resposta crua:', JSON.stringify(d).slice(0, 500));
     if (d.error && d.retry) {
       document.getElementById('updT').innerHTML = '<span style="color:orange">⏳ ' + d.error + '</span>';
       if (t < m) setTimeout(() => atualizarDados(t + 1, m), 10000);
@@ -1280,10 +1289,27 @@ function onLoad(d) {
   _dados = d;
   lprog(100, 'ONLINE');
   document.getElementById('updT').textContent = d._demo ? '⚠ DEMO' : (d.lastUpdate || '—');
+  // Debug: loga estrutura dos dados recebidos
+  console.log('[Screener] Dados recebidos:', {
+    demo: d._demo,
+    sinaisHoje: (d.sinaisHoje||[]).length,
+    proximosCruzar: (d.proximosCruzar||[]).length,
+    sinaisCompraHoje: (d.sinaisCompraHoje||[]).length,
+    reversaoMRS: (d.reversaoMRS||[]).length,
+    apgarAcoes: (d.apgar?.acoes||[]).length,
+    erro: d.error || null,
+  });
+  if (d.error) console.warn('[Screener] Erro da API:', d.error);
   if (!d._demo) { autoVCP(d); atualizaPrecos(d); }
-  // Dispara twin para sinais de compra
+  // Dispara twin para sinais de compra (aguarda sprites carregarem)
   const compraSignals = (d.sinaisCompraHoje || []);
-  if (compraSignals.length > 0) queueCompraSignals(compraSignals);
+  if (compraSignals.length > 0) {
+    const tryQueue = () => {
+      if (_allLoaded) queueCompraSignals(compraSignals);
+      else setTimeout(tryQueue, 500);
+    };
+    setTimeout(tryQueue, 800); // pequeno delay para UI estabilizar
+  }
   updateScreens(d);
   if (document.getElementById('panel').classList.contains('open')) renderPanel(_room);
   playSound('ambient');
