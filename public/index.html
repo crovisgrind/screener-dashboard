@@ -284,6 +284,34 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
 #panel-tab-dot{width:6px;height:6px;border-radius:50%;background:var(--g);
   animation:ptdot 2s ease-in-out infinite}
 @keyframes ptdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* ── SPRITE TWIN (sinal de compra) ── */
+#sprite-twin{
+  position:fixed;z-index:248;pointer-events:none;
+  image-rendering:pixelated;bottom:46px;
+  display:none;
+}
+#twin-balloon{
+  position:fixed;z-index:249;pointer-events:none;
+  display:none;flex-direction:column;align-items:center;
+}
+.twin-bln{
+  background:#fff;border:3px solid #222;border-radius:18px;
+  padding:8px 14px;max-width:260px;min-width:120px;
+  box-shadow:3px 3px 0 #222;position:relative;
+}
+.twin-bln::after{
+  content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
+  border:8px solid transparent;border-top:10px solid #222;
+}
+.twin-bln::before{
+  content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-top:9px solid #fff;z-index:1;
+}
+.twin-bln-text{
+  font-family:'Bangers',cursive;font-size:clamp(11px,2vw,17px);color:#222;
+  letter-spacing:1px;text-align:center;line-height:1.25;
+}
 </style>
 </head>
 <body>
@@ -514,6 +542,12 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
 </div><!-- /world -->
 </div><!-- /stage -->
 
+
+<!-- SPRITE TWIN (sinal de compra) -->
+<canvas id="sprite-twin" width="200" height="200"></canvas>
+<div id="twin-balloon">
+  <div class="twin-bln"><div class="twin-bln-text" id="twin-text">YOLO</div></div>
+</div>
 <!-- SPRITE CANVAS -->
 <canvas id="sprite-cv" width="200" height="200"></canvas>
 
@@ -874,11 +908,16 @@ function updateScreens(d) {
     [(i + 1) + '. ' + x.ticker, (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(2) + '%', '']
   ));
 
-  // SC4: VCP Signal
+  // SC4: VCP Signal + Reversão MRS
   const vcps = acoes.filter(a => a.score >= 5 && a.score <= 8 && a.scores?.breakout === 2 && a.mrs > 0 && a.rsv > 0);
-  setRows('sc4-rows', vcps.length
-    ? vcps.slice(0, 6).map(x => [x.ticker, x.score + '/10', 'B=2'])
-    : [['SEM SINAL', 'VCP hoje', '']]
+  const revs = d.reversaoMRS || [];
+  const sc4data = [
+    ...vcps.slice(0, 4).map(x => [x.ticker, x.score + '/10', 'VCP']),
+    ...revs.slice(0, 3).map(x => [x.ticker, x.mrs.toFixed(1) + '%', '🔁']),
+  ];
+  setRows('sc4-rows', sc4data.length
+    ? sc4data
+    : [['SEM SINAL', 'hoje', '']]
   );
 
   // SC5: Forte
@@ -1242,6 +1281,9 @@ function onLoad(d) {
   lprog(100, 'ONLINE');
   document.getElementById('updT').textContent = d._demo ? '⚠ DEMO' : (d.lastUpdate || '—');
   if (!d._demo) { autoVCP(d); atualizaPrecos(d); }
+  // Dispara twin para sinais de compra
+  const compraSignals = (d.sinaisCompraHoje || []);
+  if (compraSignals.length > 0) queueCompraSignals(compraSignals);
   updateScreens(d);
   if (document.getElementById('panel').classList.contains('open')) renderPanel(_room);
   playSound('ambient');
@@ -1273,11 +1315,150 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initChar();
   charAI();
+  initTwin();
   atualizarDados();
 });
 function initChar() {
   const stW = document.getElementById('stage').offsetWidth;
   CHAR.x = stW * 0.35; CHAR.vx = 1.4; CHAR.dir = 1;
+}
+
+// ══════════════════════════════════════════════
+// SPRITE TWIN — aparece em sinais de compra
+// ══════════════════════════════════════════════
+const COMPRA_FRASES = [
+  '{t} YOLO. Full send.',
+  '{t} All in. No regrets.',
+  '{t} Doubling down. Obviously.',
+  '{t} Backing the truck up.',
+  'Max allocation in {t}. Trust me.',
+  '{t} is the one. I feel it.',
+];
+
+function pickCompraFrase(ticker) {
+  const f = COMPRA_FRASES[Math.floor(Math.random() * COMPRA_FRASES.length)];
+  return f.replace(/\{t\}/g, ticker);
+}
+
+const TWIN = {
+  x: 0, vx: 2.2, dir: 1,
+  frame: 0, frameTick: 0,
+  running: false,
+  balloonTimer: null,
+  queue: [],
+  processing: false,
+};
+let _twinCv = null, _twinCtx = null;
+
+function initTwin() {
+  _twinCv  = document.getElementById('sprite-twin');
+  _twinCtx = _twinCv ? _twinCv.getContext('2d') : null;
+}
+
+function twinLoop() {
+  if (!TWIN.running || !_twinCv || !_twinCtx || !_allLoaded) return;
+  const sp = SP['walk'];
+  TWIN.frameTick += 16;
+  if (TWIN.frameTick >= Math.round(1000 / sp.fps)) {
+    TWIN.frameTick = 0;
+    TWIN.frame = (TWIN.frame + 1) % sp.total;
+  }
+
+  TWIN.x += TWIN.vx;
+  const stW = document.getElementById('stage').offsetWidth;
+  const panelOpen = document.getElementById('panel').classList.contains('open');
+  const maxX = stW - (panelOpen ? 300 : 0) - 200;
+  if (TWIN.x < 0)    { TWIN.x = 0;    TWIN.vx =  Math.abs(TWIN.vx); TWIN.dir =  1; }
+  if (TWIN.x > maxX) { TWIN.x = maxX; TWIN.vx = -Math.abs(TWIN.vx); TWIN.dir = -1; }
+
+  const stH = document.getElementById('stage').offsetHeight;
+  const floorH = Math.round(stH * 0.15);
+  const groundY = 46 + stH - floorH - 200;
+  _twinCv.style.left = TWIN.x + 'px';
+  _twinCv.style.top  = groundY + 'px';
+  _twinCv.width = 200; _twinCv.height = 200;
+
+  _twinCtx.clearRect(0, 0, 200, 200);
+  const img = _imgs['walk'];
+  if (img && _loaded['walk'] && img.naturalWidth > 0) {
+    const fw = img.naturalWidth / sp.cols;
+    const fh = img.naturalHeight / sp.rows;
+    const col = TWIN.frame % sp.cols;
+    const row = Math.floor(TWIN.frame / sp.cols);
+    _twinCtx.save();
+    if (TWIN.dir === -1) { _twinCtx.translate(200, 0); _twinCtx.scale(-1, 1); }
+    _twinCtx.drawImage(img, col * fw, row * fh, fw, fh, 0, 0, 200, 200);
+    _twinCtx.restore();
+  }
+
+  // Posiciona balão acima do twin
+  const tb = document.getElementById('twin-balloon');
+  if (tb && tb.style.display !== 'none') {
+    const bW = tb.offsetWidth || 200;
+    const bH = tb.offsetHeight || 70;
+    let bx = TWIN.x + 100 - bW / 2;
+    bx = Math.max(4, Math.min(bx, stW - bW - 4));
+    tb.style.left = bx + 'px';
+    tb.style.top  = (groundY - bH - 12) + 'px';
+  }
+
+  requestAnimationFrame(twinLoop);
+}
+
+function showTwin(ticker) {
+  if (!_allLoaded) return;
+  TWIN.running = true;
+  TWIN.frame = 0; TWIN.frameTick = 0;
+
+  // Começa do lado oposto do sprite principal
+  const stW = document.getElementById('stage').offsetWidth;
+  TWIN.x   = CHAR.x > stW / 2 ? 20 : stW - 240;
+  TWIN.vx  = TWIN.x < stW / 2 ? 2.2 : -2.2;
+  TWIN.dir = TWIN.vx > 0 ? 1 : -1;
+
+  if (_twinCv) _twinCv.style.display = 'block';
+
+  const tb = document.getElementById('twin-balloon');
+  const tt = document.getElementById('twin-text');
+  if (tb && tt) {
+    tt.textContent = pickCompraFrase(ticker);
+    tb.style.display = 'flex';
+  }
+
+  if (TWIN.balloonTimer) clearTimeout(TWIN.balloonTimer);
+  TWIN.balloonTimer = setTimeout(() => {
+    hideTwin();
+    setTimeout(processQueue, 800);
+  }, 6000);
+
+  requestAnimationFrame(twinLoop);
+}
+
+function hideTwin() {
+  TWIN.running = false;
+  if (_twinCv) _twinCv.style.display = 'none';
+  const tb = document.getElementById('twin-balloon');
+  if (tb) tb.style.display = 'none';
+  TWIN.processing = false;
+}
+
+function processQueue() {
+  if (TWIN.queue.length === 0) { TWIN.processing = false; return; }
+  TWIN.processing = true;
+  const ticker = TWIN.queue.shift();
+  showTwin(ticker);
+}
+
+function queueCompraSignals(sinais) {
+  if (!sinais || !sinais.length) return;
+  const existing = new Set(TWIN.queue);
+  sinais.forEach(s => {
+    if (s.ticker && !existing.has(s.ticker)) {
+      TWIN.queue.push(s.ticker);
+      existing.add(s.ticker);
+    }
+  });
+  if (!TWIN.processing) processQueue();
 }
 </script>
 </body>

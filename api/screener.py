@@ -27,6 +27,20 @@ ACOES_PRINCIPAIS = [
 ]
 
 # ── Parâmetros ────────────────────────────────────────────
+
+# ── Whitelist Reversão MRS ────────────────────────────────────────
+# Ações que historicamente revertem quando MRS entre -4% e -5%
+# (derivada de backtests v1, v2, v3 — PF 6.32 no TS10d)
+REVERSAO_WHITELIST = {
+    "BPAC11","CPLE3","CSMG3","CURY3","EGIE3",
+    "ITUB4","LWSA3","NEOE3","PETR4","PSSA3",
+    "RENT3","SBSP3","SLCE3","TOTS3",
+}
+REVERSAO_OSCIL_WIN = 30
+REVERSAO_MIN_CRUZ  = 3
+REVERSAO_MRS_MIN   = -5.0   # %
+REVERSAO_MRS_MAX   = -4.0   # %
+
 LENGTH           = 200
 MA_FAST          = 50
 MA_MED           = 150
@@ -39,6 +53,16 @@ BREAKOUT_JANELA  = 10
 _cache = {'data': None, 'data_proc': None, 'processando': False}
 
 def data_pregao():
+    # ── Sinais VCP (APGAR) ──────────────────────────────────
+    vcp_sinais = [
+        {'ticker': a['ticker'], 'tipo': 'VCP', 'preco': a['preco']}
+        for a in apgar_lista
+        if 5 <= a['score'] <= 8
+        and a['scores'].get('breakout') == 2
+        and a['mrs'] > 0
+        and a['rsv'] > 0
+    ]
+
     agora_br = datetime.utcnow() - timedelta(hours=3)
     if agora_br.time() < time(18, 30):
         return (agora_br - timedelta(days=1)).date()
@@ -182,6 +206,23 @@ def calcular_tudo(ticker, df, bova_df):
                 sinais.append({'tipo': 'RECUPERACAO', 'emoji': '🔼',
                                'dias_subindo': janela, 'dias_rsv_positivo': dias_rsv_pos, 'quebras': quebras})
 
+        # ── Sinal REVERSAO MRS (whitelist) ───────────────────────
+        tk_base = ticker.replace('.SA', '')
+        if tk_base in REVERSAO_WHITELIST and REVERSAO_MRS_MIN <= mrs_h <= REVERSAO_MRS_MAX:
+            mrs_win = mrs.iloc[-REVERSAO_OSCIL_WIN:].dropna().values
+            if len(mrs_win) >= 4:
+                cruzamentos = sum(
+                    1 for j in range(len(mrs_win) - 1)
+                    if (mrs_win[j] > 0) != (mrs_win[j+1] > 0)
+                )
+                if cruzamentos >= REVERSAO_MIN_CRUZ:
+                    sinais.append({
+                        'tipo':         'REVERSAO_MRS',
+                        'emoji':        '🔁',
+                        'mrs':          round(mrs_h, 2),
+                        'cruzamentos':  cruzamentos,
+                    })
+
         # ── Score APGAR ──────────────────────────────────
         scores = {}
 
@@ -273,7 +314,7 @@ def processar_screener():
             todas.append(res)
 
     # ── MRS/RSV: monta listas de sinais ──────────────────
-    sinais_hoje, proximos, recentes, recuperacoes = [], [], [], []
+    sinais_hoje, proximos, recentes, recuperacoes, reversao_mrs = [], [], [], [], []
     for a in todas:
         base = {k: a[k] for k in ['ticker','mrs','rsv','preco',
                                     'dias_rsv_positivo','dias_rsv_negativo',
@@ -296,6 +337,10 @@ def processar_screener():
                 item['dias_rsv_positivo'] = s['dias_rsv_positivo']
                 item['quebras']           = s['quebras']
                 recuperacoes.append(item)
+            elif s['tipo'] == 'REVERSAO_MRS':
+                item['mrs']        = s['mrs']
+                item['cruzamentos']= s['cruzamentos']
+                reversao_mrs.append(item)
 
     top_mrs = sorted(todas, key=lambda x: x['mrs'], reverse=True)[:10]
     top_rsv_pos = sorted([a for a in todas if a['dias_rsv_positivo'] > 0],
@@ -307,6 +352,16 @@ def processar_screener():
     # ── APGAR: ordenado por score ─────────────────────────
     apgar_lista = sorted(todas, key=lambda x: (x['score'], x['mrs']), reverse=True)
 
+    # ── Sinais VCP (APGAR) ──────────────────────────────────
+    vcp_sinais = [
+        {'ticker': a['ticker'], 'tipo': 'VCP', 'preco': a['preco']}
+        for a in apgar_lista
+        if 5 <= a['score'] <= 8
+        and a['scores'].get('breakout') == 2
+        and a['mrs'] > 0
+        and a['rsv'] > 0
+    ]
+
     agora_br = datetime.utcnow() - timedelta(hours=3)
     return {
         'lastUpdate': agora_br.strftime('%d/%m/%Y %H:%M:%S'),
@@ -314,6 +369,16 @@ def processar_screener():
         'totalAcoes': len(ACOES_PRINCIPAIS),
         # MRS/RSV
         'sinaisHoje':         sinais_hoje,
+        'sinaisCompraHoje':   [
+            {'ticker': s['ticker'], 'tipo': 'MRS',     'preco': s.get('preco')}
+            for s in sinais_hoje if s.get('tipo') == 'COMPRA'
+        ] + [
+            {'ticker': a['ticker'], 'tipo': 'VCP',     'preco': a.get('preco')}
+            for a in vcp_sinais
+        ] + [
+            {'ticker': r['ticker'], 'tipo': 'REVERSAO', 'preco': r.get('preco')}
+            for r in reversao_mrs
+        ],
         'proximosCruzar':     proximos,
         'cruzamentosRecentes':recentes,
         'recuperacoes':       recuperacoes,
@@ -330,6 +395,7 @@ def processar_screener():
                 'fraco':    sum(1 for a in apgar_lista if a['score'] < 5),
             }
         },
+        'reversaoMRS':        reversao_mrs,
         'cacheInfo': {'cached': False, 'dataProcessamento': data_pregao().isoformat()}
     }
 

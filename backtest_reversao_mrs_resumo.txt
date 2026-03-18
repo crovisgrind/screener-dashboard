@@ -1,0 +1,172 @@
+====================================================================
+  BACKTEST — REVERSÃO MRS · IBRX100
+  Entrada: MRS entre -4% e -5% + ≥3 cruzamentos 30d | TP +5%
+  Universo: IBRX100 · Período: 5 anos
+====================================================================
+
+  COMBO          N     Win%    RetMed   Mediana      PF       Exp     Dur   MaxStr
+  ────────────────────────────────────────────────────────────────────
+  TS5d         362    53.9%    -0.12%    +0.38%    0.93    -0.12%    4.5d        7
+  TS7d         335    55.8%    -0.18%    +0.70%    0.92    -0.18%    6.0d        9
+  TS10d        304    54.9%    -0.27%    +1.22%    0.89    -0.27%    8.1d        8
+
+  ──────────────────────────────────────────────────────────────────
+  DETALHE: TS5d
+  ──────────────────────────────────────────────────────────────────
+  Trades / Ações    : 362 / 85
+  Winrate           : 53.9%
+  Retorno médio     : -0.12%  (mediana +0.38%)
+  Ganho / Perda     : +3.26% / -4.08%
+  Profit factor     : 0.93
+  Expectancy        : -0.12%
+  Ret rel. BOVA11   : -0.39%
+  Duração média     : 4.5d
+  P25 / P75         : -2.6% / +4.2%
+  Max loss streak   : 7
+
+    Por motivo:
+    Motivo             N     Win%      RetMed     Dur
+    take_profit       80   100.0%      +5.00%    2.8d
+    time_stop        282    40.8%      -1.58%    5.0d
+
+    Por faixa MRS entrada:
+    MRS [-5.0%, -4.8%)  N= 66  Win=50.0%  Ret=+0.02%
+    MRS [-4.8%, -4.6%)  N= 81  Win=50.6%  Ret=-0.85%
+    MRS [-4.6%, -4.4%)  N= 79  Win=57.0%  Ret=+0.02%
+    MRS [-4.4%, -4.2%)  N= 53  Win=54.7%  Ret=+0.27%
+    MRS [-4.2%, -4.0%)  N= 83  Win=56.6%  Ret=+0.09%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+RENT3   3   100.00       4.06     2.22
+EGIE3   4   100.00       3.70     2.08
+LWSA3   6    83.33       3.45     1.33
+NEOE3   5    80.00       2.94     1.51
+SLCE3   5    80.00       2.54     0.22
+CURY3   4    75.00       2.53     1.51
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+CEAB3   4    50.00      -5.71    -5.42
+BBDC3   6    16.67      -3.54    -2.79
+HYPE3   6    16.67      -3.26    -3.72
+COGN3   5    40.00      -2.86    -1.72
+CMIN3   4     0.00      -2.71    -2.25
+
+    Distribuição retornos:
+         < −5%    51  █████
+      −5 a −2%    53  █████
+       −2 a 0%    63  ██████
+       0 a +2%    62  ██████
+      +2 a +5%   133  █████████████
+         > +5%     0  
+
+  ──────────────────────────────────────────────────────────────────
+  DETALHE: TS7d
+  ──────────────────────────────────────────────────────────────────
+  Trades / Ações    : 335 / 85
+  Winrate           : 55.8%
+  Retorno médio     : -0.18%  (mediana +0.70%)
+  Ganho / Perda     : +3.53% / -4.87%
+  Profit factor     : 0.92
+  Expectancy        : -0.18%
+  Ret rel. BOVA11   : -0.58%
+  Duração média     : 6.0d
+  P25 / P75         : -3.0% / +5.0%
+  Max loss streak   : 9
+
+    Por motivo:
+    Motivo             N     Win%      RetMed     Dur
+    take_profit       96   100.0%      +5.00%    3.5d
+    time_stop        239    38.1%      -2.26%    7.0d
+
+    Por faixa MRS entrada:
+    MRS [-5.0%, -4.8%)  N= 62  Win=54.8%  Ret=+0.07%
+    MRS [-4.8%, -4.6%)  N= 74  Win=52.7%  Ret=-1.09%
+    MRS [-4.6%, -4.4%)  N= 71  Win=60.6%  Ret=-0.06%
+    MRS [-4.4%, -4.2%)  N= 50  Win=58.0%  Ret=+0.33%
+    MRS [-4.2%, -4.0%)  N= 78  Win=53.8%  Ret=+0.05%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+RENT3   3    100.0       4.82     2.83
+CURY3   4    100.0       4.00     3.36
+SLCE3   5    100.0       3.60     1.30
+EGIE3   4     75.0       3.48     1.02
+SBSP3   3    100.0       3.25     0.11
+BPAC11  4     75.0       3.24     2.52
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+CEAB3   4    50.00      -7.27    -6.85
+HYPE3   5     0.00      -4.66    -4.62
+BBDC3   5    40.00      -3.73    -3.92
+B3SA3   5    40.00      -3.70    -3.03
+CYRE3   3    33.33      -3.44    -4.73
+
+    Distribuição retornos:
+         < −5%    53  █████
+      −5 a −2%    57  ██████
+       −2 a 0%    38  ████
+       0 a +2%    48  █████
+      +2 a +5%   139  ██████████████
+         > +5%     0  
+
+  ──────────────────────────────────────────────────────────────────
+  DETALHE: TS10d
+  ──────────────────────────────────────────────────────────────────
+  Trades / Ações    : 304 / 85
+  Winrate           : 54.9%
+  Retorno médio     : -0.27%  (mediana +1.22%)
+  Ganho / Perda     : +3.97% / -5.44%
+  Profit factor     : 0.89
+  Expectancy        : -0.27%
+  Ret rel. BOVA11   : -0.78%
+  Duração média     : 8.1d
+  P25 / P75         : -3.9% / +5.0%
+  Max loss streak   : 8
+
+    Por motivo:
+    Motivo             N     Win%      RetMed     Dur
+    take_profit      111   100.0%      +5.00%    4.8d
+    time_stop        193    29.0%      -3.30%   10.0d
+
+    Por faixa MRS entrada:
+    MRS [-5.0%, -4.8%)  N= 57  Win=56.1%  Ret=-0.07%
+    MRS [-4.8%, -4.6%)  N= 66  Win=45.5%  Ret=-1.49%
+    MRS [-4.6%, -4.4%)  N= 67  Win=56.7%  Ret=-0.31%
+    MRS [-4.4%, -4.2%)  N= 43  Win=58.1%  Ret=+0.13%
+    MRS [-4.2%, -4.0%)  N= 71  Win=59.2%  Ret=+0.48%
+
+    Top ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+BPAC11  3    100.0       5.00     3.94
+RENT3   3    100.0       5.00     2.82
+SBSP3   3    100.0       4.23     0.08
+EGIE3   4    100.0       3.97     1.16
+SLCE3   5     80.0       3.58     2.08
+TOTS3   5    100.0       3.53     2.03
+
+    Bottom ações (≥3 trades):
+        n  winrate  ret_medio  ret_rel
+ticker                                
+CEAB3   4     50.0      -7.04    -6.72
+HYPE3   4      0.0      -6.46    -6.10
+RECV3   3      0.0      -6.06    -4.35
+BBDC3   4      0.0      -5.82    -4.95
+CMIN3   3      0.0      -3.79    -5.06
+
+    Distribuição retornos:
+         < −5%    55  ██████
+      −5 a −2%    52  ██████
+       −2 a 0%    30  ███
+       0 a +2%    32  ███
+      +2 a +5%   135  ███████████████
+         > +5%     0  
+
+====================================================================
