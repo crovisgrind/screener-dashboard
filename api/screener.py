@@ -53,16 +53,6 @@ BREAKOUT_JANELA  = 10
 _cache = {'data': None, 'data_proc': None, 'processando': False}
 
 def data_pregao():
-    # ── Sinais VCP (APGAR) ──────────────────────────────────
-    vcp_sinais = [
-        {'ticker': a['ticker'], 'tipo': 'VCP', 'preco': a['preco']}
-        for a in apgar_lista
-        if 5 <= a['score'] <= 8
-        and a['scores'].get('breakout') == 2
-        and a['mrs'] > 0
-        and a['rsv'] > 0
-    ]
-
     agora_br = datetime.utcnow() - timedelta(hours=3)
     if agora_br.time() < time(18, 30):
         return (agora_br - timedelta(days=1)).date()
