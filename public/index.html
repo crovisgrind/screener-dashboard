@@ -346,9 +346,9 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
         <div class="window-glare"></div>
       </div>
 
-      <!-- 3 TELAS: COMPRA | PRÓXIMOS | TOP MRS -->
+      <!-- 4 TELAS: COMPRA | PRÓXIMOS | TOP MRS | REVERSÃO -->
       <!-- Tela 1: COMPRA -->
-      <div class="screen-wrap sc-green" style="left:18%;top:5%;width:22%">
+      <div class="screen-wrap sc-green" style="left:16%;top:5%;width:20%">
         <div class="led-strip led-g"></div>
         <div class="screen-frame">
           <div class="screen-bezel" style="height:160px">
@@ -363,7 +363,7 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
       </div>
 
       <!-- Tela 2: PRÓXIMOS -->
-      <div class="screen-wrap sc-yellow" style="left:42%;top:5%;width:22%">
+      <div class="screen-wrap sc-yellow" style="left:38%;top:5%;width:20%">
         <div class="led-strip led-y"></div>
         <div class="screen-frame">
           <div class="screen-bezel" style="height:160px">
@@ -378,13 +378,28 @@ html,body{height:100%;overflow:hidden;background:#1A1410;font-family:var(--mono)
       </div>
 
       <!-- Tela 3: TOP MRS -->
-      <div class="screen-wrap sc-blue" style="left:66%;top:5%;width:22%">
+      <div class="screen-wrap sc-blue" style="left:60%;top:5%;width:18%">
         <div class="led-strip led-b"></div>
         <div class="screen-frame">
           <div class="screen-bezel" style="height:160px">
             <div class="screen-content">
               <div class="screen-title">★ TOP MRS</div>
               <div id="sc3-rows">
+                <div class="screen-row"><span>—</span><span>—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tela 4: REVERSÃO MRS -->
+      <div class="screen-wrap sc-purple" style="left:80%;top:5%;width:18%">
+        <div class="led-strip led-p"></div>
+        <div class="screen-frame">
+          <div class="screen-bezel" style="height:160px">
+            <div class="screen-content">
+              <div class="screen-title">🔁 REVERSÃO</div>
+              <div id="sc-rev-rows">
                 <div class="screen-row"><span>—</span><span>—</span></div>
               </div>
             </div>
@@ -889,7 +904,6 @@ function setRows(id, rows) {
 function updateScreens(d) {
   const s = d.sinaisHoje || [], p = d.proximosCruzar || [], tm = d.topMRS || [];
   d.reversaoMRS = d.reversaoMRS || [];
-  console.log('[updateScreens] sinaisHoje:', s.length, '| compras:', s.filter(x=>x.tipo==='COMPRA').length, '| proximos:', p.length);
   const ap = d.apgar || {}, acoes = ap.acoes || [];
 
   // SC1: Compras
@@ -909,6 +923,12 @@ function updateScreens(d) {
   setRows('sc3-rows', tm.slice(0, 7).map((x, i) =>
     [(i + 1) + '. ' + x.ticker, (x.mrs >= 0 ? '+' : '') + x.mrs.toFixed(2) + '%', '']
   ));
+
+  // SC-REV: Reversão MRS (whitelist)
+  setRows('sc-rev-rows', d.reversaoMRS.length
+    ? d.reversaoMRS.slice(0, 7).map(x => [x.ticker, x.mrs.toFixed(1) + '%', '🔁'])
+    : [['WHITELIST', 'sem sinal', '']]
+  );
 
   // SC4: VCP Signal + Reversão MRS
   const vcps = acoes.filter(a => a.score >= 5 && a.score <= 8 && a.scores?.breakout === 2 && a.mrs > 0 && a.rsv > 0);
@@ -1018,11 +1038,26 @@ function panelMRS(d) {
   });
   const rec = d.recuperacoes || [];
   if (rec.length) {
-    h += sec('Viradas');
+    h += sec('Viradas em Andamento');
     rec.slice(0, 6).forEach(x => {
       h += '<div class="pr"><span class="ptk">' + x.ticker + '</span>';
       h += '<span class="pv" style="color:#7A3A9A">▲ ' + x.dias_subindo + 'd RSV ' + x.dias_rsv_positivo + 'd</span></div>';
     });
+  }
+  const revs = d.reversaoMRS || [];
+  if (revs.length) {
+    h += sec('🔁 Reversão MRS (whitelist)');
+    revs.forEach(x => {
+      h += '<div class="pr">';
+      h += '<span class="ptk">' + x.ticker + '</span>';
+      h += '<span class="ppl buy">REVERSÃO</span>';
+      h += '<span class="pv r">MRS ' + x.mrs.toFixed(1) + '%</span>';
+      h += '</div>';
+    });
+    h += '<div style="font-size:8px;color:var(--ui-mut);padding:4px 0">entrada amanhã · TP +5% · TS 7-10d</div>';
+  } else {
+    h += sec('🔁 Reversão MRS');
+    h += '<div class="pmt">Sem sinal na whitelist hoje</div>';
   }
   return h;
 }
@@ -1055,6 +1090,15 @@ function panelAPGAR(d) {
     h += '<div class="pv ' + (a.mrs >= 0 ? 'g' : 'r') + '" style="font-size:9px">' + (a.mrs >= 0 ? '+' : '') + a.mrs.toFixed(1) + '%</div></div></div>';
   });
   if (lista.length > 30) h += '<div class="pmt" style="font-size:8px">+' + (lista.length - 30) + ' mais</div>';
+  const revs2 = d.reversaoMRS || [];
+  if (revs2.length) {
+    h += sec('🔁 Reversão MRS (whitelist)');
+    revs2.forEach(x => {
+      h += '<div class="pr"><span class="ptk">' + x.ticker + '</span>';
+      h += '<span class="ppl buy">REVERSÃO</span>';
+      h += '<span class="pv r">MRS ' + x.mrs.toFixed(1) + '% · ' + x.cruzamentos + ' cruzes</span></div>';
+    });
+  }
   return h;
 }
 
@@ -1289,17 +1333,6 @@ function onLoad(d) {
   _dados = d;
   lprog(100, 'ONLINE');
   document.getElementById('updT').textContent = d._demo ? '⚠ DEMO' : (d.lastUpdate || '—');
-  // Debug: loga estrutura dos dados recebidos
-  console.log('[Screener] Dados recebidos:', {
-    demo: d._demo,
-    sinaisHoje: (d.sinaisHoje||[]).length,
-    proximosCruzar: (d.proximosCruzar||[]).length,
-    sinaisCompraHoje: (d.sinaisCompraHoje||[]).length,
-    reversaoMRS: (d.reversaoMRS||[]).length,
-    apgarAcoes: (d.apgar?.acoes||[]).length,
-    erro: d.error || null,
-  });
-  if (d.error) console.warn('[Screener] Erro da API:', d.error);
   if (!d._demo) { autoVCP(d); atualizaPrecos(d); }
   // Dispara twin para sinais de compra (aguarda sprites carregarem)
   const compraSignals = (d.sinaisCompraHoje || []);
